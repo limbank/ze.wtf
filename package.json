@@ -18,6 +18,7 @@
     "express-validator": "^6.6.1",
     "flakeid": "^1.0.0",
     "log-symbols": "^4.0.0",
+    "moment": "^2.27.0",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "passport": "^0.4.1",
