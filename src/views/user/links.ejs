@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+
+<head>
+    <%- include('../elements/imports', { title: 'ZE.WTF - Home', theme, user }); %>
+</head>
+
+<body class="bg-medium">
+
+    <%- include('../elements/nav', { path: 'home' }) %>
+
+    <div class="container flex-grow">
+        <div class="h-100 pt-3 pb-3">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="list-group mb-3">
+                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action active">
+                          Created links
+                        </a>
+                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">API access</a>
+                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Settings</a>
+                    </div>
+                    <h5 class="mb-3 text-dark">Premium options</h5>
+                    <div class="list-group mb-3">
+                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Payment area</a>
+                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Statistics</a>
+                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Domains</a>
+                    </div>
+                    <h5 class="mb-3 text-dark">Admin tools</h5>
+                    <div class="list-group mb-3">
+                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Recent links</a>
+                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Recent users</a>
+                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Site stats</a>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="card align-self-center bg-light">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title text-dark d-inline-flex mb-0">Links</h5>
+                                <form class="form-inline">
+                                    <label class="my-1 mr-2 text-dark">Show</label>
+                                    <select class="custom-select m-0 text-dark border-light bg-light" id="inlineFormCustomSelectPref">
+                                      <option value="5" selected>5</option>
+                                      <option value="10">10</option>
+                                      <option value="20">20</option>
+                                      <option value="30">30</option>
+                                    </select>
+                                </form>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped table-light table-bordered">
+                                    <thead>
+                                      <tr>
+                                        <th class="pointer">Original</th>
+                                        <th class="pointer">Created</th>
+                                        <th class="pointer">Short</th>
+                                        <th class="pointer">Visits</th>
+                                        <th width="125px">&nbsp;</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td><a class="original_link text-primary" target="_blank" href="https://google.com">https://google.com</a></td>
+                                        <td>9/6/2020</td>
+                                        <td><a class="short_link text-primary" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
+                                        <td>11</td>
+                                        <td>
+                                            <a class="btn btn-success" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-danger" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="far fa-trash-alt"></i></a>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td><a class="original_link text-primary" target="_blank" href="https://google.com">https://google.com</a></td>
+                                        <td>9/6/2020</td>
+                                        <td><a class="short_link text-primary" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
+                                        <td>21</td>
+                                        <td>
+                                            <a class="btn btn-success" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-danger" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="far fa-trash-alt"></i></a>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td><a class="original_link text-primary" target="_blank" href="https://google.com">https://google.com</a></td>
+                                        <td>9/6/2020</td>
+                                        <td><a class="short_link text-primary" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
+                                        <td>138</td>
+                                        <td>
+                                            <a class="btn btn-success" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-danger" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="far fa-trash-alt"></i></a>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td><a class="original_link text-primary" target="_blank" href="https://google.com">https://google.com</a></td>
+                                        <td>9/6/2020</td>
+                                        <td><a class="short_link text-primary" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
+                                        <td>2</td>
+                                        <td>
+                                            <a class="btn btn-success" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-danger" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="far fa-trash-alt"></i></a>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td><a class="original_link text-primary" target="_blank" href="https://google.com">https://google.com</a></td>
+                                        <td>9/6/2020</td>
+                                        <td><a class="short_link text-primary" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
+                                        <td>0</td>
+                                        <td>
+                                            <a class="btn btn-success" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-danger" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="far fa-trash-alt"></i></a>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                            </div>
+
+                            <div class="btn-toolbar d-flex justify-content-center">
+                                <div class="btn-group" role="group">
+                                  <button type="button" class="btn btn-light">1</button>
+                                  <button type="button" class="btn btn-light">2</button>
+                                  <button type="button" class="btn btn-light">3</button>
+                                  <button type="button" class="btn btn-light">4</button>
+                                  <button type="button" class="btn btn-light">Next</button>
+                                  <button type="button" class="btn btn-light">Last</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../elements/footer', { theme }) %>
+
+</body>
+
+</html>
+
+
+
+
+<!-- When you code this properly please make one of them buttons that toggles showing your password because that is cool -->
+
+<!--
+<form action="/auth/login" method="POST">
+    <input type="text" name="username" placeholder="Username or Email"/><br>
+    <input type="password" name="password" placeholder="Password" /><br>
+    <button type="submit">Login</button>
+</form>
+-->
