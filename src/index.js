@@ -140,6 +140,10 @@ server.use((req, res, next) => {
             subtitle: opt.subtitle ? opt.subtitle : undefined
         });
     };
+    res.frender = (file, opt = {}) => {
+        console.log({ ...opt, theme: req.theme, user: req.user })
+        return res.render(file, { ...opt, theme: req.theme, user: req.user });
+    };
     next();
 });
 
