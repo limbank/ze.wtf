@@ -1,10 +1,10 @@
 const { Router } = require('express');
 const router = Router();
-const passport = require('passport');
+const { authenticate } = require('passport');
 const { body, validationResult } = require('express-validator');
-const bodyParser = require('body-parser');
+const { urlencoded } = require('body-parser');
 const FlakeId = require('flakeid');
-const bcrypt = require('bcrypt');
+const { hash } = require('bcrypt');
 
 const flake = new FlakeId({ timeOffset : (2013-1970)*31536000*1000 });  
 
@@ -17,7 +17,7 @@ module.exports = (connection) => {
         });
     });
 
-    router.use(bodyParser.urlencoded({ extended: false }));
+    router.use(urlencoded({ extended: false }));
     
     router.get('/login', (req, res, next) => req.isAuthenticated() ? res.redirect('/user') : next(), (req, res) => res.frender('login'));
     router.get('/signup', (req, res, next) => req.isAuthenticated() ? res.redirect('/user') : next(), (req, res) => res.frender('signup'));
@@ -57,7 +57,7 @@ module.exports = (connection) => {
         if (errors.length > 0) {
             res.errorRedir('error', errors[0].msg, '/auth/signup');
         } else {
-            bcrypt.hash(req.body.password, 10, function(error, hash) {
+            hash(req.body.password, 10, function(error, hash) {
                 if (error) return res.errorRedir('error', 'Error in signing up. Please try again', '/auth/signup');
                 connection.query('INSERT INTO users (username, user_id, password, email, joined_timestamp) VALUES (?, ?, ?, ?, ?)', [req.body.username, flake.gen(), hash, req.body.email, Date.now()], error => {
                     if (error) return res.errorRedir('error', 'Error in signing up. Please try again', '/auth/signup');
