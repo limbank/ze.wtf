@@ -1,1 +1,112 @@
-coming soon
+<!DOCTYPE html>
+<html lang="en-GB">
+
+<head>
+    <%- include('elements/imports', { title: 'ZE.WTF - Home', theme, user }); %>
+</head>
+
+<body class="bg-medium">
+
+    <%- include('elements/nav', { path: 'home' }) %>
+
+    <div class="container flex-grow">
+        <div class="h-100 pt-3 pb-3">
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="card align-self-center bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4 text-dark">Our contacts</h5>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text text-dark border-light bg-light"><i class="fas fa-at"></i></div>
+                                    </div>
+                                    <input type="email" id="contact_email" class="form-control text-dark border-light bg-light" value="Our E-mail" readonly>
+                                    <div class="input-group-append pointer copy_append_js" data-target="#contact_email" data-toggle="tooltip" data-placement="top" title="Copy our E-mail">
+                                        <div class="input-group-text text-dark border-light bg-light"><i class="far fa-clipboard"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text text-dark border-light bg-light"><i class="fab fa-discord"></i></div>
+                                    </div>
+                                    <input type="email" id="contact_discord" class="form-control text-dark border-light bg-light" value="Our Discord server" readonly>
+                                    <div class="input-group-append pointer copy_append_js" data-target="#contact_discord" data-toggle="tooltip" data-placement="top" title="Copy our Discord link">
+                                        <div class="input-group-text text-dark border-light bg-light"><i class="far fa-clipboard"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="card align-self-center bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4 text-dark">Send us a message</h5>
+
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text text-dark border-light bg-light"><i class="fas fa-user"></i></div>
+                                                </div>
+                                                <input type="text" class="form-control text-dark border-light bg-light" placeholder="Name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text text-dark border-light bg-light"><i class="fas fa-at"></i></div>
+                                                </div>
+                                                <input type="email" class="form-control text-dark border-light bg-light" placeholder="E-mail">
+                                            </div>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text text-dark border-light bg-light"><i class="fas fa-envelope"></i></div>
+                                        </div>
+                                        <textarea class="form-control text-dark border-light bg-light" placeholder="Your message"></textarea>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <div class="d-inline-flex align-items-center justify-content-center"><!-- captcha block --></div>
+                                    <div class="d-inline-flex align-items-center justify-content-center">
+                                        <button type="submit" class="btn btn-primary">Lets go</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('elements/footer', { theme }) %>
+
+</body>
+
+</html>
+
+
+
+
+<!-- When you code this properly please make one of them buttons that toggles showing your password because that is cool -->
+
+<!--
+<form action="/auth/login" method="POST">
+    <input type="text" name="username" placeholder="Username or Email"/><br>
+    <input type="password" name="password" placeholder="Password" /><br>
+    <button type="submit">Login</button>
+</form>
+-->
