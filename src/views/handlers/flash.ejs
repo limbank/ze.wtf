@@ -1,0 +1,10 @@
+<% flash.forEach(message => { %>
+    <script>
+        $(document).ready(function(){
+            VanillaToasts.create({
+                text: "<%= message.message %>",
+                type: "<%= message.type %>"
+            })
+        });
+    </script>
+<% }); %>
