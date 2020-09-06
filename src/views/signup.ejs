@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+    <head>
+        <%- include('elements/imports', { title: 'ZE.WTF - Home', theme, user }); %>
+    </head>
+    <body class="bg-medium">
+
+        <%- include('elements/nav', { path: 'home' }) %>
+
+        <div class="container flex-grow">
+            <div class="d-flex h-100 justify-content-center align-items-center flex-column pt-3 pb-3">
+                <% if (flash[0]) { %>
+                    <div class="alert alert-danger mb-3 text-center" role="alert" style="width: 28rem;">
+                        <span><%= flash[0].message %></span>
+                    </div>
+                <% }; %>
+                <div class="card align-self-center bg-light" style="width: 28rem;">
+                    <div class="card-body">
+                        <p class="card-text text-center text-dark">Register</p>
+                        <form action="/auth/signup" method="POST">
+                            <div class="form-group">
+                                <input name="username" type="text" class="form-control text-dark border-light bg-light" placeholder="Username">
+                            </div>
+                            <div class="form-group">
+                                <input name="email" type="email" class="form-control text-dark border-light bg-light" placeholder="E-mail">
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input name="password" type="password" class="form-control text-dark border-light bg-light" placeholder="Password">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text show_pass_js pointer text-dark border-light bg-light"><i class="far fa-eye"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input name="passwordconfirm" type="password" class="form-control text-dark border-light bg-light" placeholder="Confirm password">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text show_pass_js pointer text-dark border-light bg-light"><i class="far fa-eye"></i></span>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-center align-items-center mb-3"><!-- captcha here --></div>
+
+                            <button type="submit" class="btn btn-primary btn-block mb-3">Lets go</button>
+
+                            <div class="text-center"><a href="/auth/login" class="text-primary">Already registered?</a></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- include('elements/footer', { theme }) %>
+    </body>
+</html>
