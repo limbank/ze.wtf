@@ -1,0 +1,35 @@
+{
+  "name": "ze.wtf",
+  "version": "0.0.0-alpha.1",
+  "description": "URL shortening done right",
+  "main": "src/index.js",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "express-rate-limit": "^5.1.3",
+    "express-session": "^1.17.1",
+    "log-symbols": "^4.0.0",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atomic-addison/ze.wtf.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atomic-addison/ze.wtf/issues"
+  },
+  "homepage": "https://github.com/atomic-addison/ze.wtf#readme"
+}
