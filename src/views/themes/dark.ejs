@@ -1,6 +1,6 @@
 <style>
     .text-primary{
-        
+        color: #4eacff !important;
     }
     .text-secondary{
         
@@ -21,7 +21,7 @@
     
     }
     .text-dark{
-        color: #f8f9fa !important;
+        color: #ddd !important;
     }
     .text-muted{
     
@@ -31,7 +31,7 @@
     }
     a.text-primary:focus,
     a.text-primary:hover{
-    
+        color: #2f9dff !important;
     }
     a.text-secondary:focus,
     a.text-secondary:hover{
@@ -70,7 +70,7 @@
 
     }
     .bg-primary{
-    
+        background-color: #2f9dff !important;
     }
     .bg-secondary{
     
@@ -102,5 +102,81 @@
 
     .border-light{
         border-color:#24272b !important;
+    }
+    
+
+    input.text-dark::-webkit-input-placeholder {
+        color: #ADB3B8;
+    }
+
+    input.text-dark:-ms-input-placeholder {
+        color: #ADB3B8;
+    }
+
+    input.text-dark::placeholder {
+        color: #ADB3B8;
+    }
+    textarea.text-dark::-webkit-input-placeholder {
+        color: #ADB3B8;
+    }
+
+    textarea.text-dark:-ms-input-placeholder {
+        color: #ADB3B8;
+    }
+
+    textarea.text-dark::placeholder {
+        color: #ADB3B8;
+    }
+
+    a.bg-light:focus,
+    a.bg-light:hover,
+    button.bg-light:focus,
+    button.bg-light:hover {
+        background-color: #262a2f !important;
+    }
+
+    .list-group-item.active {
+        color: #fff !important;
+        background-color: #007bff !important;
+        border-color: #007bff !important;
+    }
+
+    .table-light {
+        color: #ddd;
+        background-color: #343a40;
+    }
+
+    .table-light th,
+    .table-light td,
+    .table-light thead th {
+        border-color: #454d55;
+    }
+
+    .table-light.table-bordered {
+        border: 0;
+    }
+
+    .table-light.table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .table-light.table-hover tbody tr:hover {
+        color: #ddd;
+        background-color: rgba(255, 255, 255, 0.075);
+    }
+    
+    .btn-light  {
+        color: #ddd;
+        background-color: #30363c;
+        border-color: #272b2f;
+    }
+    .btn-light:hover {
+        color: #c8c8c8;
+        background-color: #292e33;
+        border-color: #272b2f;
+    }
+
+    .custom-select.bg-light{
+        background: #343a40 url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='white' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right .75rem center/8px 10px !important;
     }
 </style>
