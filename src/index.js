@@ -39,47 +39,13 @@ const sessionStore = new MySQLStore({
     }
 }, connection);
 
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
-});
+passport.serializeUser((user, done) => done(null, user.user_id));
 
 passport.deserializeUser(function(id, done) {
-    connection.query("SELECT * FROM users WHERE id = ?", [id], function(err, rows){
-        done(err, rows[0]);
+    connection.query("SELECT * FROM users WHERE user_id = ?", id, (error, rows) => {
+        done(error, rows[0]);
     });
 });
-
-passport.use(
-    'local-signup',
-    new LocalStrategy({
-        usernameField : 'username',
-        passwordField : 'password',
-        passReqToCallback : true
-    },
-    function(req, username, password, done) {
-        connection.query("SELECT * FROM users WHERE username = ?",[username], function(err, rows) {
-            if (err)
-                return done(err);
-            if (rows.length) {
-                return done(null, false, req.flash('signupMessage', 'That username is already taken.'));
-            } else {
-                var newUserMysql = {
-                    username: username,
-                    password: bcrypt.hashSync(password, null, null)
-                };
-
-                connection.query('INSERT INTO users (username, password) VALUES (?, ?)', [newUserMysql.username, newUserMysql.password], function (err, rows) {
-
-                    newUserMysql.id = rows.insertId;
-
-                    done(null, newUserMysql);
-
-                });
-            };
-
-        });  
-    })
-);
 
 passport.use(
     'local-login',
@@ -89,20 +55,12 @@ passport.use(
         passReqToCallback : true
     },
     function(req, username, password, done) {
-        
-        connection.query("SELECT * FROM users WHERE username = ?", [username], function(err, rows){
-            if (err)
-                return done(err);
-            if (!rows.length) {
-                return done(null, false, req.flash('loginMessage', 'No user found.'));
-            }
-
-            if (!bcrypt.compareSync(password, rows[0].password))
-                return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
-
+        connection.query("SELECT * FROM users WHERE username = ? OR email = ?", [username, username], (error, rows) => {
+            if (error) return done(error);
+            if (!rows.length) return done(null, false, req.flash('error', 'Incorrect username/password'));
+            if (!compareSync(password, rows[0].password)) return done(null, false, req.flash('error', 'Incorrect username/password'));
             return done(null, rows[0]);
-        });
-        
+        });  
     })
 );
 
@@ -122,7 +80,6 @@ server.use('/resources', express.static(path.join(__dirname, './resources')));
 server.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    store: sessionStore,
     saveUninitialized: true,
 }));
 
@@ -132,7 +89,6 @@ server.use(passport.session());
 server.set('view engine', 'ejs');
 server.set('views', path.join(__dirname, './views'));
 server.use(cookieParser());
-server.use(express.json());
 server.use(morgan('dev'));
 server.use(limiter);
 server.use((req, res, next) => {
@@ -145,7 +101,6 @@ server.use((req, res, next) => {
         });
     };
     res.frender = (file, opt = {}) => {
-        console.log({ ...opt, theme: req.theme, user: req.user })
         return res.render(file, { ...opt, theme: req.theme, user: req.user });
     };
     next();
