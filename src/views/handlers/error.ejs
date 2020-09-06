@@ -1,0 +1,39 @@
+<% if (title == '500') title = '500 - Internal Error'; %>
+<% if (title == '404') title = '404 - Not Found'; %>
+<% if (title == '403') title = '403 - Not Authorized'; %>
+<% if (title == '408') title = '408 - Timeout' %>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/resources/css/style.css">
+    <title>Index</title>
+
+    <link rel="stylesheet" href="/resources/css/bootstrap.min.css">
+    <script src="/resources/js/jquery-3.5.1.min.js"></script>
+    <script src="/resources/js/bootstrap.min.js"></script>
+    <script src="/resources/js/popper.min.js"></script>
+
+    <link rel="stylesheet" href="/resources/css/style.css">
+</head>
+
+<body class="h-100 d-flex align-items-center justify-content-center">
+    <div class="card" style="width: 22rem;">
+        <div class="card-body">
+            <h5 class="card-title text-center d-block"><%= title %></h5>
+            <% if (subtitle) { %>
+                <p class="card-text text-center d-inline-block"><%= subtitle %></p>
+            <% }; %>
+            <a href="/contact" class="card-link text-center d-block mb-3">Contact Support</a>
+            <div class="d-flex justify-content-center">
+                <a href="/" type="submit" class="btn btn-primary">Back</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
