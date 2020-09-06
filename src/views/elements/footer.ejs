@@ -1,0 +1,39 @@
+<footer class="page-footer font-small bg-light pt-4">
+    <div class="container text-center text-md-left">
+        <div class="row">
+            <div class="col-md-6 mt-md-0 mt-3">
+                <h5 class="text-uppercase text-dark">ZE.WTF</h5>
+                <p class="text-dark">URL shortening done right. Thanks for using the site!</p>
+            </div>
+            <hr class="clearfix w-100 d-md-none pb-3">
+            <div class="col-md-3 mb-md-0 mb-3">
+                <h5 class="text-uppercase text-dark">API</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#!" class="text-dark">Link 1</a></li>
+                    <li><a href="#!" class="text-dark">Link 2</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 mb-md-0 mb-3">
+                <h5 class="text-dark">More info</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#!" class="text-dark">Link 1</a></li>
+                    <li><a href="#!" class="text-dark">Link 2</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container d-flex justify-content-between">
+        <div class="footer-copyright text-center py-3 text-dark">© 2020 Copyright ZE.WTF</div>
+
+        <ul class="nav nav-pills">
+            <li class="nav-item" data-toggle="tooltip" data-placement="top" title="Lights <%- theme == 'light' ? 'out' : 'on' %>!">
+                <% console.log(theme) %>
+                <a class="nav-link text-dark" id="theme" style="cursor: pointer;"><i id="theme-icon" class="<%- theme == 'light' ? 'fas' : 'far' %> fa-lightbulb"></i></a>
+            </li>
+            <li class="nav-item" id="scroll_to_top" style="display:none;" data-toggle="tooltip" data-placement="top" title="Back to top">
+              <a class="nav-link text-dark" href="#"><i class="fas fa-angle-double-up nav-link"></i></a>
+            </li>
+          </ul>
+    </div>
+</footer>
+<script src="/resources/js/script.js"></script>
