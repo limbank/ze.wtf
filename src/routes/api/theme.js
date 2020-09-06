@@ -1,9 +1,5 @@
 const { Router } = require('express');
 const router = Router();
-const fs = require('fs');
-const path = require('path');
-const { promisify } = require('util');
-const readDirAsync = promisify(fs.readdir);
 
 module.exports = (a, b) => {
 
