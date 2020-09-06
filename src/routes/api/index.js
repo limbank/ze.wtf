@@ -1,4 +1,4 @@
-module.exports = (server, ...imports) => {
-    server.use('/api/themes', require('./theme.js')(...imports));
-    server.use('/api/links', require('./theme.js')(...imports));
+module.exports = (server, connection) => {
+    server.use('/api/themes', require('./theme.js')());
+    server.use('/api/links', require('./theme.js')(connection));
 };

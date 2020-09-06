@@ -111,7 +111,7 @@ server.use((req, res, next) => {
 server.use('/', require('./routes/root.js')());
 server.use('/auth', require('./routes/auth.js')(connection));
 server.use('/user', require('./routes/user.js')(connection));
-require('./routes/api')(server);
+require('./routes/api')(server, connection);
 
 server.use((req, res, next) => res.error('404'));
 server.use((error, req, res, next) => {
