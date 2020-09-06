@@ -10,6 +10,8 @@ const MySQLStore = require('express-mysql-session')(session);
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const flash = require('flash');
+const { compareSync } = require('bcrypt');
 
 require('dotenv').config({ path: path.join(__dirname, './config/.env') });
 const server = express();
@@ -123,6 +125,8 @@ server.use(session({
     store: sessionStore,
     saveUninitialized: true,
 }));
+
+server.use(flash());
 server.use(passport.initialize());
 server.use(passport.session());
 server.set('view engine', 'ejs');
