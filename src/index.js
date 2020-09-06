@@ -10,7 +10,6 @@ const MySQLStore = require('express-mysql-session')(session);
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const flash = require('flash');
 const { compareSync } = require('bcrypt');
 
 require('dotenv').config({ path: path.join(__dirname, './config/.env') });
@@ -57,8 +56,8 @@ passport.use(
     function(req, username, password, done) {
         connection.query("SELECT * FROM users WHERE username = ? OR email = ?", [username, username], (error, rows) => {
             if (error) return done(error);
-            if (!rows.length) return done(null, false, req.flash('error', 'Incorrect username/password'));
-            if (!compareSync(password, rows[0].password)) return done(null, false, req.flash('error', 'Incorrect username/password'));
+            if (!rows.length) return done(null, false);
+            if (!compareSync(password, rows[0].password)) return done(null, false);
             return done(null, rows[0]);
         });  
     })
@@ -83,7 +82,6 @@ server.use(session({
     saveUninitialized: true,
 }));
 
-server.use(flash());
 server.use(passport.initialize());
 server.use(passport.session());
 server.set('view engine', 'ejs');
@@ -101,7 +99,10 @@ server.use((req, res, next) => {
         });
     };
     res.frender = (file, opt = {}) => {
-        return res.render(file, { ...opt, theme: req.theme, user: req.user });
+        return res.render(file, { ...opt, theme: req.theme, user: req.user, error: req.query.error });
+    };
+    res.errorRedir = (type, message, link) => {
+        return res.redirect(`${link}?${type}=${message}`);
     };
     next();
 });

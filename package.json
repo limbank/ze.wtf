@@ -16,7 +16,6 @@
     "express-session": "^1.17.1",
     "express-validator": "^6.6.1",
     "flakeid": "^1.0.0",
-    "flash": "^1.1.0",
     "log-symbols": "^4.0.0",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
