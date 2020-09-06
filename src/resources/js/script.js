@@ -51,11 +51,11 @@ $(window).resize(function() {
 $('#theme').click(function() {
     if ($('#theme-icon').hasClass('fas')) {
         axios('/api/themes/set/dark', {
-            method: 'GET'
+            method: 'PUT'
         }).then(done).catch(error)
     } else {
         axios('/api/themes/set/light', {
-            method: 'GET'
+            method: 'PUT'
         }).then(done).catch(error)
     }
 });
