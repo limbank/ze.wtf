@@ -18,3 +18,23 @@ body{
 .hidden{
     display:none;
 }
+.pointer{
+    cursor:pointer;
+}
+.short_link,
+.original_link{
+    display:inline-block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:200px;
+    white-space: nowrap;
+}
+
+a.bg-light:focus, a.bg-light:hover, button.bg-light:focus, button.bg-light:hover {
+    border-top-width: 1px;
+    margin-top: -1px;
+}
+.list-group>a.list-group-item:first-child:focus,
+.list-group>a.list-group-item:first-child:hover{
+    margin-top:0px !important;
+}
