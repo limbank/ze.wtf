@@ -88,6 +88,7 @@ server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(passport.initialize());
 server.use(passport.session());
+server.set('trust proxy', 1);
 server.set('view engine', 'ejs');
 server.set('views', path.join(__dirname, './views'));
 server.use(cookieParser());
