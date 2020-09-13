@@ -30,9 +30,21 @@ $(document).ready(function() {
     });
 
     $(".copy_append_js").each(function (i, e) {
-        $(this).click(function () {
-            $($(this).data("target")).select();
-            document.execCommand("copy");
+        $(this).click(function (e) {
+            e.preventDefault();
+
+            if($(this).data("target") == 'self'){
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val($(this).html()).select();
+                document.execCommand("copy");
+                $temp.remove();
+            }
+            else{
+                $($(this).data("target")).select();
+                document.execCommand("copy");
+                $($(this).data("target")).blur()
+            }
 
             var copy_toast = VanillaToasts.create({
                 title: 'Successfully copied!',
@@ -40,8 +52,6 @@ $(document).ready(function() {
                 type: 'success', // success, info, warning, error   / optional parameter
                 timeout: 1000 // hide after 5000ms, // optional parameter
             });
-
-            $($(this).data("target")).blur()
         });
     });
 });
