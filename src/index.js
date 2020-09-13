@@ -104,7 +104,7 @@ server.use((req, res, next) => {
         });
     };
     res.frender = (file, opt = {}) => {
-        return res.render(file, { ...opt, theme: req.theme, user: req.user, error: req.query.error });
+        return res.render(file, { ...opt, theme: req.theme, user: req.user, error: req.query.error, success: req.query.success, recaptcha: { public: process.env.RECAPTCHA_PUBLIC } });
     };
     res.errorRedir = (type, message, link) => {
         return res.redirect(`${link}?${type}=${message}`);
