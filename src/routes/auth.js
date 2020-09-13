@@ -1,8 +1,8 @@
 const { Router } = require('express');
 const router = Router();
-const { authenticate } = require('passport');
+const passport = require('passport');
 const { body, validationResult } = require('express-validator');
-const { urlencoded } = require('body-parser');
+const { recaptcha } = require('../functions');
 const FlakeId = require('flakeid');
 const { hash } = require('bcrypt');
 
@@ -25,12 +25,12 @@ module.exports = (connection) => {
         res.redirect('/');
     });
 
-    router.post('/login', passport.authenticate('local-login', {
+    router.post('/login', recaptcha.middleware, passport.authenticate('local-login', {
         successRedirect: '/user',
         failureRedirect: '/auth/login?error=Error in logging in'
     }));
 
-    router.post('/signup', [
+    router.post('/signup', recaptcha.middleware, [
         body('email').isEmail().withMessage('You must give a valid email').custom(async (val, { req }) => {
             const x = await asyncSQL('SELECT email FROM users WHERE email = ?', val);
             if (x.error) throw new Error('Database error. Please try again');
