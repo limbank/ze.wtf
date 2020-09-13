@@ -1,0 +1,23 @@
+<% const active = (p) => p == path ? 'active' : ''; %>
+
+<div class="col-lg-3">
+    <div class="list-group mb-3">
+        <a href="/user/links" class="list-group-item bg-light text-dark list-group-item-action <%- active('links') %>">
+            Created links
+        </a>
+        <a href="/user/api" class="list-group-item bg-light text-dark list-group-item-action <%- active('api') %>">API access</a>
+        <a href="/user/settings" class="list-group-item bg-light text-dark list-group-item-action <%- active('settings') %>">Settings</a>
+    </div>
+    <h5 class="mb-3 text-dark">Premium options</h5>
+    <div class="list-group mb-3">
+        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Payment area</a>
+        <a href="/user/stats" class="list-group-item bg-light text-dark list-group-item-action <%- active('stats') %>">Statistics</a>
+        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Domains</a>
+    </div>
+    <h5 class="mb-3 text-dark">Admin tools</h5>
+    <div class="list-group mb-3">
+        <a href="/admin/links" class="list-group-item bg-light text-dark list-group-item-action <%- active('adminlinks') %>">Recent links</a>
+        <a href="/admin/users" class="list-group-item bg-light text-dark list-group-item-action <%- active('adminusers') %>">Recent users</a>
+        <a href="/admin/stats" class="list-group-item bg-light text-dark list-group-item-action <%- active('adminstats') %>">Site stats</a>
+    </div>
+</div>
