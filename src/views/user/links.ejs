@@ -2,37 +2,18 @@
 <html lang="en-GB">
 
 <head>
-    <%- include('../elements/imports', { title: 'ZE.WTF - Home', theme, user }); %>
+    <%- include('../elements/imports', { title: null, theme, user }); %>
+    <title>ZE.WTF - <%= user.username %> - Settings</title>
 </head>
 
 <body class="bg-medium">
-
     <%- include('../elements/nav', { path: 'home' }) %>
 
     <div class="container flex-grow">
         <div class="h-100 pt-3 pb-3">
             <div class="row">
-                <div class="col-lg-3">
-                    <div class="list-group mb-3">
-                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action active">
-                          Created links
-                        </a>
-                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">API access</a>
-                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Settings</a>
-                    </div>
-                    <h5 class="mb-3 text-dark">Premium options</h5>
-                    <div class="list-group mb-3">
-                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Payment area</a>
-                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Statistics</a>
-                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Domains</a>
-                    </div>
-                    <h5 class="mb-3 text-dark">Admin tools</h5>
-                    <div class="list-group mb-3">
-                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Recent links</a>
-                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Recent users</a>
-                        <a href="#" class="list-group-item bg-light text-dark list-group-item-action">Site stats</a>
-                    </div>
-                </div>
+                <%- include('../elements/sidebar', { path: 'links' }) %>
+
                 <div class="col-lg-9">
                     <div class="card align-self-center bg-light">
                         <div class="card-body">
@@ -62,9 +43,9 @@
                                     </thead>
                                     <tbody>
                                       <tr>
-                                        <td><a class="original_link text-primary" target="_blank" href="https://google.com">https://google.com</a></td>
+                                        <td><a class="original_link text-primary copy_append_js" data-target="self" data-toggle="tooltip" data-placement="top" title="Click to copy" target="_blank" href="https://google.com">https://google.com</a></td>
                                         <td>9/6/2020</td>
-                                        <td><a class="short_link text-primary" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
+                                        <td><a class="short_link text-primary copy_append_js" data-target="self" data-toggle="tooltip" data-placement="top" title="Click to copy" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
                                         <td>11</td>
                                         <td>
                                             <a class="btn btn-success" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-pencil-alt"></i></a>
@@ -72,9 +53,9 @@
                                         </td>
                                       </tr>
                                       <tr>
-                                        <td><a class="original_link text-primary" target="_blank" href="https://google.com">https://google.com</a></td>
+                                        <td><a class="original_link text-primary copy_append_js" data-target="self" data-toggle="tooltip" data-placement="top" title="Click to copy"  target="_blank" href="https://google.com">https://google.com</a></td>
                                         <td>9/6/2020</td>
-                                        <td><a class="short_link text-primary" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
+                                        <td><a class="short_link text-primary copy_append_js" data-target="self" data-toggle="tooltip" data-placement="top" title="Click to copy"  target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
                                         <td>21</td>
                                         <td>
                                             <a class="btn btn-success" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-pencil-alt"></i></a>
@@ -82,9 +63,9 @@
                                         </td>
                                       </tr>
                                       <tr>
-                                        <td><a class="original_link text-primary" target="_blank" href="https://google.com">https://google.com</a></td>
+                                        <td><a class="original_link text-primary copy_append_js" data-target="self" data-toggle="tooltip" data-placement="top" title="Click to copy"  target="_blank" href="https://google.com">https://google.com</a></td>
                                         <td>9/6/2020</td>
-                                        <td><a class="short_link text-primary" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
+                                        <td><a class="short_link text-primary copy_append_js" data-target="self" data-toggle="tooltip" data-placement="top" title="Click to copy"  target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
                                         <td>138</td>
                                         <td>
                                             <a class="btn btn-success" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-pencil-alt"></i></a>
@@ -92,9 +73,9 @@
                                         </td>
                                       </tr>
                                       <tr>
-                                        <td><a class="original_link text-primary" target="_blank" href="https://google.com">https://google.com</a></td>
+                                        <td><a class="original_link text-primary copy_append_js" data-target="self" data-toggle="tooltip" data-placement="top" title="Click to copy"  target="_blank" href="https://google.com">https://google.com</a></td>
                                         <td>9/6/2020</td>
-                                        <td><a class="short_link text-primary" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
+                                        <td><a class="short_link text-primary copy_append_js" data-target="self" data-toggle="tooltip" data-placement="top" title="Click to copy"  target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
                                         <td>2</td>
                                         <td>
                                             <a class="btn btn-success" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-pencil-alt"></i></a>
@@ -102,9 +83,9 @@
                                         </td>
                                       </tr>
                                       <tr>
-                                        <td><a class="original_link text-primary" target="_blank" href="https://google.com">https://google.com</a></td>
+                                        <td><a class="original_link text-primary copy_append_js" data-target="self" data-toggle="tooltip" data-placement="top" title="Click to copy"  target="_blank" href="https://google.com">https://google.com</a></td>
                                         <td>9/6/2020</td>
-                                        <td><a class="short_link text-primary" target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
+                                        <td><a class="short_link text-primary copy_append_js" data-target="self" data-toggle="tooltip" data-placement="top" title="Click to copy"  target="_blank" href="ze.wtf/shortURL">ze.wtf/shortURL</a></td>
                                         <td>0</td>
                                         <td>
                                             <a class="btn btn-success" href="#" role="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fas fa-pencil-alt"></i></a>
@@ -133,20 +114,6 @@
     </div>
 
     <%- include('../elements/footer', { theme }) %>
-
 </body>
 
 </html>
-
-
-
-
-<!-- When you code this properly please make one of them buttons that toggles showing your password because that is cool -->
-
-<!--
-<form action="/auth/login" method="POST">
-    <input type="text" name="username" placeholder="Username or Email"/><br>
-    <input type="password" name="password" placeholder="Password" /><br>
-    <button type="submit">Login</button>
-</form>
--->
