@@ -3,11 +3,12 @@
 
 <head>
     <%- include('elements/imports', { title: 'ZE.WTF - Home', theme, user }); %>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body class="bg-medium">
 
-    <%- include('elements/nav', { path: 'home' }) %>
+    <%- include('elements/nav', { path: 'contact' }) %>
 
     <div class="container flex-grow">
         <div class="h-100 pt-3 pb-3">
@@ -22,7 +23,7 @@
                                     <div class="input-group-prepend">
                                         <div class="input-group-text text-dark border-light bg-light"><i class="fas fa-at"></i></div>
                                     </div>
-                                    <input type="email" id="contact_email" class="form-control text-dark border-light bg-light" value="Our E-mail" readonly>
+                                    <input type="email" id="contact_email" class="form-control text-dark border-light bg-light" value="hello@ze.wtf" readonly>
                                     <div class="input-group-append pointer copy_append_js" data-target="#contact_email" data-toggle="tooltip" data-placement="top" title="Copy our E-mail">
                                         <div class="input-group-text text-dark border-light bg-light"><i class="far fa-clipboard"></i></div>
                                     </div>
@@ -47,15 +48,15 @@
                         <div class="card-body">
                             <h5 class="card-title mb-4 text-dark">Send us a message</h5>
 
-                            <form>
+                            <form method="POST" action="/contact">
                                 <div class="row">
                                     <div class="col-md-12 col-lg-6">
                                         <div class="form-group">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <div class="input-group-text text-dark border-light bg-light"><i class="fas fa-user"></i></div>
+                                                    <div class="input-group-text text-dark border-light bg-light"><i class="fab fa-discord"></i></div>
                                                 </div>
-                                                <input type="text" class="form-control text-dark border-light bg-light" placeholder="Name">
+                                                <input type="text" class="form-control text-dark border-light bg-light" placeholder="Discord tag" name="discord">
                                             </div>
                                         </div>
                                     </div>
@@ -65,7 +66,29 @@
                                                 <div class="input-group-prepend">
                                                     <div class="input-group-text text-dark border-light bg-light"><i class="fas fa-at"></i></div>
                                                 </div>
-                                                <input type="email" class="form-control text-dark border-light bg-light" placeholder="E-mail">
+                                                <input type="email" class="form-control text-dark border-light bg-light" placeholder="E-mail" name="email" required>
+                                            </div>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text text-dark border-light bg-light"><i class="fas fa-user"></i></div>
+                                                </div>
+                                                <input type="text" class="form-control text-dark border-light bg-light" placeholder="Name" name="name" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-lg-6">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text text-dark border-light bg-light"><i class="far fa-question-circle"></i></div>
+                                                </div>
+                                                <input type="text" class="form-control text-dark border-light bg-light" placeholder="Subject" name="subject" required>
                                             </div>
                                             </div>
                                     </div>
@@ -75,11 +98,13 @@
                                         <div class="input-group-prepend">
                                             <div class="input-group-text text-dark border-light bg-light"><i class="fas fa-envelope"></i></div>
                                         </div>
-                                        <textarea class="form-control text-dark border-light bg-light" placeholder="Your message"></textarea>
+                                        <textarea class="form-control text-dark border-light bg-light" placeholder="Your message" name="message" required></textarea>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between">
-                                    <div class="d-inline-flex align-items-center justify-content-center"><!-- captcha block --></div>
+                                    <div class="d-inline-flex align-items-center justify-content-center">
+                                        <div class="g-recaptcha" data-theme="<%= theme %>" data-sitekey="<%= recaptcha.public %>"></div>
+                                    </div>
                                     <div class="d-inline-flex align-items-center justify-content-center">
                                         <button type="submit" class="btn btn-primary">Lets go</button>
                                     </div>
@@ -92,6 +117,13 @@
         </div>
     </div>
 
+    <% if (error) { %>
+        <script>$(document).ready(function(){VanillaToasts.create({title:'Error!',timeout:3000,text:"<%= error %>",type:"error"});});</script>
+    <% }; %>
+    <% if (success) { %>
+        <script>$(document).ready(function(){VanillaToasts.create({title:'Success!',timeout:3000,text:"<%= success %>",type:"success"});});</script>
+    <% }; %>
+
     <%- include('elements/footer', { theme }) %>
 
 </body>
@@ -99,9 +131,6 @@
 </html>
 
 
-
-
-<!-- When you code this properly please make one of them buttons that toggles showing your password because that is cool -->
 
 <!--
 <form action="/auth/login" method="POST">
