@@ -30,6 +30,14 @@ body{
     white-space: nowrap;
 }
 
+.api_overflow{
+    display:inline-block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:250px;
+    white-space: nowrap;
+}
+
 a.bg-light:focus, a.bg-light:hover, button.bg-light:focus, button.bg-light:hover {
     border-top-width: 1px;
     margin-top: -1px;
