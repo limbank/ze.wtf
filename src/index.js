@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const { compareSync } = require('bcrypt');
+const bodyParser = require('body-parser');
 
 require('dotenv').config({ path: path.join(__dirname, './config/.env') });
 const server = express();
@@ -83,6 +84,8 @@ server.use(session({
     saveUninitialized: true,
 }));
 
+server.use(bodyParser.json());
+server.use(bodyParser.urlencoded({ extended: true }));
 server.use(passport.initialize());
 server.use(passport.session());
 server.set('view engine', 'ejs');

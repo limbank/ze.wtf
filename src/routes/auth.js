@@ -17,8 +17,6 @@ module.exports = (connection) => {
         });
     });
 
-    router.use(urlencoded({ extended: false }));
-    
     router.get('/login', (req, res, next) => req.isAuthenticated() ? res.redirect('/user') : next(), (req, res) => res.frender('login'));
     router.get('/signup', (req, res, next) => req.isAuthenticated() ? res.redirect('/user') : next(), (req, res) => res.frender('signup'));
 
