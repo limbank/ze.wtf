@@ -1,0 +1,11 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "home" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/home.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	{{error}}
+{% endblock %}

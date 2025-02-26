@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "home" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/home.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<form method="POST" action="/">
+		{% if error != None %}
+			{{error}}
+		{% endif %}
+		<input name="url" type="text" placeholder="URL" />
+		<input type="submit" value="Submit">
+	</form>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "home" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/home.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<form method="POST" action="/">
+		{% if error != None %}
+			{{error}}
+		{% endif %}
+		<input name="username" type="text" placeholder="Username" />
+		<input name="password" type="password" placeholder="Password" />
+		<input name="password-confirm" type="password" placeholder="Password confirm" />
+
+        <img src="{{ url_for('auth.dash_captcha') }}" id="captcha_image" />
+        <a href="#" class="form__captcha__button" onclick="document.getElementById('captcha_image').src = '/captcha?' + Math.random(); return false">
+            Refresh
+        </a>
+        <input type="text"name="captcha" placeholder="Captcha" id="captcha" required>
+
+		<input type="submit" value="Submit">
+	</form>
+
+	<a href="{{ url_for('auth.handle_login') }}">Login</a>
+{% endblock %}
