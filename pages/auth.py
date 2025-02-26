@@ -43,12 +43,12 @@ def dash_captcha():
 @auth.route("/auth/login", methods=['GET', 'POST'])
 @limiter.limit("2/second")
 def handle_login():
-    return render_template("login.html", version=os.getenv('VERSION'))
+    return render_template("login.html")
 
 @auth.route("/auth/register", methods=['GET', 'POST'])
 @limiter.limit("2/second")
 def handle_register():
-    return render_template("register.html", version=os.getenv('VERSION'))
+    return render_template("register.html")
     
 @auth.route("/auth")
 @limiter.limit("2/second")

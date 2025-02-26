@@ -19,4 +19,8 @@ app.register_blueprint(home)
 app.register_blueprint(auth)
 app.register_blueprint(error)
 
+@app.context_processor
+def app_version():
+    return dict(version=os.getenv('VERSION'))
+
 sass.compile(dirname=('styles', 'static/styles'))

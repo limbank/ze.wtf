@@ -1,11 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, abort
-import os
 from dotenv import load_dotenv
 import validators
 import random
 import string
-
-load_dotenv()
 
 from models import *
 
@@ -38,7 +35,7 @@ def index(path):
             print("Done!")
 
 
-    return render_template("home.html", version=os.getenv('VERSION'), error=error)
+    return render_template("home.html", error=error)
 
 @home.route("/<string:path>")
 @home.route('/<path:path>')
