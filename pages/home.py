@@ -4,12 +4,8 @@ import validators
 import random
 import string
 
+# Only import urls here instead
 from models import *
-
-# user = User.get(User.username == 'admin')
-# print(user.date_joined)
-
-#User.create(username='admin')
 
 home = Blueprint('home', __name__, template_folder='templates')
 
@@ -34,7 +30,6 @@ def index(path):
             error = "New URL available at /" + newID
             print("Done!")
 
-
     return render_template("home.html", error=error)
 
 @home.route("/<string:path>")
@@ -45,7 +40,6 @@ def catch_all(path):
         return redirect(short_link.url)
     else:
         abort(404)
-
 
 # @home.route('/', defaults={'path': ''})
 # @home.route("/<string:path>")

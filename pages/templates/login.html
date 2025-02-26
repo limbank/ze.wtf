@@ -7,7 +7,10 @@
 {% endblock %}
 
 {% block content %}
-	<form method="POST" action="/">
+	<p>
+		{{msg}}
+	</p>
+	<form action="{{ url_for('auth.handle_login') }}" method="post" autocomplete="off">
 		{% if error != None %}
 			{{error}}
 		{% endif %}

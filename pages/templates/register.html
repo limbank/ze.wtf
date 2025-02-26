@@ -7,7 +7,10 @@
 {% endblock %}
 
 {% block content %}
-	<form method="POST" action="/">
+	<p>
+		{{msg}}
+	</p>
+	<form action="{{ url_for('auth.handle_register') }}" method="post" autocomplete="off">
 		{% if error != None %}
 			{{error}}
 		{% endif %}
@@ -16,15 +19,13 @@
 		<input name="password-confirm" type="password" placeholder="Password confirm" />
 
         <img src="{{ url_for('auth.dash_captcha') }}" id="captcha_image" />
-        <a href="#" class="form__captcha__button" onclick="document.getElementById('captcha_image').src = '/captcha?' + Math.random(); return false">
+        <a href="#" onclick="document.getElementById('captcha_image').src = '/captcha?' + Math.random(); return false">
             Refresh
         </a>
         <input type="text"name="captcha" placeholder="Captcha" id="captcha" required>
 
 		<input type="submit" value="Submit">
 	</form>
-
-	{{version}}
 
 	<a href="{{ url_for('auth.handle_login') }}">Login</a>
 {% endblock %}
