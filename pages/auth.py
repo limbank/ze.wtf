@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, current_app, session, send_file, redirect, url_for, request
+from flask import Blueprint, render_template, current_app, session, send_file, redirect, url_for, request, make_response
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from argon2 import PasswordHasher
@@ -7,7 +7,7 @@ import os
 import string
 import random
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Change to only import users later
 from models import *
@@ -62,10 +62,29 @@ def authenticate_user():
         # Check password
         try:
             ph.verify(user.password, password + current_app.secret_key)
-
-            return dict(msg = "Logged in!", success = True)
         except:
             return dict(msg = default_msg, success = False)
+
+        # TO-DO:
+        # Factor in user-agent
+        # Move to its own func
+        
+        # Construct login cookie
+        users_ip = request.remote_addr
+        users_id = user.users_id
+        user_agent = request.headers.get('User-Agent')
+
+        cookie_token = random_string(12)
+        cookie_validator = random_string(24)
+
+        cookie_hash = ph.hash(cookie_validator + users_ip)
+
+        # Save cookie to DB
+        Cookie.create(user_id=users_id, created=datetime.now(), expires=datetime.now() + timedelta(days=30), cookie_token=cookie_token, cookie_hash=cookie_hash)
+
+        new_cookie = cookie_token + "." + cookie_validator
+
+        return dict(msg = "Logged in!", cookie=new_cookie, success = True)
 
     else:
         return dict(msg = "Missing username or password!", success = False)
@@ -82,11 +101,6 @@ def register_user():
         username = request.form['username']
         password = request.form['password']
         password_confirm = request.form['password-confirm']
-
-        # user = User.get(User.username == 'admin')
-        # print(user.date_joined)
-
-        #User.create(username='admin')
 
         # Check passwords
         if password != password_confirm:
@@ -131,9 +145,12 @@ def handle_login():
         check_auth = authenticate_user()
 
         if check_auth['success']:
-            # User authenticated, redirect here...
-            # Temporary
-            return render_template("login.html", msg=check_auth['msg'])
+            # User authenticated, set cookie, then redirect here...
+
+            response = make_response(render_template("login.html", msg=check_auth['msg']))
+            response.set_cookie('loggedin', check_auth['cookie'])
+
+            return response
         else:
             return render_template("login.html", msg=check_auth['msg'])
 

@@ -7,7 +7,8 @@ class Cookie(Model):
   user_id = IntegerField()
   created = DateTimeField()
   expires = DateTimeField()
-  cookie = CharField(unique=True)
+  cookie_token = CharField()
+  cookie_hash = CharField()
 
   class Meta:
     database = db

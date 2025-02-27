@@ -1,11 +1,12 @@
 from flask import Flask
 import sass
 import os
+from dotenv import load_dotenv
+from flask_cors import CORS
 from pages.home import home
 from pages.auth import auth
 from pages.error import error
-from dotenv import load_dotenv
-from flask_cors import CORS
+from pages.dash import dash
 
 load_dotenv()
 
@@ -18,6 +19,7 @@ CORS(app)
 app.register_blueprint(home)
 app.register_blueprint(auth)
 app.register_blueprint(error)
+app.register_blueprint(dash)
 
 @app.context_processor
 def app_version():

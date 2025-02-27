@@ -1,17 +1,13 @@
 {% extends 'core/base.html' %}
 
-{% set active_page = "home" %}
+{% set active_page = "dash" %}
 
 {% block head %}
 	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
 {% endblock %}
 
 {% block content %}
-	<form method="POST" action="/">
-		{% if error != None %}
-			{{error}}
-		{% endif %}
-		<input name="url" type="text" placeholder="URL" />
-		<input type="submit" value="Submit">
-	</form>
+	<p>
+		Welcome, {{username}}
+	</p>
 {% endblock %}
