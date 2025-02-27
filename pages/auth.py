@@ -7,6 +7,7 @@ import os
 import string
 import random
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Change to only import users later
 from models import *
@@ -52,11 +53,6 @@ def authenticate_user():
         username = request.form['username']
         password = request.form['password']
 
-        # user = User.get(User.username == 'admin')
-        # print(user.date_joined)
-
-        #User.create(username='admin')
-
         # Check username
         user = User.get_or_none(User.username == username)
         if user is None:
@@ -64,13 +60,15 @@ def authenticate_user():
             return dict(msg = default_msg, success = False)
 
         # Check password
+        try:
+            ph.verify(user.password, password + current_app.secret_key)
 
+            return dict(msg = "Logged in!", success = True)
+        except:
+            return dict(msg = default_msg, success = False)
 
-        return dict(msg = "Logged in!", success = True)
     else:
         return dict(msg = "Missing username or password!", success = False)
-
-    return dict(msg = "Logged in!", success = True)
 
 def register_user():
     # Check captcha
@@ -101,13 +99,15 @@ def register_user():
             # User already exists
             return dict(msg = "User already exists", success = False)
 
-        # Create user in database
+        # Hash password
+        phash = ph.hash(password + current_app.secret_key)
+
+        # Add user to database
+        User.create(username=username, password=phash, date_joined=datetime.now())
 
         return dict(msg = "Registered!", success = True)
     else:
         return dict(msg = "Missing username or password!", success = False)
-
-    return dict(msg = "Logged in!", success = True)
 
 auth = Blueprint('auth', __name__, template_folder='templates')
 
