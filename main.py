@@ -24,8 +24,8 @@ def app_version():
 
 @app.before_request
 def before_request():
-   g.request_start_time = time.time()
-   g.request_time = lambda: "%.5fs" % (time.time() - g.request_start_time)
+    g.request_start_time = time.time()
+    g.request_time = lambda: "%.5fs" % (time.time() - g.request_start_time)
 
 app.register_blueprint(home)
 app.register_blueprint(auth)

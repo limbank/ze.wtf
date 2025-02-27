@@ -48,6 +48,11 @@ def index(path):
 def catch_all(path):
     short_link = Link.get_or_none(ref=path)
     if short_link is not None:
+        # Update visits counter
+        short_link.visits = short_link.visits + 1
+        short_link.save()
+
+        # Redirect user to link
         return redirect(short_link.url)
     else:
         abort(404)
