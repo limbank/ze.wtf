@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import validators
 import random
 import string
+from utils.cookies import check_cookie, user_from_cookie
 
 # Only import urls here instead
 from models import *
@@ -30,7 +31,15 @@ def index(path):
             error = "New URL available at /" + newID
             print("Done!")
 
-    return render_template("home.html", error=error)
+    # Check cookie
+    valid_cookie = check_cookie()
+    username = None
+    if valid_cookie != False:
+        # Get user if logged in
+        current_user = user_from_cookie(valid_cookie)
+        username = current_user['username']
+
+    return render_template("home.html", error=error, username=username)
 
 @home.route("/<string:path>")
 @home.route('/<path:path>')

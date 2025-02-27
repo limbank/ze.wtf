@@ -2,7 +2,16 @@
 	<li>
 		<a href="/">Home</a>
 	</li>
-	<li>
-		<a href="/auth">Login</a>
-	</li>
+	{% if username %}
+		<li>
+			<a href="/dash">Dash</a>
+		</li>
+		<li>
+			<a href="/logout">Logout</a>
+		</li>
+	{% else %}
+		<li>
+			<a href="/auth">Login</a>
+		</li>
+	{% endif %}
 </ul>
