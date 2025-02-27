@@ -28,8 +28,4 @@ def handle_dash():
     # Retrieve the URLs created by user
     links = Link.select().where(Link.owner == current_user['user_id'])
 
-    # Iterate over the result
-    for link in links:
-        print(f"url: {link.url}, ref: {link.ref}")
-
     return render_template("dash.html", username=current_user['username'], links = links)
