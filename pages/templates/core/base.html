@@ -10,5 +10,6 @@
 <body>
     {% include 'partials/header.html' %}
 	{% block content %}{% endblock %}
+    generated in {{ g.request_time() }}
 </body>
 </html>

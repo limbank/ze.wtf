@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, g
 import sass
 import os
+import time
 from dotenv import load_dotenv
 from flask_cors import CORS
 from pages.home import home
@@ -17,15 +18,20 @@ app.secret_key = os.getenv('SECRET')
 
 CORS(app)
 
+@app.context_processor
+def app_version():
+    return dict(version=os.getenv('VERSION'))
+
+@app.before_request
+def before_request():
+   g.request_start_time = time.time()
+   g.request_time = lambda: "%.5fs" % (time.time() - g.request_start_time)
+
 app.register_blueprint(home)
 app.register_blueprint(auth)
 app.register_blueprint(error)
 app.register_blueprint(dash)
 app.register_blueprint(logout)
-
-@app.context_processor
-def app_version():
-    return dict(version=os.getenv('VERSION'))
 
 sass.compile(dirname=('styles', 'static/styles'))
 
