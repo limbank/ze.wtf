@@ -1,9 +1,14 @@
 from flask import  request
 from argon2 import PasswordHasher
 from datetime import datetime, timedelta
+import random
+import string
 from models import *
 
 ph = PasswordHasher()
+
+def random_string(length = 5):
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=int(length)))
 
 def create_cookie(user):
     # Construct login cookie
