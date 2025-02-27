@@ -9,6 +9,8 @@ import random
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
+from utils.cookies import check_cookie, create_cookie
+
 # Change to only import users later
 from models import *
 
@@ -65,24 +67,8 @@ def authenticate_user():
         except:
             return dict(msg = default_msg, success = False)
 
-        # TO-DO:
-        # Factor in user-agent
-        # Move to its own func
-        
         # Construct login cookie
-        users_ip = request.remote_addr
-        users_id = user.users_id
-        user_agent = request.headers.get('User-Agent')
-
-        cookie_token = random_string(12)
-        cookie_validator = random_string(24)
-
-        cookie_hash = ph.hash(cookie_validator + users_ip)
-
-        # Save cookie to DB
-        Cookie.create(user_id=users_id, created=datetime.now(), expires=datetime.now() + timedelta(days=30), cookie_token=cookie_token, cookie_hash=cookie_hash)
-
-        new_cookie = cookie_token + "." + cookie_validator
+        new_cookie = create_cookie(user)
 
         return dict(msg = "Logged in!", cookie=new_cookie, success = True)
 
@@ -139,6 +125,11 @@ def dash_captcha():
 @auth.route("/auth/login", methods=['GET', 'POST'])
 @limiter.limit("2/second")
 def handle_login():
+    valid_cookie = check_cookie()
+
+    if valid_cookie is not False:
+        return redirect(url_for('dash.handle_dash'))
+
     msg = ''
 
     if request.method == 'POST':
@@ -159,6 +150,11 @@ def handle_login():
 @auth.route("/auth/register", methods=['GET', 'POST'])
 @limiter.limit("2/second")
 def handle_register():
+    valid_cookie = check_cookie()
+
+    if valid_cookie is not False:
+        return redirect(url_for('dash.handle_dash'))
+
     msg = ''
 
     if request.method == 'POST':
