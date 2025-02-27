@@ -26,7 +26,7 @@ def create_cookie(user):
 def check_cookie():
     cookie_token = request.cookies.get('loggedin')
 
-    if cookie_token:
+    if cookie_token is not None:
         cookie_details = cookie_token.split('.')
 
         cookie = Cookie.get_or_none(Cookie.cookie_token == cookie_details[0])
@@ -46,13 +46,23 @@ def check_cookie():
             return False
 
         return cookie
+    else:
+        return False
 
 def destroy_cookie():
-    current_cookie = check_cookie()
-    current_cookie.delete_instance()
+    try:
+        current_cookie = check_cookie()
+        current_cookie.delete_instance()
+    except:
+        # Cookie already deleted
+        print("Cookie already deleted")
 
     return True
 
 def user_from_cookie(cookie):
+    if cookie is None:
+        # No cookie
+        return None
+
     current_user = User.get(User.users_id == cookie.user_id)
     return dict(username=current_user.username)

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, current_app, redirect, url_for
+from flask import Blueprint, render_template, current_app, redirect, url_for, make_response
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import destroy_cookie
