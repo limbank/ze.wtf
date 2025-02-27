@@ -1,18 +1,12 @@
-from flask import Blueprint, render_template, current_app, session, send_file, redirect, url_for, request, make_response
+from flask import Blueprint, render_template, current_app, redirect, url_for, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from argon2 import PasswordHasher
-from captcha.image import ImageCaptcha
-import os
-import string
-import random
-from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
 # Change to only import users later
 from models import *
 
-load_dotenv()
 ph = PasswordHasher()
 limiter = Limiter(
     get_remote_address,
@@ -60,13 +54,6 @@ def handle_dash():
     if valid_cookie == False:
         return redirect(url_for('home.index'))
 
-    print("hi")
-    print("Our user is")
-    print(user_from_cookie(valid_cookie))
+    current_user = user_from_cookie(valid_cookie)
 
-    return render_template("dash.html", username='test')
-
-# @dash.route("/auth")
-# @limiter.limit("2/second")
-# def handle_auth():
-#     return redirect(url_for('dash.handle_login'))
+    return render_template("dash.html", username=current_user.username)
