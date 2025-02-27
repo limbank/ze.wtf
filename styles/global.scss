@@ -14,14 +14,86 @@ html, body {
 body {
 	margin: 0;
     font-family: 'Roboto', sans-serif;
+    background: lighten(#111113, 5%);
+	color: #cfd3cf;
+	size: 14px;
+}
+
+a {
+	color: #cfd3cf;
+	font-size: 14px;
+}
+
+.main {
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+
+	& > div {
+		width: 100%;
+	}
+
+	&__inner {
+		flex-grow: 1;
+		overflow-y: auto;
+	}
+}
+
+.footer,
+.header {
+	background: #111113;
+}
+
+.footer {
+	padding: 8px 12px;
+	font-size: 14px;
 }
 
 .nav {
 	list-style: none;
 	padding: 0;
 	margin: 0;
+	display: flex;
+
+	a,
+	li {
+		display: inline-block;
+	}
+
+	li {
+		&:first-child {
+			margin-right: auto;
+		}
+	}
+
+	a {
+		text-decoration: none;
+		padding: 8px 12px;
+		transition: background 0.2s ease-in;
+
+		&:hover {
+			background: lighten(#111113, 20%);
+		}
+	}
 }
 
-.nav li, .nav li a {
-	display: inline-block;
+.container {
+	width: 850px;
+	max-width: 100%;
+	padding: 0 10px;
+	margin: 0 auto;
+}
+
+.form {
+	input {
+		background: lighten(#111113, 10%);
+		padding: 8px 12px;
+		font-size: 14px;
+		color: #cfd3cf;
+		border: 1px solid #111113;
+	}
 }

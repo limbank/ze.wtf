@@ -1,17 +1,21 @@
-<ul class="nav">
-	<li>
-		<a href="/">Home</a>
-	</li>
-	{% if username %}
-		<li>
-			<a href="/dash">Dash</a>
-		</li>
-		<li>
-			<a href="/logout">Logout</a>
-		</li>
-	{% else %}
-		<li>
-			<a href="/auth">Login</a>
-		</li>
-	{% endif %}
-</ul>
+<div class="header">
+	<div class="container">
+		<ul class="nav">
+			<li>
+				<a href="/">Home</a>
+			</li>
+			{% if username %}
+				<li>
+					<a href="/dash">Dash</a>
+				</li>
+				<li>
+					<a href="/logout">Logout</a>
+				</li>
+			{% else %}
+				<li>
+					<a href="/auth">Login</a>
+				</li>
+			{% endif %}
+		</ul>
+	</div>
+</div>

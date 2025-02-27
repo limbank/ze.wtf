@@ -8,8 +8,12 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    {% include 'partials/header.html' %}
-	{% block content %}{% endblock %}
-    generated in {{ g.request_time() }}
+    <div class="main">
+        {% include 'partials/header.html' %}
+        <div class="main__inner">
+    	   {% block content %}{% endblock %}
+        </div>
+        {% include 'partials/footer.html' %}
+    </div>
 </body>
 </html>

@@ -1,0 +1,32 @@
+.main {
+	&__inner {
+		position: relative;
+	}
+}
+
+.register {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow-y: auto;
+	padding: 20px 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	input {
+		width: 200px;
+		max-width: 100%;
+		margin: 5px 0;
+	}
+}
