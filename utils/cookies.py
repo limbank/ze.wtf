@@ -9,7 +9,6 @@ def create_cookie(user):
     # Construct login cookie
     # TO-DO:
     # Factor in user-agent
-    # Move to its own func
     users_ip = request.remote_addr
     users_id = user.users_id
     user_agent = request.headers.get('User-Agent')
@@ -47,6 +46,12 @@ def check_cookie():
             return False
 
         return cookie
+
+def destroy_cookie():
+    current_cookie = check_cookie()
+    current_cookie.delete_instance()
+
+    return True
 
 def user_from_cookie(cookie):
     current_user = User.get(User.users_id == cookie.user_id)

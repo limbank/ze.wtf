@@ -1,0 +1,19 @@
+# import os
+# import importlib
+# from flask import Flask
+
+# def register_blueprints(app: Flask):
+#     # Get the directory of the blueprints package
+#     package_name = __name__
+#     package_path = os.path.dirname(__file__)
+
+#     for filename in os.listdir(package_path):
+#         if filename.endswith(".py") and filename != "__init__.py":
+#             module_name = f"{package_name}.{filename[:-3]}"  # Strip ".py"
+#             module = importlib.import_module(module_name)
+
+#             # Look for a Blueprint instance (convention: ends with "_bp")
+#             for attr in dir(module):
+#                 if attr.endswith("_bp"):  
+#                     blueprint = getattr(module, attr)
+#                     app.register_blueprint(blueprint)

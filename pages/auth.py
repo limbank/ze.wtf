@@ -103,9 +103,12 @@ def register_user():
         phash = ph.hash(password + current_app.secret_key)
 
         # Add user to database
-        User.create(username=username, password=phash, date_joined=datetime.now())
+        new_user = User.create(username=username, password=phash, date_joined=datetime.now())
 
-        return dict(msg = "Registered!", success = True)
+        # Construct login cookie
+        new_cookie = create_cookie(new_user)
+
+        return dict(msg = "Registered!", cookie=new_cookie, success = True)
     else:
         return dict(msg = "Missing username or password!", success = False)
 
@@ -136,9 +139,9 @@ def handle_login():
         check_auth = authenticate_user()
 
         if check_auth['success']:
-            # User authenticated, set cookie, then redirect here...
+            # User authenticated, set cookie, then redirect...
 
-            response = make_response(render_template("login.html", msg=check_auth['msg']))
+            response = make_response(redirect(url_for('dash.handle_dash')))
             response.set_cookie('loggedin', check_auth['cookie'])
 
             return response
@@ -161,9 +164,12 @@ def handle_register():
         check_reg = register_user()
 
         if check_reg['success']:
-            # User registered, redirect here...
-            # Temporary
-            return render_template("register.html", msg=check_reg['msg'])
+            # User registered, set cookie, then redirect...
+
+            response = make_response(redirect(url_for('dash.handle_dash')))
+            response.set_cookie('loggedin', check_auth['cookie'])
+
+            return response
         else:
             return render_template("register.html", msg=check_reg['msg'])
 
