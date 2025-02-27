@@ -12,6 +12,16 @@ home = Blueprint('home', __name__, template_folder='templates')
 
 @home.route("/", methods=['GET', 'POST'], defaults={'path': ''})
 def index(path):
+    # Check cookie
+    valid_cookie = check_cookie()
+    username = None
+    user_id = None
+    if valid_cookie != False:
+        # Get user if logged in
+        current_user = user_from_cookie(valid_cookie)
+        username = current_user['username']
+        user_id = current_user['user_id']
+
     url = request.form.get('url')
     error = None
 
@@ -27,17 +37,9 @@ def index(path):
         else:
             newID = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
             print(newID)
-            Link.create(url=url, ref=newID)
+            Link.create(url=url, ref=newID, owner=user_id)
             error = "New URL available at /" + newID
             print("Done!")
-
-    # Check cookie
-    valid_cookie = check_cookie()
-    username = None
-    if valid_cookie != False:
-        # Get user if logged in
-        current_user = user_from_cookie(valid_cookie)
-        username = current_user['username']
 
     return render_template("home.html", error=error, username=username)
 
@@ -49,9 +51,3 @@ def catch_all(path):
         return redirect(short_link.url)
     else:
         abort(404)
-
-# @home.route('/', defaults={'path': ''})
-# @home.route("/<string:path>")
-# @home.route('/<path:path>')
-# def catch_all(path):
-#     return 'You want path: %s' % path

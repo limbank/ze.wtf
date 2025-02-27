@@ -3,6 +3,8 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
 
+from models import *
+
 limiter = Limiter(
     get_remote_address,
     app=current_app,
@@ -23,4 +25,11 @@ def handle_dash():
 
     current_user = user_from_cookie(valid_cookie)
 
-    return render_template("dash.html", username=current_user['username'])
+    # Retrieve the URLs created by user
+    links = Link.select().where(Link.owner == current_user['user_id'])
+
+    # Iterate over the result
+    for link in links:
+        print(f"url: {link.url}, ref: {link.ref}")
+
+    return render_template("dash.html", username=current_user['username'], links = links)

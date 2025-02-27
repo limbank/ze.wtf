@@ -9,5 +9,13 @@
 {% block content %}
 	<p>
 		Welcome, {{username}}
+		<br>
+		Your created links:<br>
+
+        {% for link in links %}
+            <a href="ze.wtf/{{ link.ref }}">ze.wtf/{{ link.ref }}</a> | <a href="{{ link.url }}">{{ link.url }}</a><br>
+        {% else %}
+            <span>No items found.</span>
+        {% endfor %}
 	</p>
 {% endblock %}
