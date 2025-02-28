@@ -29,6 +29,8 @@ def index(path):
     # urls = extractor.find_urls(url)
     # print(len(urls))
 
+    url_available = None
+
     if url is not None:
         print("URL NOT NONE")
         print(url)
@@ -38,10 +40,9 @@ def index(path):
             newID = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
             print(newID)
             Link.create(url=url, ref=newID, owner=user_id)
-            error = "New URL available at " + request.host + "/" + newID
-            print("Done!")
+            url_available = newID
 
-    return render_template("home.html", error=error, domain=request.host, username=username)
+    return render_template("home.html", error=error, url_available = url_available, domain=request.host, username=username)
 
 @home.route("/<string:path>")
 @home.route('/<path:path>')
