@@ -2,18 +2,18 @@
 	<div class="container">
 		<ul class="nav">
 			<li>
-				<a href="/">Home</a>
+				<a href="{{ url_for('home.index') }}">Home</a>
 			</li>
 			{% if username %}
 				<li>
-					<a href="/dash">Dash</a>
+					<a href="{{ url_for('dash.handle_dash') }}">Dash</a>
 				</li>
 				<li>
-					<a href="/logout">Logout</a>
+					<a href="{{ url_for('logout.handle_logout') }}">Logout</a>
 				</li>
 			{% else %}
 				<li>
-					<a href="/auth">Login</a>
+					<a href="{{ url_for('auth.handle_auth') }}">Login</a>
 				</li>
 			{% endif %}
 		</ul>
