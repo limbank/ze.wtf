@@ -9,4 +9,7 @@ def handle_error(e):
     code = 500
     if isinstance(e, HTTPException):
         code = e.code
-    return render_template('error.html', error=str(e)), code
+
+    error_data = dict(code = code, text = str(e))
+
+    return render_template('error.html', error=error_data), code
