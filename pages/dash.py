@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, current_app, redirect, url_for
+from flask import Blueprint, render_template, current_app, redirect, url_for, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
@@ -28,4 +28,4 @@ def handle_dash():
     # Retrieve the URLs created by user
     links = Link.select().where(Link.owner == current_user['user_id'])
 
-    return render_template("dash.html", username=current_user['username'], links = links)
+    return render_template("dash.html", username=current_user['username'], domain=request.host, links = links)
