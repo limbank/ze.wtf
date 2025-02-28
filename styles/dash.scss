@@ -1,0 +1,30 @@
+.links {
+	width: 100%;
+	overflow: auto;
+
+	&__table {
+		width: 100%;
+		border: 1px solid #111113;
+  		border-collapse: collapse;
+
+		tr {
+			&:nth-child(even) {
+				td {
+					background: #29292e;
+				}
+			}
+		}
+
+		th, td {
+			border: 1px solid #111113;
+			padding: 8px 12px;
+		}
+
+		th {
+			background: #111113;
+		}
+
+		td {
+		}
+	}
+}
