@@ -8,25 +8,25 @@
 
 {% block content %}
 	<div class="login">
-		<p>
-			{{msg}}
-		</p>
 		<form class="form" action="{{ url_for('auth.handle_login') }}" method="post" autocomplete="off">
+			{% if msg != "" %}
+				<div class="form__message">{{msg}}</div>
+			{% endif %}
 			{% if error != None %}
 				{{error}}
 			{% endif %}
-			<input name="username" type="text" placeholder="Username" />
-			<input name="password" type="password" placeholder="Password" />
+			<input name="username" type="text" placeholder="Username" required />
+			<input name="password" type="password" placeholder="Password" required />
 
-	        <img src="{{ url_for('auth.dash_captcha') }}" id="captcha_image" />
-	        <a href="#" class="form__captcha__button" onclick="document.getElementById('captcha_image').src = '/captcha?' + Math.random(); return false">
+	        <img src="{{ url_for('auth.dash_captcha') }}" id="captcha_image" class="captcha" />
+	        <a href="#" class="captcha__button" onclick="document.getElementById('captcha_image').src = '/captcha?' + Math.random(); return false">
 	            Refresh
 	        </a>
-	        <input type="text"name="captcha" placeholder="Captcha" id="captcha" required>
+	        <input type="text"name="captcha" placeholder="Captcha" id="captcha" required />
 
 			<input type="submit" value="Submit">
-		</form>
 
-		<a href="{{ url_for('auth.handle_register') }}">Register</a>
+			<a href="{{ url_for('auth.handle_register') }}">Register</a>
+		</form>
 	</div>
 {% endblock %}

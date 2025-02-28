@@ -7,11 +7,13 @@
 {% endblock %}
 
 {% block content %}
-	<form method="POST" action="/">
-		{% if error != None %}
-			{{error}}
-		{% endif %}
-		<input name="url" type="text" placeholder="URL" />
-		<input type="submit" value="Submit">
-	</form>
+	<div class="home">
+		<form class="form" method="POST" action="/" autocomplete="off">
+			{% if error != None %}
+				<div class="form__message">{{error}}</div>
+			{% endif %}
+			<input name="url" type="text" placeholder="URL" />
+			<input type="submit" value="Submit">
+		</form>
+	</div>
 {% endblock %}
