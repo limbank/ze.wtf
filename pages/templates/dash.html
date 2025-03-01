@@ -40,15 +40,15 @@
 		<div class="links">
 			<table class="links__table">
 				<tr>
-					<th>Created</th>
 					<th>Expires</th>
-					<th>Used</th>
+					<th>Code</th>
+					<th>Used by</th>
 				</tr>
 		        {% for invite in invites %}
 					<tr>
-						<td>{{invite.created}}</td>
 						<td>{{invite.expires}}</td>
-						<td>{{invite.used_by}}</td>
+						<td>{{invite.code}}</td>
+						<td>{{invite.used_by.username}}</td>
 					</tr>
 		        {% else %}
 					<tr>

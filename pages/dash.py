@@ -30,6 +30,6 @@ def handle_dash():
 
     # Retrieve the invites created by user
     # TO-DO make invites show names instead of IDs
-    invites = Invites.select().where(Invites.created_by == current_user['user_id'])
+    invites = Invites.select().join(User, on=(Invites.used_by == User.users_id)).where(Invites.created_by == current_user['user_id'])
 
     return render_template("dash.html", username=current_user['username'], domain=request.host, links = links, invites = invites)

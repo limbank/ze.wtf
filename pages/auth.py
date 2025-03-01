@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 
 from utils.cookies import check_cookie, create_cookie
+from utils.invites import check_invite
 
 # Change to only import users later
 from models import *
@@ -41,24 +42,6 @@ def check_captcha():
             return dict(success = True)
     else:
         return dict(msg = "Missing captcha!", success = False)
-
-def check_invite():
-    if 'invite' in request.form:
-        # Check db for invite
-        invite = Invites.get_or_none(Invites.code == request.form['invite'])
-        if invite is None:
-            # Invite does not exist
-            return dict(msg = "You need a valid invite to join!", success = False)
-
-        if invite.used_by is not None:
-            # Invite already used
-            return dict(msg = "Invite has already been used!", success = False)
-
-        if datetime.now() > invite.expires:
-            # Invite already expired
-            return dict(msg = "Invite has expired!", success = False)
-    else:
-        return dict(msg = "Missing invite code", success = False)
 
 def authenticate_user():
     # Check captcha
