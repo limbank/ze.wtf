@@ -33,3 +33,17 @@ def handle_dash():
     invites = Invites.select().join(User, on=(Invites.used_by == User.users_id)).where(Invites.created_by == current_user['user_id'])
 
     return render_template("dash.html", username=current_user['username'], domain=request.host, links = links, invites = invites)
+
+@dash.route("/dash/invite")
+@limiter.limit("2/second")
+def create_invite():
+    # Check cookie
+    valid_cookie = check_cookie()
+
+    if valid_cookie == False:
+        return redirect(url_for('home.index'))
+
+    current_user = user_from_cookie(valid_cookie)
+
+    # Redirect back to dash
+    return "hi"
