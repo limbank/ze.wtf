@@ -21,3 +21,6 @@ def check_invite():
             return dict(msg = "Invite has expired!", success = False)
     else:
         return dict(msg = "Missing invite code", success = False)
+
+def create_invite():
+    return "hi"

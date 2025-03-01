@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, current_app, redirect, url_for, re
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
+from utils.invites import create_invite
 
 from models import *
 
@@ -45,5 +46,7 @@ def create_invite():
 
     current_user = user_from_cookie(valid_cookie)
 
+
+
     # Redirect back to dash
-    return "hi"
+    return redirect(url_for('dash.handle_dash'))
