@@ -30,14 +30,13 @@ def handle_dash():
     links = Link.select().where(Link.owner == current_user['user_id'])
 
     # Retrieve the invites created by user
-    # TO-DO make invites show names instead of IDs
-    invites = Invites.select().join(User, on=(Invites.used_by == User.users_id)).where(Invites.created_by == current_user['user_id'])
+    invites = Invites.select().join(User, JOIN.LEFT_OUTER, on=(Invites.used_by == User.users_id)).where(Invites.created_by == current_user['user_id'])
 
     return render_template("dash.html", username=current_user['username'], domain=request.host, links = links, invites = invites)
 
 @dash.route("/dash/invite")
 @limiter.limit("2/second")
-def create_invite():
+def handle_invite():
     # Check cookie
     valid_cookie = check_cookie()
 
@@ -46,7 +45,7 @@ def create_invite():
 
     current_user = user_from_cookie(valid_cookie)
 
-
+    create_invite(current_user)
 
     # Redirect back to dash
     return redirect(url_for('dash.handle_dash'))
