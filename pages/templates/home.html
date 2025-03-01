@@ -8,18 +8,20 @@
 
 {% block content %}
 	<div class="home">
-		<form class="form" method="POST" action="/" autocomplete="off">
-			{% if error != None %}
-				<div class="form__message">{{error}}</div>
-			{% endif %}
-			{% if url_available != None %}
-				<div class="form__message">
-					New url available at
-					<a href="/{{url_available}}">{{ domain }}/{{url_available}}</a>
-				</div>
-			{% endif %}
-			<input name="url" type="text" placeholder="URL" required />
-			<input type="submit" value="Submit">
-		</form>
+		{% if username != None %}
+			<form class="form" method="POST" action="/" autocomplete="off">
+				{% if error != None %}
+					<div class="form__message">{{error}}</div>
+				{% endif %}
+				{% if url_available != None %}
+					<div class="form__message">
+						New url available at
+						<a href="/{{url_available}}">{{ domain }}/{{url_available}}</a>
+					</div>
+				{% endif %}
+				<input name="url" type="text" placeholder="URL" required />
+				<input type="submit" value="Submit">
+			</form>
+		{% endif %}
 	</div>
 {% endblock %}
