@@ -23,7 +23,11 @@ def index(path):
         user_id = current_user['user_id']
 
     url = request.form.get('url')
+    url_name = request.form.get('name')
     error = None
+
+    if url_name == "":
+        url_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
 
     # extractor = URLExtract()
     # urls = extractor.find_urls(url)
@@ -37,10 +41,8 @@ def index(path):
         if not validators.url(url):
             error = "\"" + url + "\" is not a valid URL! Remember to include the schema."
         else:
-            newID = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
-            print(newID)
-            Link.create(url=url, ref=newID, owner=user_id)
-            url_available = newID
+            Link.create(url=url, ref=url_name, owner=user_id)
+            url_available = url_name
 
     return render_template("home.html", error=error, url_available = url_available, domain=request.host, username=username)
 
