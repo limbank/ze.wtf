@@ -2,6 +2,18 @@ from peewee import *
 
 db = SqliteDatabase('short.db')
 
+class Invites(Model):
+  invites_id = IntegerField(primary_key=True)
+  created_by = IntegerField()
+  used_by = IntegerField()
+  created = DateTimeField()
+  expires = DateTimeField()
+  code = CharField()
+
+  class Meta:
+    database = db
+    db_table = 'invites'
+
 class Cookie(Model):
   cookies_id = IntegerField(primary_key=True)
   user_id = IntegerField()

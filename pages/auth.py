@@ -7,7 +7,7 @@ import os
 import string
 import random
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from utils.cookies import check_cookie, create_cookie
 
@@ -81,6 +81,27 @@ def register_user():
     if captcha_valid['success'] == False:
         return captcha_valid
 
+    # Check invite
+    # TO-DO: optimize this
+    if 'invite' in request.form:
+        # Check db for invite
+        invite = Invites.get_or_none(Invites.code == request.form['invite'])
+        print("This is our invite:")
+        print(invite)
+        if invite is None:
+            # Invite does not exist
+            return dict(msg = "You need a valid invite to join!", success = False)
+
+        if invite.used_by is not None:
+            # Invite already used
+            return dict(msg = "You need a valid invite to join!", success = False)
+            
+        # if datetime.now() > invite.expires:
+        #     # Invite already expired
+        #     return dict(msg = "You need a valid invite to join!", success = False)
+    else:
+        return dict(msg = "You need a valid invite to join!", success = False)
+
     # Check user
     if 'username' in request.form and 'password' in request.form:
         # Separating these introduces and easier credential stuffing attack vector
@@ -104,6 +125,11 @@ def register_user():
 
         # Add user to database
         new_user = User.create(username=username, password=phash, date_joined=datetime.now())
+
+        # Mark invite as used
+        invite = Invites.get(Invites.code == request.form['invite'])
+        invite.used_by = new_user.users_id
+        invite.save()
 
         # Construct login cookie
         new_cookie = create_cookie(new_user)
@@ -167,7 +193,7 @@ def handle_register():
             # User registered, set cookie, then redirect...
 
             response = make_response(redirect(url_for('dash.handle_dash')))
-            response.set_cookie('loggedin', check_auth['cookie'])
+            response.set_cookie('loggedin', check_reg['cookie'])
 
             return response
         else:
