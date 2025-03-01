@@ -6,6 +6,7 @@ from captcha.image import ImageCaptcha
 import os
 import string
 import random
+import json
 from dotenv import load_dotenv
 from datetime import datetime
 
@@ -84,6 +85,8 @@ def register_user():
 
     # Check invite
     invite_valid = check_invite()
+    print("invite check")
+    print(invite_valid)
     if invite_valid['success'] == False:
         return invite_valid
 
@@ -98,6 +101,12 @@ def register_user():
         if password != password_confirm:
             # Passwords dont match
             return dict(msg = "Passwords do not match", success = False)
+
+        # Check if username is allowed
+        with open('utils/usernames.json') as f:
+            data = json.load(f)
+            if username in data['usernames']:
+                return dict(msg = "Username not allowed", success = False)
 
         # Check username
         user = User.get_or_none(User.username == username)

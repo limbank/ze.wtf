@@ -1,4 +1,4 @@
-from flask import  request
+from flask import request
 from datetime import datetime, timedelta
 import random
 import string
@@ -22,6 +22,8 @@ def check_invite():
         if datetime.now() > invite.expires:
             # Invite already expired
             return dict(msg = "Invite has expired!", success = False)
+
+        return dict(msg = "Invite valid!", success = True)
     else:
         return dict(msg = "Missing invite code", success = False)
 
