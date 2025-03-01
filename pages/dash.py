@@ -28,4 +28,8 @@ def handle_dash():
     # Retrieve the URLs created by user
     links = Link.select().where(Link.owner == current_user['user_id'])
 
-    return render_template("dash.html", username=current_user['username'], domain=request.host, links = links)
+    # Retrieve the invites created by user
+    # TO-DO make invites show names instead of IDs
+    invites = Invites.select().where(Invites.created_by == current_user['user_id'])
+
+    return render_template("dash.html", username=current_user['username'], domain=request.host, links = links, invites = invites)

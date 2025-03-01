@@ -42,6 +42,24 @@ def check_captcha():
     else:
         return dict(msg = "Missing captcha!", success = False)
 
+def check_invite():
+    if 'invite' in request.form:
+        # Check db for invite
+        invite = Invites.get_or_none(Invites.code == request.form['invite'])
+        if invite is None:
+            # Invite does not exist
+            return dict(msg = "You need a valid invite to join!", success = False)
+
+        if invite.used_by is not None:
+            # Invite already used
+            return dict(msg = "Invite has already been used!", success = False)
+
+        if datetime.now() > invite.expires:
+            # Invite already expired
+            return dict(msg = "Invite has expired!", success = False)
+    else:
+        return dict(msg = "Missing invite code", success = False)
+
 def authenticate_user():
     # Check captcha
     captcha_valid = check_captcha()
@@ -82,25 +100,9 @@ def register_user():
         return captcha_valid
 
     # Check invite
-    # TO-DO: optimize this
-    if 'invite' in request.form:
-        # Check db for invite
-        invite = Invites.get_or_none(Invites.code == request.form['invite'])
-        print("This is our invite:")
-        print(invite)
-        if invite is None:
-            # Invite does not exist
-            return dict(msg = "You need a valid invite to join!", success = False)
-
-        if invite.used_by is not None:
-            # Invite already used
-            return dict(msg = "You need a valid invite to join!", success = False)
-            
-        # if datetime.now() > invite.expires:
-        #     # Invite already expired
-        #     return dict(msg = "You need a valid invite to join!", success = False)
-    else:
-        return dict(msg = "You need a valid invite to join!", success = False)
+    invite_valid = check_invite()
+    if invite_valid['success'] == False:
+        return invite_valid
 
     # Check user
     if 'username' in request.form and 'password' in request.form:
