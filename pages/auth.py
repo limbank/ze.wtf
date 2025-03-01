@@ -85,8 +85,6 @@ def register_user():
 
     # Check invite
     invite_valid = check_invite()
-    print("invite check")
-    print(invite_valid)
     if invite_valid['success'] == False:
         return invite_valid
 
