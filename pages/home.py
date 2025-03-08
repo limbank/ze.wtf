@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, abort
+from flask import Blueprint, render_template, request, redirect, abort, url_for
 from dotenv import load_dotenv
 import validators
 import random
@@ -47,7 +47,7 @@ def create_link(user_id):
 
     return dict(url_available=url_name, error=None)
 
-@home.route("/", methods=['GET', 'POST'], defaults={'path': ''})
+@home.route("/", defaults={'path': ''})
 def index(path):
     # Check cookie
     valid_cookie = check_cookie()
@@ -59,11 +59,45 @@ def index(path):
         username = current_user['username']
         user_id = current_user['user_id']
 
+    if username is not None:
+        return redirect(url_for('home.links'))
+    else: 
+        return render_template("home.html")
+
+@home.route("/links", methods=['GET', 'POST'], defaults={'path': ''})
+def links(path):
+    # Check cookie
+    valid_cookie = check_cookie()
+
+    if valid_cookie == False:
+        return redirect(url_for('home.index'))
+    else:
+        # Get user if logged in
+        current_user = user_from_cookie(valid_cookie)
+        username = current_user['username']
+        user_id = current_user['user_id']
+
+    # If a POST request was submitted, create URL
     new_url = dict(error=None, url_available=None)
     if request.method == 'POST':
         new_url = create_link(user_id)
 
-    return render_template("home.html", error=new_url['error'], url_available = new_url['url_available'], domain=request.host, username=username)
+    return render_template("links.html", error=new_url['error'], url_available = new_url['url_available'], domain=request.host, username=username)
+
+@home.route("/images", methods=['GET', 'POST'], defaults={'path': ''})
+def images(path):
+    # Check cookie
+    valid_cookie = check_cookie()
+
+    if valid_cookie == False:
+        return redirect(url_for('home.index'))
+    else:
+        # Get user if logged in
+        current_user = user_from_cookie(valid_cookie)
+        username = current_user['username']
+        user_id = current_user['user_id']
+
+    return render_template("images.html", domain=request.host, username=username)
 
 @home.route("/<string:path>")
 @home.route('/<path:path>')

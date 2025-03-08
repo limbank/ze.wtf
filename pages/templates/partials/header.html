@@ -1,7 +1,7 @@
 <div class="header">
 	<div class="container">
 		<ul class="nav">
-			<li>
+			<li class="item-left">
 				<a href="{{ url_for('home.index') }}">Home</a>
 			</li>
 			{% if username %}
@@ -19,3 +19,17 @@
 		</ul>
 	</div>
 </div>
+{% if username and active_page == "home" %}
+	<div class="header header-secondary">
+		<div class="container">
+			<ul class="nav">
+				<li>
+					<a href="{{ url_for('home.links') }}">Links</a>
+				</li>
+				<li>
+					<a href="{{ url_for('home.images') }}">Images</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+{% endif %}

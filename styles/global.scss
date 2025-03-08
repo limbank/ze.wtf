@@ -48,6 +48,12 @@ a {
 	background: #111113;
 }
 
+.header {
+	&-secondary {
+		background: #29292E;
+	}
+}
+
 .footer {
 	padding: 8px 12px;
 	font-size: 14px;
@@ -65,7 +71,7 @@ a {
 	}
 
 	li {
-		&:first-child {
+		&.item-left {
 			margin-right: auto;
 		}
 	}
@@ -95,5 +101,26 @@ a {
 		font-size: 14px;
 		color: #cfd3cf;
 		border: 1px solid #111113;
+	}
+
+	&__file {
+		background: lighten(#111113, 10%);
+		padding: 16px 24px;
+		font-size: 14px;
+		color: #cfd3cf;
+		border: 1px solid #111113;
+		cursor: pointer;
+
+		&:hover {
+			background: lighten(#111113, 20%);
+		}
+
+		&-dragging {
+			background: lighten(#111113, 20%);
+		}
+
+		&-input {
+			display: none;
+		}
 	}
 }
