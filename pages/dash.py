@@ -26,6 +26,22 @@ def handle_dash():
     else:
         return redirect(url_for('dash.dash_links'))
 
+def delete_invite(slug, user_id):
+    selected_invite = Invites.get_or_none(code=slug)
+
+    if selected_invite is None:
+        return dict(success=False, message="Invite does not exist.")
+
+    if selected_invite.created_by.users_id != user_id:
+        return dict(success=False, message="Permission denied.")
+        
+    if selected_invite.used_by is not None:
+        return dict(success=False, message="Cannot delete used invites.")
+
+    # Delete invite
+    selected_invite.delete_instance();
+
+    return dict(success=True, message="Invite with the slug " + slug + " has been deleted.")
 
 @dash.route("/dash/invites", methods=['GET', 'POST'])
 @limiter.limit("2/second")
@@ -37,6 +53,12 @@ def dash_invites():
         return redirect(url_for('home.index'))
 
     current_user = user_from_cookie(valid_cookie)
+
+    if (request.content_type == "application/json"):
+        content = request.json
+        if 'delete' in content:
+            deleted_invite = delete_invite(content['delete'], current_user['user_id'])
+            return(deleted_invite)
 
     if request.method == 'POST':
         create_invite(current_user)

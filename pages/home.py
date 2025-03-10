@@ -110,10 +110,11 @@ def links(path):
         username = current_user['username']
         user_id = current_user['user_id']
 
-    content = request.json
-    if 'delete' in content:
-        deleted_url = delete_link(content['delete'], user_id)
-        return(deleted_url)
+    if (request.content_type == "application/json"):
+        content = request.json
+        if 'delete' in content:
+            deleted_url = delete_link(content['delete'], user_id)
+            return(deleted_url)
 
     # Prepare return variable default
     new_url = dict(error=None, url_available=None)

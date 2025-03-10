@@ -6,10 +6,12 @@
 
     delete_buttons.forEach(button => {
         button.addEventListener('click', async () => {
-            let target_url = button.dataset.urlname;
+            let target_invite = button.dataset.invitename;
+
+            console.log("Will delete invite", target_invite)
 
             try {
-                const response = await fetch(window.location.origin + "/links", {
+                const response = await fetch(window.location.origin + "/dash/invites", {
                     method: "POST",
                     // Set the FormData instance as the request body
                     headers: {
@@ -17,11 +19,12 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        "delete": target_url
+                        "delete": target_invite
                     }),
                 });
 
                 let result = await response.json();
+                console.log(result)
 
                 let new_notif = document.createElement('div');
                 new_notif.className = 'notif';
