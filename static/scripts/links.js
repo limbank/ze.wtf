@@ -8,6 +8,11 @@
         button.addEventListener('click', async () => {
             let target_url = button.dataset.urlname;
 
+            let confirmation = "Are you sure you want to delete this link?";
+            if (confirm(confirmation) == false) {
+                return console.log("Deletion cancelled");
+            }
+
             try {
                 const response = await fetch(window.location.origin + "/links", {
                     method: "POST",
