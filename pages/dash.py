@@ -23,20 +23,13 @@ def handle_dash():
 
     if valid_cookie == False:
         return redirect(url_for('home.index'))
+    else:
+        return redirect(url_for('dash.dash_links'))
 
-    current_user = user_from_cookie(valid_cookie)
 
-    # Retrieve the URLs created by user
-    links = Link.select().where(Link.owner == current_user['user_id'])
-
-    # Retrieve the invites created by user
-    invites = Invites.select().join(User, JOIN.LEFT_OUTER, on=(Invites.used_by == User.users_id)).where(Invites.created_by == current_user['user_id'])
-
-    return render_template("dash.html", username=current_user['username'], domain=request.host, links = links, invites = invites)
-
-@dash.route("/dash/invite")
+@dash.route("/dash/invites", methods=['GET', 'POST'])
 @limiter.limit("2/second")
-def handle_invite():
+def dash_invites():
     # Check cookie
     valid_cookie = check_cookie()
 
@@ -45,7 +38,43 @@ def handle_invite():
 
     current_user = user_from_cookie(valid_cookie)
 
-    create_invite(current_user)
+    if request.method == 'POST':
+        create_invite(current_user)
+        return redirect(url_for('dash.dash_invites'))
 
-    # Redirect back to dash
-    return redirect(url_for('dash.handle_dash'))
+    # Retrieve the invites created by user
+    invites = Invites.select().join(User, JOIN.LEFT_OUTER, on=(Invites.used_by == User.users_id)).where(Invites.created_by == current_user['user_id'])
+
+    return render_template("dash_invites.html", username=current_user['username'], domain=request.host, invites = invites)
+
+@dash.route("/dash/links")
+@limiter.limit("2/second")
+def dash_links():
+    # Check cookie
+    valid_cookie = check_cookie()
+
+    if valid_cookie == False:
+        return redirect(url_for('home.index'))
+
+    current_user = user_from_cookie(valid_cookie)
+
+    # Retrieve the URLs created by user
+    links = Link.select().where(Link.owner == current_user['user_id'])
+
+    return render_template("dash_links.html", username=current_user['username'], domain=request.host, links = links)
+
+@dash.route("/dash/images")
+@limiter.limit("2/second")
+def dash_images():
+    # Check cookie
+    valid_cookie = check_cookie()
+
+    if valid_cookie == False:
+        return redirect(url_for('home.index'))
+
+    current_user = user_from_cookie(valid_cookie)
+
+    # Retrieve the images created by user
+    images = File.select().where(File.owner == current_user['user_id'])
+
+    return render_template("dash_images.html", username=current_user['username'], domain=request.host, images = images)

@@ -8,12 +8,13 @@
 
 {% block content %}
 	<div class="home">
-		<form class="form" method="POST" action="/images" autocomplete="off">
+		<form class="form" method="POST" action="/images" autocomplete="off" id="form">
 			<label for="file-upload" class="form__file" id="dropzone">
 		        Select or drop image
 		    </label>
-			<input id="file-upload" type="file" class="form__file-input" />
+			<input id="file-upload" name="file" type="file" class="form__file-input" />
 		</form>
+		<div class="uploaded-image" id="result" style="display: none;"></div>
 	</div>
 
 	<script src="{{ url_for('static', filename='scripts/upload.js') + '?v=' + version }}"></script>

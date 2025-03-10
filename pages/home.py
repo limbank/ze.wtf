@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, abort, url_for
+from flask import Blueprint, render_template, request, redirect, abort, url_for, current_app, send_from_directory
 from dotenv import load_dotenv
 import validators
 import random
@@ -6,10 +6,25 @@ import string
 import json
 from utils.cookies import check_cookie, user_from_cookie
 
+from werkzeug.utils import secure_filename
+from pathlib import Path
+from slugify import slugify
+from datetime import datetime
+
+UPLOAD_FOLDER = Path.cwd() / 'uploads'
+ALLOWED_EXTENSIONS = {'webp', 'tiff', 'png', 'jpg', 'jpeg', 'gif'}
+
 # Only import urls here instead
 from models import *
 
 home = Blueprint('home', __name__, template_folder='templates')
+
+def random_string(length = 5):
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=int(length)))
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def create_link(user_id):
     # Create URL
@@ -43,7 +58,7 @@ def create_link(user_id):
             return dict(error="URL alias already exists.", url_available=None)
 
     # Add URL to database
-    Link.create(url=url, ref=url_name, owner=user_id)
+    Link.create(url=url, date_created=datetime.now(), ref=url_name, owner=user_id)
 
     return dict(url_available=url_name, error=None)
 
@@ -68,6 +83,8 @@ def index(path):
 def links(path):
     # Check cookie
     valid_cookie = check_cookie()
+    username = None
+    user_id = None
 
     if valid_cookie == False:
         return redirect(url_for('home.index'))
@@ -88,6 +105,8 @@ def links(path):
 def images(path):
     # Check cookie
     valid_cookie = check_cookie()
+    username = None
+    user_id = None
 
     if valid_cookie == False:
         return redirect(url_for('home.index'))
@@ -97,11 +116,63 @@ def images(path):
         username = current_user['username']
         user_id = current_user['user_id']
 
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            # No file part
+            return dict(success = False, message="File not found.")
+
+        file = request.files['file']
+
+        # If the user does not select a file, the browser submits an empty file without a filename.
+        if file.filename == '':
+            # No selected file
+            return dict(success = False, message="File not found.")
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+
+            # Convert username to slug
+            username_as_slug = slugify(username)
+            # Make a directory for a user if none exist
+            UPLOAD_FOLDER.joinpath(username_as_slug).mkdir(parents=True, exist_ok=True)
+
+            # Generate new random filename
+            file_slug = random_string(8)
+            new_filename = file_slug + "." + filename.rsplit('.', 1)[1].lower()
+            # Get new destination
+            file_dest = Path(UPLOAD_FOLDER) / username_as_slug / new_filename
+
+            # Save file
+            file.save(file_dest)
+
+            # Write file to DB
+            # To-Do: make sure file name is unique in db without throwing error
+            relative_path = Path(username_as_slug) / new_filename
+            File.create(owner=user_id, created=datetime.now(), filename=file_slug, location=relative_path, original=filename)
+
+            # Inform user of success
+            return dict(success = True, message="Success! Your file is available at: " + request.host + "/" + file_slug)
+        else:
+            # File not allowed
+            print(file.filename)
+            print(allowed_file(file.filename))
+            return dict(success = False, message="Filetype not allowed.")
+
     return render_template("images.html", domain=request.host, username=username)
+
+#If the files are too large
+@home.app_errorhandler(413)
+def request_entity_too_large(error):
+    #return dict(success = False, message="File too large."), 413
+    # PNG image of Ed Sheeran raises this error for some reason. Multipart encoding bug?
+    print("Too large raised")
+    return dict(success = False, message="File too large.")
 
 @home.route("/<string:path>")
 @home.route('/<path:path>')
 def catch_all(path):
+    # Check if slug is a link
     short_link = Link.get_or_none(ref=path)
     if short_link is not None:
         # Update visits counter
@@ -110,5 +181,15 @@ def catch_all(path):
 
         # Redirect user to link
         return redirect(short_link.url)
-    else:
-        abort(404)
+
+    # Check if slug is a file
+    file = File.get_or_none(filename=path)
+    if file is not None:
+        # Send file
+        # Get absolute file path
+        file_location = Path(UPLOAD_FOLDER) / file.location
+        # Return file
+        return send_from_directory(file_location.parent, file_location.name)
+
+    # Failed to find file or link
+    abort(404)

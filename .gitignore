@@ -174,3 +174,7 @@ cython_debug/
 .pypirc
 short.db
 /static/styles
+
+# Custom
+backup.env
+/uploads

@@ -57,5 +57,26 @@
 		        {% endfor %}
 			</table>
 	    </div>
+		<p>
+			Your created Files:
+		</p>
+		<div class="links">
+			<table class="links__table">
+				<tr>
+					<th>URL</th>
+					<th>Filename</th>
+				</tr>
+		        {% for image in images %}
+					<tr>
+						<td><a href="/{{ image.filename }}">{{ domain }}/{{ image.filename }}</a></td>
+						<td>{{image.original}}</td>
+					</tr>
+		        {% else %}
+					<tr>
+						<td colspan="3" class="links__not-found">No items found.</td>
+					</tr>
+		        {% endfor %}
+			</table>
+	    </div>
 	</div>
 {% endblock %}

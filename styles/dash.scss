@@ -33,14 +33,30 @@
 	}
 }
 
-.create-link {
-	float: right;
-	text-decoration: none;
-	font-size: 14px;
-	display: inline-block;
-	text-underline-offset: 2px;
+.invites-header {
+	p {
+		display: inline-block;
+		margin: 0 0 14px;
+	}
 
-	&:hover {
-		text-decoration: underline;
+	.create-invite {
+		float: right;
+		display: inline-block;
+
+		button {
+			border: none;
+			background: transparent;
+			font-size: 14px;
+			color: #cfd3cf;
+			display: inline-block;
+			text-underline-offset: 2px;
+			padding: 0;
+			transform: translateY(-1px);
+			cursor: pointer;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
 	}
 }

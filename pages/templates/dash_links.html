@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "dash" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<p>
+			Welcome, {{username}}.
+		</p>
+		<p>
+			Your created links:
+		</p>
+		<div class="links">
+			<table class="links__table">
+				<tr>
+					<th>Short</th>
+					<th>URL</th>
+					<th>Visits</th>
+				</tr>
+		        {% for link in links %}
+					<tr>
+						<td><a href="/{{ link.ref }}">{{ domain }}/{{ link.ref }}</a></td>
+						<td><a href="{{ link.url }}">{{ link.url }}</a></td>
+						<td>{{link.visits}}</td>
+					</tr>
+		        {% else %}
+					<tr>
+						<td colspan="3" class="links__not-found">No items found.</td>
+					</tr>
+		        {% endfor %}
+			</table>
+	    </div>
+	</div>
+{% endblock %}

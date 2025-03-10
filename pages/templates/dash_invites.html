@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "dash" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<p>
+			Welcome, {{username}}.
+		</p>
+		<div class="invites-header">
+			<p>
+				Your created invites:
+			</p>
+			<form action="{{ url_for('dash.dash_invites') }}" class="create-invite" method="post">
+		    	<button type="submit" name="your_name">[Create]</button>
+			</form>
+		</div>
+		<div class="links">
+			<table class="links__table">
+				<tr>
+					<th>Expires</th>
+					<th>Code</th>
+					<th>Used by</th>
+				</tr>
+		        {% for invite in invites %}
+					<tr>
+						<td>{{invite.expires}}</td>
+						<td>{{invite.code}}</td>
+						<td>{{invite.used_by.username}}</td>
+					</tr>
+		        {% else %}
+					<tr>
+						<td colspan="3" class="links__not-found">No items found.</td>
+					</tr>
+		        {% endfor %}
+			</table>
+	    </div>
+	</div>
+{% endblock %}
