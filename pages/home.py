@@ -47,20 +47,36 @@ def create_link(user_id):
         url_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
     else:
         # Check if url alias is allowed
+        url_slug = slugify(url_name)
+
         with open('utils/usernames.json') as f:
             data = json.load(f)
-            if url_name in data['usernames']:
+            if url_slug in data['usernames']:
                 return dict(error="URL alias not allowed.", url_available=None)
 
         # Verify alias not existing
-        alias_count = Link.select().where(Link.ref == url_name).count()
+        alias_count = Link.select().where(Link.ref == url_slug).count()
         if alias_count > 0:
             return dict(error="URL alias already exists.", url_available=None)
 
     # Add URL to database
-    Link.create(url=url, date_created=datetime.now(), ref=url_name, owner=user_id)
+    Link.create(url=url, date_created=datetime.now(), ref=url_slug, owner=user_id)
 
-    return dict(url_available=url_name, error=None)
+    return dict(url_available=url_slug, error=None)
+
+def delete_link(slug, user_id):
+    short_link = Link.get_or_none(ref=slug)
+
+    if short_link is None:
+        return dict(success=False, message="Link does not exist.")
+
+    if short_link.owner != user_id:
+        return dict(success=False, message="Permission denied.")
+        
+    # Delete link
+    short_link.delete_instance();
+
+    return dict(success=True, message="Url with the slug " + slug + " has been deleted.")
 
 @home.route("/", defaults={'path': ''})
 def index(path):
@@ -94,9 +110,16 @@ def links(path):
         username = current_user['username']
         user_id = current_user['user_id']
 
-    # If a POST request was submitted, create URL
+    content = request.json
+    if 'delete' in content:
+        deleted_url = delete_link(content['delete'], user_id)
+        return(deleted_url)
+
+    # Prepare return variable default
     new_url = dict(error=None, url_available=None)
+
     if request.method == 'POST':
+        # If a POST request was submitted, create URL
         new_url = create_link(user_id)
 
     return render_template("links.html", error=new_url['error'], url_available = new_url['url_available'], domain=request.host, username=username)

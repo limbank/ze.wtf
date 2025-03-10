@@ -60,3 +60,35 @@
 		}
 	}
 }
+
+.delete-link {
+	cursor: pointer;
+	background: transparent;
+	border: 0px;
+	color: inherit;
+	height: 22px;
+	width: 22px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s ease-in;
+
+	&:hover {
+		background: #414149;
+	}
+
+	svg {
+		width: 16px;
+		height: 16px;
+	}
+}
+
+.notifications {
+	.notif {
+		margin-bottom: 10px;
+		width: 100%;
+		border: 1px solid #111113;
+		padding: 8px 12px;
+		background: #29292e;
+	}
+}
