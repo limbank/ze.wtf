@@ -44,3 +44,19 @@ def delete_image(slug, current_user):
     selected_image.delete_instance();
 
     return dict(success=True, message="Image with the slug " + slug + " has been deleted.")
+
+def delete_link(slug, current_user):
+    user_id = current_user['user_id']
+
+    short_link = Link.get_or_none(ref=slug)
+
+    if short_link is None:
+        return dict(success=False, message="Link does not exist.")
+
+    if short_link.owner != user_id or not has_permission(current_user, "delete:ownLinks"):
+        return dict(success=False, message="Permission denied.")
+        
+    # Delete link
+    short_link.delete_instance();
+
+    return dict(success=True, message="Url with the slug " + slug + " has been deleted.")

@@ -4,7 +4,7 @@ from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
 from utils.invites import create_invite
 from utils.permissions import has_permission
-from utils.crud import delete_invite, delete_image
+from utils.crud import delete_invite, delete_image, delete_link
 from pathlib import Path
 
 from models import *
@@ -59,7 +59,7 @@ def dash_invites():
 
     return render_template("dash/invites.html", username=current_user['username'], domain=request.host, invites = invites, can_delete = can_delete, can_create=can_create)
 
-@dash.route("/dash/links")
+@dash.route("/dash/links", methods=['GET', 'POST'])
 @limiter.limit("2/second")
 def dash_links():
     # Check cookie
@@ -69,6 +69,12 @@ def dash_links():
         return redirect(url_for('home.index'))
 
     current_user = user_from_cookie(valid_cookie)
+
+    if (request.content_type == "application/json"):
+        content = request.json
+        if 'delete' in content:
+            deleted_url = delete_link(content['delete'], current_user)
+            return(deleted_url)
 
     # Retrieve the URLs created by user
     links = Link.select().where(Link.owner == current_user['user_id'])

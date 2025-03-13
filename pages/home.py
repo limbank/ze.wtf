@@ -64,20 +64,6 @@ def create_link(user_id):
 
     return dict(url_available=url_slug, error=None)
 
-def delete_link(slug, user_id):
-    short_link = Link.get_or_none(ref=slug)
-
-    if short_link is None:
-        return dict(success=False, message="Link does not exist.")
-
-    if short_link.owner != user_id:
-        return dict(success=False, message="Permission denied.")
-        
-    # Delete link
-    short_link.delete_instance();
-
-    return dict(success=True, message="Url with the slug " + slug + " has been deleted.")
-
 @home.route("/", defaults={'path': ''})
 def index(path):
     # Check cookie
@@ -109,12 +95,6 @@ def links(path):
         current_user = user_from_cookie(valid_cookie)
         username = current_user['username']
         user_id = current_user['user_id']
-
-    if (request.content_type == "application/json"):
-        content = request.json
-        if 'delete' in content:
-            deleted_url = delete_link(content['delete'], user_id)
-            return(deleted_url)
 
     # Prepare return variable default
     new_url = dict(error=None, url_available=None)

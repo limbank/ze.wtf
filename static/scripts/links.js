@@ -14,7 +14,7 @@
             }
 
             try {
-                const response = await fetch(window.location.origin + "/links", {
+                const response = await fetch(window.location.origin + "/dash/links", {
                     method: "POST",
                     // Set the FormData instance as the request body
                     headers: {
