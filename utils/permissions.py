@@ -14,7 +14,7 @@ def has_permission(current_user, perm_name):
     # Check if the permission exists in the list
     return perm_name in permissions
 
-def is_banned(current_user)
+def is_banned(current_user):
     if current_user['role'] == 3:
         return True
     return False

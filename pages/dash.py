@@ -3,6 +3,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
 from utils.invites import create_invite
+from utils.permissions import has_permission
 from pathlib import Path
 
 from models import *
@@ -90,7 +91,10 @@ def dash_invites():
     # Retrieve the invites created by user
     invites = Invites.select().join(User, JOIN.LEFT_OUTER, on=(Invites.used_by == User.users_id)).where(Invites.created_by == current_user['user_id'])
 
-    return render_template("dash_invites.html", username=current_user['username'], domain=request.host, invites = invites)
+    # Retreive invite-related permissions for user
+    can_delete = has_permission(current_user, "delete:ownInvites")
+
+    return render_template("dash/invites.html", username=current_user['username'], domain=request.host, invites = invites, can_delete = can_delete)
 
 @dash.route("/dash/links")
 @limiter.limit("2/second")
@@ -106,7 +110,10 @@ def dash_links():
     # Retrieve the URLs created by user
     links = Link.select().where(Link.owner == current_user['user_id'])
 
-    return render_template("dash_links.html", username=current_user['username'], domain=request.host, links = links)
+    # Retreive link-related permissions for user
+    can_delete = has_permission(current_user, "delete:ownLinks")
+
+    return render_template("dash/links.html", username=current_user['username'], domain=request.host, links = links, can_delete = can_delete)
 
 @dash.route("/dash/images", methods=['GET', 'POST'])
 @limiter.limit("2/second")
@@ -128,4 +135,7 @@ def dash_images():
     # Retrieve the images created by user
     images = File.select().where(File.owner == current_user['user_id'])
 
-    return render_template("dash_images.html", username=current_user['username'], domain=request.host, images = images)
+    # Retreive image-related permissions for user
+    can_delete = has_permission(current_user, "delete:ownFiles")
+
+    return render_template("dash/images.html", username=current_user['username'], domain=request.host, images = images, can_delete = can_delete)

@@ -26,22 +26,26 @@
 					<th>Expires</th>
 					<th>Code</th>
 					<th>Used by</th>
-					<th></th>
+					{% if can_delete == True %}
+						<th></th>
+					{% endif %}
 				</tr>
 		        {% for invite in invites %}
 					<tr>
 						<td>{{invite.expires}}</td>
 						<td>{{invite.code}}</td>
 						<td>{{invite.used_by.username}}</td>
-						<td width="38px">
-							<button class="delete-item" data-invitename="{{ invite.code }}">
-								<svg viewBox="0 0 24 24">
-									<g id="icons">
-										<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor" id="exit"/>
-									</g>
-								</svg>
-							</button>
-						</td>
+						{% if can_delete == True %}
+							<td width="38px">
+								<button class="delete-item" data-invitename="{{ invite.code }}">
+									<svg viewBox="0 0 24 24">
+										<g id="icons">
+											<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor" id="exit"/>
+										</g>
+									</svg>
+								</button>
+							</td>
+						{% endif %}
 					</tr>
 		        {% else %}
 					<tr>
@@ -52,5 +56,7 @@
 	    </div>
 	</div>
 
-	<script src="{{ url_for('static', filename='scripts/invites.js') + '?v=' + version }}"></script>
+	{% if can_delete == True %}
+		<script src="{{ url_for('static', filename='scripts/invites.js') + '?v=' + version }}"></script>
+	{% endif %}
 {% endblock %}
