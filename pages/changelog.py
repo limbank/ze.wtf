@@ -97,9 +97,10 @@ def index(post):
     username = None
     user_id = None
 
-    current_user = user_from_cookie(valid_cookie)
-    username = current_user['username']
-    user_id = current_user['user_id']
+    if valid_cookie != False:
+        current_user = user_from_cookie(valid_cookie)
+        username = current_user['username']
+        user_id = current_user['user_id']
 
 
     # list all the files in the posts directory
