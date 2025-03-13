@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "changelog" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="changelog">
+		<div class="container">
+			<div class="changelog__inner">
+		        {% if (latest is defined) and latest %}
+			        <b>[{{latest.date|safe}}] {{latest.title|safe}}</b>
+
+			        {{latest.content|safe}}
+		        {% else %}
+		            No posts found.
+		        {% endif %}
+
+		        {% if (posts is defined) and posts %}
+		        	<div class="changelog__earlier">
+		        		<b>Earlier logs:</b>
+		        	</div>
+		            {% for post in posts %}
+		                <div class="changelog__entry">
+		                    <a href="/changelog/{{post.slug}}">
+		                        <span>[{{post.date|safe}}]</span>
+		                        <span>{{post.title|safe}}</span>
+		                    </a>
+		                </div>
+		            {% endfor %}
+		        {% endif %}
+		    </div>
+		</div>
+	</div>
+{% endblock %}

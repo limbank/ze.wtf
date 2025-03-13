@@ -1,0 +1,17 @@
+.changelog {
+	&__inner {
+		padding: 20px 0;
+	}
+
+	&__earlier {
+		padding: 20px 0;
+	}
+
+	&__back {
+		margin-bottom: 10px;
+
+		a {
+			text-decoration: none;
+		}
+	}
+}

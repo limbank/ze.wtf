@@ -16,17 +16,6 @@ limiter = Limiter(
 
 dash = Blueprint('dash', __name__, template_folder='templates')
 
-@dash.route("/dash")
-@limiter.limit("2/second")
-def handle_dash():
-    # Check cookie
-    valid_cookie = check_cookie()
-
-    if valid_cookie == False:
-        return redirect(url_for('home.index'))
-    else:
-        return redirect(url_for('dash.dash_links'))
-
 def delete_invite(slug, user_id):
     selected_invite = Invites.get_or_none(code=slug)
 
@@ -65,6 +54,17 @@ def delete_image(slug, user_id):
     selected_image.delete_instance();
 
     return dict(success=True, message="Image with the slug " + slug + " has been deleted.")
+
+@dash.route("/dash")
+@limiter.limit("2/second")
+def handle_dash():
+    # Check cookie
+    valid_cookie = check_cookie()
+
+    if valid_cookie == False:
+        return redirect(url_for('home.index'))
+    else:
+        return redirect(url_for('dash.dash_links'))
 
 @dash.route("/dash/invites", methods=['GET', 'POST'])
 @limiter.limit("2/second")

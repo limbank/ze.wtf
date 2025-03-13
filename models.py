@@ -24,6 +24,7 @@ class User(Model):
   username = CharField(unique=True)
   email = CharField()
   password = CharField()
+  role = IntegerField()
 
   class Meta:
     database = db
@@ -65,5 +66,31 @@ class Link(Model):
     database = db
     db_table = 'links'
 
+class Role(Model):
+  roles_id = AutoField(primary_key=True)
+  name = CharField()
+
+  class Meta:
+    database = db
+    db_table = 'roles'
+
+class Permission(Model):
+  permissions_id = AutoField(primary_key=True)
+  name = CharField()
+
+  class Meta:
+    database = db
+    db_table = 'permissions'
+
+class RolePerm(Model):
+  roleperms_id = AutoField(primary_key=True)
+  role_id = ForeignKeyField(Role, backref='permissions', column_name='role_id')  
+  perm_id = ForeignKeyField(Permission, backref='roles', column_name='perm_id')
+
+  class Meta:
+    database = db
+    db_table = 'roleperms'
+
 db.connect()
-#db.create_tables([Link, Invites, File, User, Cookie])
+#db.create_tables([Link, Invites, File, User, Cookie, Role, Permission, RolePerm])
+

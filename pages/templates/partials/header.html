@@ -1,8 +1,11 @@
 <div class="header">
 	<div class="container">
 		<ul class="nav">
-			<li class="item-left">
+			<li>
 				<a href="{{ url_for('home.index') }}">Home</a>
+			</li>
+			<li class="item-left">
+				<a href="{{ url_for('changelog.index') }}">Changelog</a>
 			</li>
 			{% if username %}
 				<li>

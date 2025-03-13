@@ -70,4 +70,4 @@ def user_from_cookie(cookie):
         return None
 
     current_user = User.get(User.users_id == cookie.user_id)
-    return dict(username=current_user.username, user_id=current_user.users_id)
+    return dict(username=current_user.username, user_id=current_user.users_id, role=current_user.role)

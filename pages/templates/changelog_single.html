@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "changelog" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="header header-secondary">
+		<div class="container">
+			<ul class="nav">
+				<li>
+					<a href="{{ url_for('changelog.index') }}">Back</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="changelog">
+		<div class="container">
+			<div class="changelog__inner">
+		        <b>[{{date|safe}}] {{p_title|safe}}</b>
+
+		        {{postdata|safe}}
+		    </div>
+		</div>
+	</div>
+{% endblock %}

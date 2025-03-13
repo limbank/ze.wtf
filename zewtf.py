@@ -9,6 +9,7 @@ from pages.auth import auth
 from pages.error import error
 from pages.dash import dash
 from pages.logout import logout
+from pages.changelog import changelog
 
 load_dotenv()
 
@@ -34,6 +35,7 @@ app.register_blueprint(auth)
 app.register_blueprint(error)
 app.register_blueprint(dash)
 app.register_blueprint(logout)
+app.register_blueprint(changelog)
 
 sass.compile(dirname=('styles', 'static/styles'))
 

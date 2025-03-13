@@ -16,6 +16,7 @@ limits==4.0.1
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 mdurl==0.1.2
+mistune==3.1.2
 ordered-set==4.1.0
 packaging==24.2
 peewee==3.17.6
