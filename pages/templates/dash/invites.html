@@ -15,9 +15,11 @@
 			<p>
 				Your created invites:
 			</p>
-			<form action="{{ url_for('dash.dash_invites') }}" class="create-invite" method="post">
-		    	<button type="submit" name="your_name">[Create]</button>
-			</form>
+			{% if can_create == True %}
+				<form action="{{ url_for('dash.dash_invites') }}" class="create-invite" method="post">
+			    	<button type="submit" name="your_name">[Create]</button>
+				</form>
+			{% endif %}
 		</div>
 		<div class="notifications" id="notifications"></div>
 		<div class="links">

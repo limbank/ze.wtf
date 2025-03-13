@@ -93,8 +93,9 @@ def dash_invites():
 
     # Retreive invite-related permissions for user
     can_delete = has_permission(current_user, "delete:ownInvites")
+    can_create = has_permission(current_user, "create:ownInvites")
 
-    return render_template("dash/invites.html", username=current_user['username'], domain=request.host, invites = invites, can_delete = can_delete)
+    return render_template("dash/invites.html", username=current_user['username'], domain=request.host, invites = invites, can_delete = can_delete, can_create=can_create)
 
 @dash.route("/dash/links")
 @limiter.limit("2/second")
