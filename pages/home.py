@@ -93,7 +93,7 @@ def index(path):
     if username is not None:
         return redirect(url_for('home.links'))
     else: 
-        return render_template("home.html")
+        return render_template("home/index.html")
 
 @home.route("/links", methods=['GET', 'POST'], defaults={'path': ''})
 def links(path):
@@ -123,7 +123,7 @@ def links(path):
         # If a POST request was submitted, create URL
         new_url = create_link(user_id)
 
-    return render_template("links.html", error=new_url['error'], url_available = new_url['url_available'], domain=request.host, username=username)
+    return render_template("home/links.html", error=new_url['error'], url_available = new_url['url_available'], domain=request.host, username=username)
 
 @home.route("/images", methods=['GET', 'POST'], defaults={'path': ''})
 def images(path):
@@ -183,7 +183,7 @@ def images(path):
             print(allowed_file(file.filename))
             return dict(success = False, message="Filetype not allowed.")
 
-    return render_template("images.html", domain=request.host, username=username)
+    return render_template("home/images.html", domain=request.host, username=username)
 
 #If the files are too large
 @home.app_errorhandler(413)
