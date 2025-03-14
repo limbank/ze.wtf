@@ -34,9 +34,9 @@ def index():
             return(deleted_url)
 
     # Retrieve the URLs created by user
-    links = Link.select().where(Link.owner == current_user['user_id'])
+    own_links = Link.select().where(Link.owner == current_user['user_id'])
 
     # Retreive link-related permissions for user
     can_delete = has_permission(current_user, "delete:ownLinks")
 
-    return render_template("dash/links.html", username=current_user['username'], domain=request.host, links = links, can_delete = can_delete)
+    return render_template("dash/links.html", username=current_user['username'], domain=request.host, links = own_links, can_delete = can_delete)
