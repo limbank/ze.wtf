@@ -1,4 +1,5 @@
 import os
+import datetime
 from dotenv import load_dotenv
 from peewee import *
 
@@ -90,6 +91,16 @@ class RolePerm(Model):
   class Meta:
     database = db
     db_table = 'roleperms'
+
+class Space(Model):
+  spaces_id = AutoField(primary_key=True)
+  name = CharField()
+  owner = IntegerField(default=0)
+  date_created = DateTimeField(default=datetime.datetime.now)
+
+  class Meta:
+    database = db
+    db_table = 'spaces'
 
 db.connect()
 #db.create_tables([Link, Invites, File, User, Cookie, Role, Permission, RolePerm])

@@ -10,6 +10,7 @@ from pages.error import error
 from pages.dash import dash
 from pages.logout import logout
 from pages.changelog import changelog
+from pages.spaces import spaces
 
 load_dotenv()
 
@@ -18,6 +19,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET')
 # First number is megabytes
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1000 * 1000
+app.config['SERVER_NAME'] = os.getenv('SERVER_NAME')
 
 CORS(app)
 
@@ -36,6 +38,7 @@ app.register_blueprint(error)
 app.register_blueprint(dash)
 app.register_blueprint(logout)
 app.register_blueprint(changelog)
+app.register_blueprint(spaces, subdomain='<subdomain>')
 
 sass.compile(dirname=('styles', 'static/styles'))
 

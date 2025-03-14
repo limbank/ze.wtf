@@ -1,5 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, abort, url_for, current_app, send_from_directory
-from dotenv import load_dotenv
+from flask import Blueprint, render_template, request, redirect, abort, url_for, send_from_directory
 from utils.cookies import check_cookie, user_from_cookie
 from utils.crud import create_link, create_file
 from utils.general import random_string
