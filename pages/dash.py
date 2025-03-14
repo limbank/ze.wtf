@@ -34,4 +34,4 @@ def handle_dash():
     if valid_cookie == False:
         return redirect(url_for('home.index'))
     else:
-        return redirect(url_for('dash.dash_links'))
+        return redirect(url_for('dash.links.index'))

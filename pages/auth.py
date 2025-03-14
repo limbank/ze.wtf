@@ -4,14 +4,13 @@ from flask_limiter.util import get_remote_address
 from argon2 import PasswordHasher
 from captcha.image import ImageCaptcha
 import os
-import string
-import random
 import json
 from dotenv import load_dotenv
 from datetime import datetime
 
 from utils.cookies import check_cookie, create_cookie
-from utils.invites import check_invite
+from utils.crud import check_invite
+from utils.general import random_string, check_argon
 
 # Change to only import users later
 from models import *
@@ -24,16 +23,6 @@ limiter = Limiter(
     default_limits=["1000 per day", "50 per hour"],
     storage_uri="memory://",
 )
-
-def random_string(length = 5):
-    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=int(length)))
-
-def check_argon(chash, value):
-    try:
-        ph.verify(chash, value)
-        return True
-    except:
-        return False
 
 def check_captcha():
     if 'captcha' in request.form:

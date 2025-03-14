@@ -2,8 +2,7 @@ from flask import Blueprint, render_template, current_app, redirect, url_for, re
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
-from utils.invites import create_invite
-from utils.crud import delete_invite
+from utils.crud import delete_invite, create_invite
 from utils.permissions import has_permission
 
 from models import *
