@@ -41,13 +41,16 @@
 		<div class="container">
 			<ul class="nav">
 				<li>
-					<a href="{{ url_for('dash.dash_links') }}">Links</a>
+					<a href="{{ url_for('dash.links.index') }}">Links</a>
 				</li>
 				<li>
-					<a href="{{ url_for('dash.dash_images') }}">Images</a>
+					<a href="{{ url_for('dash.files.index') }}">Files</a>
 				</li>
 				<li>
-					<a href="{{ url_for('dash.dash_invites') }}">Invites</a>
+					<a href="{{ url_for('dash.invites.index') }}">Invites</a>
+				</li>
+				<li>
+					<a href="{{ url_for('dash.spaces.index') }}">Spaces</a>
 				</li>
 			</ul>
 		</div>

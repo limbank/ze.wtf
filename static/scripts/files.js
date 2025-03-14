@@ -6,15 +6,15 @@
 
     delete_buttons.forEach(button => {
         button.addEventListener('click', async () => {
-            let target_image = button.dataset.imagename;
+            let target_file = button.dataset.filename;
 
-            let confirmation = "Are you sure you want to delete this image?";
+            let confirmation = "Are you sure you want to delete this file?";
             if (confirm(confirmation) == false) {
                 return console.log("Deletion cancelled");
             }
 
             try {
-                const response = await fetch(window.location.origin + "/dash/images", {
+                const response = await fetch(window.location.origin + "/dash/files", {
                     method: "POST",
                     // Set the FormData instance as the request body
                     headers: {
@@ -22,7 +22,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        "delete": target_image
+                        "delete": target_file
                     }),
                 });
 

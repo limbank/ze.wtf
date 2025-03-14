@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "dash" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<p>
+			Welcome, {{username}}.
+		</p>
+		<p>
+			Your created spaces:
+		</p>
+		<div class="notifications" id="notifications"></div>
+		<div class="links">
+			<table class="links__table">
+				<tr>
+					<th>Short</th>
+					<th>URL</th>
+					<th>Visits</th>
+
+				</tr>
+
+			</table>
+	    </div>
+	</div>
+{% endblock %}

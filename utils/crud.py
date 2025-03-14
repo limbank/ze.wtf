@@ -32,26 +32,26 @@ def delete_invite(slug, current_user):
 
     return dict(success=True, message="Invite with the slug " + slug + " has been deleted.")
 
-def delete_image(slug, current_user):
+def delete_file(slug, current_user):
     user_id = current_user['user_id']
 
-    selected_image = File.get_or_none(filename=slug)
+    selected_file = File.get_or_none(filename=slug)
 
-    if selected_image is None:
+    if selected_file is None:
         return dict(success=False, message="Image does not exist.")
 
-    if selected_image.owner != user_id or not has_permission(current_user, "delete:ownFiles"):
+    if selected_file.owner != user_id or not has_permission(current_user, "delete:ownFiles"):
         return dict(success=False, message="Permission denied.")
 
     # Check if image exists, if it does, delete it on disk
-    image_file = Path.cwd() / 'uploads' / selected_image.location
-    if image_file.is_file():
-        image_file.unlink()
+    file_path = Path.cwd() / 'uploads' / selected_file.location
+    if file_path.is_file():
+        file_path.unlink()
     else:
         return dict(success=False, message="Image does not exist.")
 
     # Delete image in DB
-    selected_image.delete_instance();
+    selected_file.delete_instance();
 
     return dict(success=True, message="Image with the slug " + slug + " has been deleted.")
 

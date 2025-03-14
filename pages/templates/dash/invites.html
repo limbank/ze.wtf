@@ -16,7 +16,7 @@
 				Your created invites:
 			</p>
 			{% if can_create == True %}
-				<form action="{{ url_for('dash.dash_invites') }}" class="create-invite" method="post">
+				<form action="{{ url_for('dash.invites.index') }}" class="create-invite" method="post">
 			    	<button type="submit" name="your_name">[Create]</button>
 				</form>
 			{% endif %}
