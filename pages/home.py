@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, abort, url_for, current_app, send_from_directory
 from dotenv import load_dotenv
-import validators
 import json
 from utils.cookies import check_cookie, user_from_cookie
 from utils.crud import create_link, create_file
@@ -52,7 +51,7 @@ def links(path):
 
     if request.method == 'POST':
         # If a POST request was submitted, create URL
-        new_url = create_link(user_id)
+        new_url = create_link(current_user)
 
     return render_template("home/links.html", error=new_url['error'], url_available = new_url['url_available'], domain=request.host, username=username)
 

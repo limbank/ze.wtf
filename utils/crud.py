@@ -1,10 +1,11 @@
+import validators
 from flask import request
 from pathlib import Path
 from slugify import slugify
 from datetime import datetime
 from werkzeug.utils import secure_filename
-from utils.permissions import has_permission
 from utils.general import random_string, allowed_files
+from utils.permissions import has_permission
 
 from models import *
 
@@ -69,7 +70,10 @@ def delete_link(slug, current_user):
 
     return dict(success=True, message="Url with the slug " + slug + " has been deleted.")
 
-def create_link(user_id):
+def create_link(current_user):
+    username = current_user['username']
+    user_id = current_user['user_id']
+        
     # Create URL
     url = request.form.get('url')
     url_name = request.form.get('name')
@@ -84,6 +88,10 @@ def create_link(user_id):
     if not validators.url(url):
         # URL is invalid
         return dict(error=gen_msg, url_available=None)
+
+    # Prevent link creation if the user is not allowed to
+    if not has_permission(current_user, "create:ownLinks"):
+        return dict(error="Permission denied.", url_available=None)
 
     # Validate alias if available
     if url_name == "":
@@ -110,7 +118,7 @@ def create_link(user_id):
 def create_file(current_user):
     username = current_user['username']
     user_id = current_user['user_id']
-        
+
     # check if the post request has the file part
     if 'file' not in request.files:
         # No file part
@@ -122,6 +130,10 @@ def create_file(current_user):
     if file.filename == '':
         # No selected file
         return dict(success = False, message="File not found.")
+
+    # Prevent file creation if the user is not allowed to
+    if not has_permission(current_user, "create:ownFiles"):
+        return dict(success=False, message="Permission denied.")
 
     if file and allowed_files(file.filename):
         filename = secure_filename(file.filename)
