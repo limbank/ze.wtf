@@ -1,6 +1,14 @@
+from flask import request
 from pathlib import Path
+from slugify import slugify
+from datetime import datetime
+from werkzeug.utils import secure_filename
 from utils.permissions import has_permission
+from utils.general import random_string, allowed_files
+
 from models import *
+
+UPLOAD_FOLDER = Path.cwd() / 'uploads'
 
 def delete_invite(slug, current_user):
     user_id = current_user['user_id']
@@ -60,3 +68,87 @@ def delete_link(slug, current_user):
     short_link.delete_instance();
 
     return dict(success=True, message="Url with the slug " + slug + " has been deleted.")
+
+def create_link(user_id):
+    # Create URL
+    url = request.form.get('url')
+    url_name = request.form.get('name')
+    error = None
+
+    gen_msg = "Not a valid URL! Remember to include the schema."
+
+    if url is None:
+        # Form submitted without URL
+        return dict(error=gen_msg, url_available=None)
+
+    if not validators.url(url):
+        # URL is invalid
+        return dict(error=gen_msg, url_available=None)
+
+    # Validate alias if available
+    if url_name == "":
+        url_name = ''.join(random_string(6))
+    else:
+        # Check if url alias is allowed
+        url_slug = slugify(url_name)
+
+        with open('utils/usernames.json') as f:
+            data = json.load(f)
+            if url_slug in data['usernames']:
+                return dict(error="URL alias not allowed.", url_available=None)
+
+        # Verify alias not existing
+        alias_count = Link.select().where(Link.ref == url_slug).count()
+        if alias_count > 0:
+            return dict(error="URL alias already exists.", url_available=None)
+
+    # Add URL to database
+    Link.create(url=url, date_created=datetime.now(), ref=url_slug, owner=user_id)
+
+    return dict(url_available=url_slug, error=None)
+
+def create_file(current_user):
+    username = current_user['username']
+    user_id = current_user['user_id']
+        
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        # No file part
+        return dict(success = False, message="File not found.")
+
+    file = request.files['file']
+
+    # If the user does not select a file, the browser submits an empty file without a filename.
+    if file.filename == '':
+        # No selected file
+        return dict(success = False, message="File not found.")
+
+    if file and allowed_files(file.filename):
+        filename = secure_filename(file.filename)
+
+        # Convert username to slug
+        username_as_slug = slugify(username)
+        # Make a directory for a user if none exist
+        UPLOAD_FOLDER.joinpath(username_as_slug).mkdir(parents=True, exist_ok=True)
+
+        # Generate new random filename
+        file_slug = random_string(8)
+        new_filename = file_slug + "." + filename.rsplit('.', 1)[1].lower()
+        # Get new destination
+        file_dest = Path(UPLOAD_FOLDER) / username_as_slug / new_filename
+
+        # Save file
+        file.save(file_dest)
+
+        # Write file to DB
+        # To-Do: make sure file name is unique in db without throwing error
+        relative_path = Path(username_as_slug) / new_filename
+        File.create(owner=user_id, created=datetime.now(), filename=file_slug, location=relative_path, original=filename)
+
+        # Inform user of success
+        return dict(success = True, message="Success! Your file is available at: " + request.host + "/" + file_slug)
+    else:
+        # File not allowed
+        print(file.filename)
+        print(allowed_file(file.filename))
+        return dict(success = False, message="Filetype not allowed.")

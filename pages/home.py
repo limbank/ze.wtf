@@ -1,68 +1,19 @@
 from flask import Blueprint, render_template, request, redirect, abort, url_for, current_app, send_from_directory
 from dotenv import load_dotenv
 import validators
-import random
-import string
 import json
 from utils.cookies import check_cookie, user_from_cookie
+from utils.crud import create_link, create_file
+from utils.general import random_string
 
-from werkzeug.utils import secure_filename
 from pathlib import Path
-from slugify import slugify
-from datetime import datetime
-
-UPLOAD_FOLDER = Path.cwd() / 'uploads'
-ALLOWED_EXTENSIONS = {'webp', 'tiff', 'png', 'jpg', 'jpeg', 'gif'}
 
 # Only import urls here instead
 from models import *
 
+UPLOAD_FOLDER = Path.cwd() / 'uploads'
+
 home = Blueprint('home', __name__, template_folder='templates')
-
-def random_string(length = 5):
-    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=int(length)))
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def create_link(user_id):
-    # Create URL
-    url = request.form.get('url')
-    url_name = request.form.get('name')
-    error = None
-
-    gen_msg = "Not a valid URL! Remember to include the schema."
-
-    if url is None:
-        # Form submitted without URL
-        return dict(error=gen_msg, url_available=None)
-
-    if not validators.url(url):
-        # URL is invalid
-        return dict(error=gen_msg, url_available=None)
-
-    # Validate alias if available
-    if url_name == "":
-        url_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
-    else:
-        # Check if url alias is allowed
-        url_slug = slugify(url_name)
-
-        with open('utils/usernames.json') as f:
-            data = json.load(f)
-            if url_slug in data['usernames']:
-                return dict(error="URL alias not allowed.", url_available=None)
-
-        # Verify alias not existing
-        alias_count = Link.select().where(Link.ref == url_slug).count()
-        if alias_count > 0:
-            return dict(error="URL alias already exists.", url_available=None)
-
-    # Add URL to database
-    Link.create(url=url, date_created=datetime.now(), ref=url_slug, owner=user_id)
-
-    return dict(url_available=url_slug, error=None)
 
 @home.route("/", defaults={'path': ''})
 def index(path):
@@ -121,47 +72,8 @@ def images(path):
         user_id = current_user['user_id']
 
     if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            # No file part
-            return dict(success = False, message="File not found.")
-
-        file = request.files['file']
-
-        # If the user does not select a file, the browser submits an empty file without a filename.
-        if file.filename == '':
-            # No selected file
-            return dict(success = False, message="File not found.")
-
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-
-            # Convert username to slug
-            username_as_slug = slugify(username)
-            # Make a directory for a user if none exist
-            UPLOAD_FOLDER.joinpath(username_as_slug).mkdir(parents=True, exist_ok=True)
-
-            # Generate new random filename
-            file_slug = random_string(8)
-            new_filename = file_slug + "." + filename.rsplit('.', 1)[1].lower()
-            # Get new destination
-            file_dest = Path(UPLOAD_FOLDER) / username_as_slug / new_filename
-
-            # Save file
-            file.save(file_dest)
-
-            # Write file to DB
-            # To-Do: make sure file name is unique in db without throwing error
-            relative_path = Path(username_as_slug) / new_filename
-            File.create(owner=user_id, created=datetime.now(), filename=file_slug, location=relative_path, original=filename)
-
-            # Inform user of success
-            return dict(success = True, message="Success! Your file is available at: " + request.host + "/" + file_slug)
-        else:
-            # File not allowed
-            print(file.filename)
-            print(allowed_file(file.filename))
-            return dict(success = False, message="Filetype not allowed.")
+        file_status = create_file(current_user)
+        return file_status
 
     return render_template("home/images.html", domain=request.host, username=username)
 
