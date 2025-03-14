@@ -74,7 +74,7 @@ def delete_link(slug, current_user):
 def create_link(current_user):
     username = current_user['username']
     user_id = current_user['user_id']
-        
+
     # Create URL
     url = request.form.get('url')
     url_name = request.form.get('name')
@@ -165,3 +165,14 @@ def create_file(current_user):
         print(file.filename)
         print(allowed_file(file.filename))
         return dict(success = False, message="Filetype not allowed.")
+
+def get_space(space_name):
+    try:
+        query = (Space
+                 .select(Space, User)
+                 .join(User, on=(Space.owner == User.users_id))
+                 .where(Space.name == space_name)
+                 .get())
+        return query
+    except Space.DoesNotExist:
+        return None 

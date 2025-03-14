@@ -42,7 +42,5 @@ app.register_blueprint(spaces, subdomain='<subdomain>')
 
 sass.compile(dirname=('styles', 'static/styles'))
 
-
-
 # from blueprints import register_blueprints  # Auto-register function
 # register_blueprints(app)  # Automatically registers all Blueprints

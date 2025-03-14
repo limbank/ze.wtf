@@ -1,5 +1,5 @@
 import os
-import datetime
+from datetime import datetime
 from dotenv import load_dotenv
 from peewee import *
 
@@ -95,8 +95,8 @@ class RolePerm(Model):
 class Space(Model):
   spaces_id = AutoField(primary_key=True)
   name = CharField()
-  owner = IntegerField(default=0)
-  date_created = DateTimeField(default=datetime.datetime.now)
+  owner = ForeignKeyField(User, backref='spaces')
+  date_created = DateTimeField(default=datetime.now)
 
   class Meta:
     database = db
@@ -104,4 +104,3 @@ class Space(Model):
 
 db.connect()
 #db.create_tables([Link, Invites, File, User, Cookie, Role, Permission, RolePerm])
-
