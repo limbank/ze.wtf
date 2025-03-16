@@ -231,6 +231,11 @@
             if (result.success) location.reload();
             */
             console.log(result)
+
+            if (result.success === false) {
+                return console.log("Error attempting to delete...");
+            }
+            
             console.log("ATTEMPTING TO REBUILD");
             backup_data = result;
             updatePath("");

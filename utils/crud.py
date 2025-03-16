@@ -245,27 +245,35 @@ def delete_space_files(current_user):
     # Check if users space exists
     users_spaces = Space.select().where(Space.owner == user_id).count()
     if users_spaces < 1:
-        return dict(Success = False, message = "You do not have a space")
+        return dict(success = False, message = "You do not have a space")
 
     # Check if file exists
     target_file = Path.cwd() / 'uploads' / username / 'space' / content['delete']
 
-    print(content['delete'])
-    print(target_file)
+    # Define the trusted base directory
+    temp_base = Path.cwd() / 'uploads' / username / 'space'
+    BASE_DIR = Path(temp_base).resolve()
+
+    # Resolve new path
+    temp_path = Path(target_file).resolve()
+
+    # Check new path against basedir
+    if BASE_DIR not in temp_path.parents:
+        return dict(success = False, message = "File or directory does not exist")
 
     if target_file.exists():
         if target_file.is_file():
-            #print("will unlink")
-            target_file.unlink()  # Deletes the file
+            print("will unlink")
+            #target_file.unlink()  # Deletes the file
         elif target_file.is_dir():
-            #print("will rmtree")
-            shutil.rmtree(target_file)  # Deletes the directory and its contents
+            print("will rmtree")
+            #shutil.rmtree(target_file)  # Deletes the directory and its contents
 
         # return the new file tree here
-        #print(f"{target_file} has been deleted.")
+        print(f"{target_file} has been deleted.")
         return get_space_files(current_user)
     else:
-        return dict(Success = False, message = "File or directory does not exist")
+        return dict(success = False, message = "File or directory does not exist")
     
     # Delete file
 
