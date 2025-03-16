@@ -257,7 +257,7 @@ def upload_space_files(current_user):
 
         # Create directory
         target_dir.mkdir()
-        
+
     # Rebuild file tree
     return get_space_files(current_user)
 
@@ -406,6 +406,10 @@ def create_space(current_user):
 
     # Create space
     created_space = Space.create(name=new_name, owner=user_id)
+
+    # Make a space directory in users folder
+    new_space_dir = Path.cwd() / 'uploads' / slugify(username) / 'space'
+    new_space_dir.mkdir()
 
     return dict(success = True, message = "Space created. Give us a second...")
 
