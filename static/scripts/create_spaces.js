@@ -44,9 +44,7 @@
             new_space_delete
             notification_area.appendChild(new_notif);
 
-            if (result.success) {
-                location.reload();
-            }
+            if (result.success) location.reload();
         } catch (e) {
             console.error(e);
         }

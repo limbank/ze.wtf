@@ -102,6 +102,15 @@
 		background: #111113;
 		border: 1px solid #111113;
 		border-bottom: 0px;
+		display: flex;
+
+		&__address {
+			margin-right: auto;
+			display: inline-flex;
+			align-items: center;
+			color: #29292E;
+			padding: 8px 12px;
+		}
 
 		button {
 			background: #111113;
@@ -150,6 +159,8 @@
 	&__directory {
 		font-weight: bold;
 		text-decoration: none;
+		cursor: pointer;
+		display: block;
 
 		&:hover {
 			text-decoration: underline;
@@ -178,6 +189,11 @@
 }
 
 .table {
+	&__button-cell {
+		width:0.1%;
+		white-space: nowrap;
+	}
+
 	&__buttons {
 		display: flex;
 		justify-content: flex-end;

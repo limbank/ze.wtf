@@ -178,6 +178,92 @@ def get_space(space_name):
     except Space.DoesNotExist:
         return None 
 
+def get_space_files(current_user):
+    user_id = current_user['user_id']
+
+    # Retrieve the spaces created by user
+    own_spaces = Space.select().where(Space.owner == user_id)
+
+    space_files = None
+
+    if own_spaces is not None:
+        UPLOAD_FOLDER = Path.cwd() / 'uploads' / current_user['username'] / 'space'
+        base_path = UPLOAD_FOLDER  # This is the root path for the listing
+        p = Path(UPLOAD_FOLDER).glob('**/*')
+
+        # Prepare lists
+        directories = []
+        files = []
+
+        for path in p:
+            relative_path = path.relative_to(base_path).as_posix()  # Make it relative & use forward slashes
+            if path.is_dir():
+                directories.append(relative_path + '/')  # Add trailing slash for directories
+            else:
+                files.append(relative_path)
+
+        # Sort them (directories first, then files)
+        directories.sort()
+        files.sort()
+
+        # Combine into a JSON-serializable format
+        listing = {
+            "directories": directories,
+            "files": files
+        }
+
+        # Convert to JSON
+        space_files = json.dumps(listing)
+        return space_files
+
+    return dict(success = False, message = "Incomplete")
+
+def create_space(current_user):
+    user_id = current_user['user_id']
+
+    # Check if the content is sent in JSON
+    if (request.content_type != "application/json"):
+        return dict(success = False, message = "Malformed request")
+
+    content = request.json
+
+    # Check if the content contains space name
+    if 'name' not in content:
+        return dict(success = False, message = "Name invalid")
+
+    # Check if the user can create spaces
+    can_create = has_permission(current_user, "create:ownSpaces")
+    if not can_create:
+        return dict(success = False, message = "Missing permission.")
+
+    # Check if user already has a space
+    users_spaces = Space.select().where(Space.owner == user_id).count()
+    if users_spaces > 0:
+        return dict(Success = False, message = "You can only create one space")
+
+    new_name = slugify(content['name'])
+
+    # Check if name is allowed
+    with open('utils/usernames.json') as f:
+        data = json.load(f)
+        if new_name in data['usernames']:
+            return dict(success = False, message="Name not allowed")
+
+    # Check if name is a username and doesnt belong to current user
+    user_count = User.select().where(((User.username == content['name']) | (User.username == new_name)) & (User.id != user_id)).count()
+    if user_count > 0:
+        return dict(success = False, message = "Name already exists")
+
+    # Check if space name exists
+    space_count = Space.select().where(Space.name == new_name).count()
+    if space_count > 0:
+        return dict(success = False, message = "Name already exists")
+
+    # Create space
+    created_space = Space.create(name=new_name, owner=user_id)
+
+    return dict(success = True, message = "Space created. Give us a second...")
+
 def check_invite():
     if 'invite' in request.form:
         # Check db for invite
