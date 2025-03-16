@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, current_app, redirect, url_for, re
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
-from utils.crud import create_space, get_space_files
+from utils.crud import create_space, get_space_files, delete_space_files
 
 from utils.permissions import has_permission
 
@@ -50,6 +50,21 @@ def get_files():
     space_files = get_space_files(current_user)
 
     return space_files
+
+@spaces.route("/spaces/files/delete", methods=['POST'])
+@limiter.limit("2/second")
+def delete_files():
+    # Check cookie
+    valid_cookie = check_cookie()
+
+    if valid_cookie == False:
+        return redirect(url_for('home.index'))
+
+    current_user = user_from_cookie(valid_cookie)
+
+    deleted_files = delete_space_files(current_user)
+
+    return deleted_files
 
 @spaces.route("/spaces/create", methods=['POST'])
 @limiter.limit("2/second")

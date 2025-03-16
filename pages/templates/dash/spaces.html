@@ -28,7 +28,7 @@
 					</tr>
 			        {% for space in spaces %}
 						<tr>
-							<td>{{ space.name }}.{{ domain }}</td>
+							<td id="space-domain">{{ space.name }}.{{ domain }}</td>
 							<td>{{ space.date_created }}</td>
 							{% if can_delete == True %}
 								<td width="38px">

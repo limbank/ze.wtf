@@ -2,6 +2,7 @@ import validators
 import json
 from flask import request
 from pathlib import Path
+import shutil
 from slugify import slugify
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
@@ -178,6 +179,35 @@ def get_space(space_name):
     except Space.DoesNotExist:
         return None 
 
+def space_file_tree(working_dir):
+    base_path = working_dir  # This is the root path for the listing
+    p = Path(working_dir).glob('**/*')
+
+    # Prepare lists
+    directories = []
+    files = []
+
+    for path in p:
+        relative_path = path.relative_to(base_path).as_posix()  # Make it relative & use forward slashes
+        if path.is_dir():
+            directories.append(relative_path + '/')  # Add trailing slash for directories
+        else:
+            files.append(relative_path)
+
+    # Sort them (directories first, then files)
+    directories.sort()
+    files.sort()
+
+    # Combine into a JSON-serializable format
+    listing = {
+        "directories": directories,
+        "files": files
+    }
+
+    # Convert to JSON
+    space_files = json.dumps(listing)
+    return space_files
+
 def get_space_files(current_user):
     user_id = current_user['user_id']
 
@@ -187,36 +217,59 @@ def get_space_files(current_user):
     space_files = None
 
     if own_spaces is not None:
-        UPLOAD_FOLDER = Path.cwd() / 'uploads' / current_user['username'] / 'space'
-        base_path = UPLOAD_FOLDER  # This is the root path for the listing
-        p = Path(UPLOAD_FOLDER).glob('**/*')
-
-        # Prepare lists
-        directories = []
-        files = []
-
-        for path in p:
-            relative_path = path.relative_to(base_path).as_posix()  # Make it relative & use forward slashes
-            if path.is_dir():
-                directories.append(relative_path + '/')  # Add trailing slash for directories
-            else:
-                files.append(relative_path)
-
-        # Sort them (directories first, then files)
-        directories.sort()
-        files.sort()
-
-        # Combine into a JSON-serializable format
-        listing = {
-            "directories": directories,
-            "files": files
-        }
-
-        # Convert to JSON
-        space_files = json.dumps(listing)
-        return space_files
+        working_dir = Path.cwd() / 'uploads' / current_user['username'] / 'space'
+        
+        return space_file_tree(working_dir)
 
     return dict(success = False, message = "Incomplete")
+
+def delete_space_files(current_user):
+    user_id = current_user['user_id']
+    username = current_user['username']
+
+    # Check if the content is sent in JSON
+    if (request.content_type != "application/json"):
+        return dict(success = False, message = "Malformed request")
+
+    content = request.json
+
+    # Check if the content contains file name
+    if 'delete' not in content:
+        return dict(success = False, message = "Name invalid")
+
+    # Check if the user can delete files
+    can_delete = has_permission(current_user, "delete:ownFiles")
+    if not can_delete:
+        return dict(success = False, message = "Missing permission.")
+
+    # Check if users space exists
+    users_spaces = Space.select().where(Space.owner == user_id).count()
+    if users_spaces < 1:
+        return dict(Success = False, message = "You do not have a space")
+
+    # Check if file exists
+    target_file = Path.cwd() / 'uploads' / username / 'space' / content['delete']
+
+    print(content['delete'])
+    print(target_file)
+
+    if target_file.exists():
+        if target_file.is_file():
+            #print("will unlink")
+            target_file.unlink()  # Deletes the file
+        elif target_file.is_dir():
+            #print("will rmtree")
+            shutil.rmtree(target_file)  # Deletes the directory and its contents
+
+        # return the new file tree here
+        #print(f"{target_file} has been deleted.")
+        return get_space_files(current_user)
+    else:
+        return dict(Success = False, message = "File or directory does not exist")
+    
+    # Delete file
+
+    return dict(success = True, message = "Deleted file")
 
 def create_space(current_user):
     user_id = current_user['user_id']

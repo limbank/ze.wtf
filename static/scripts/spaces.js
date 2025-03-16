@@ -7,6 +7,7 @@
     const create_directory_table = document.getElementById("create-directory");
     const upload_file_table = document.getElementById("upload-file");
     const path_address = document.getElementById("path-address");
+    const space_domain = document.getElementById("space-domain");
 
     const delete_button_template = `
         <svg viewBox="0 0 24 24">
@@ -50,12 +51,21 @@
         return buttons_td;
     }
 
+    function addOpenButton(parent, target) {
+        let button_container = parent.firstChild;
+        const current_button = document.createElement('button');
+        current_button.className = "action-button browser-open";
+        current_button.dataset.target = target;
+        current_button.insertAdjacentHTML('afterbegin', open_button_template);
+        button_container.appendChild(current_button);
+    }
+
     function addDeleteButton(parent, target) {
         let button_container = parent.firstChild;
         const current_button = document.createElement('button');
-        current_button.className = "action-button";
+        current_button.className = "action-button browser-delete";
         current_button.dataset.target = target;
-        current_button.insertAdjacentHTML('beforeend', delete_button_template);
+        current_button.insertAdjacentHTML('afterbegin', delete_button_template);
         button_container.appendChild(current_button);
     }
 
@@ -90,11 +100,11 @@
             const navLink = document.createElement("a");
             navLink.className = "file-browser__directory";
 
-            let filtered_dirname = `/${path ? dir.replace(path + "/", "") : dir}`;
+            let filtered_dirname = path ? dir.replace(path + "/", "") : dir;
 
-            navLink.textContent = filtered_dirname.replace(/\/$/, "");
+            navLink.textContent = `/${filtered_dirname.replace(/\/$/, "")}`;
 
-            if (filtered_dirname == "/") return;
+            if (navLink.textContent == "/") return;
 
             navLink.onclick = (e) => {
                 e.preventDefault();
@@ -117,6 +127,7 @@
             fileElement.textContent = filtered_filename;
             parent_tr.appendChild(fileElement);
             let button_parent = makeButtonWrapper();
+            addOpenButton(button_parent, path + "/" + filtered_filename)
             addDeleteButton(button_parent, path + "/" + filtered_filename)
             parent_tr.appendChild(button_parent);
             container.appendChild(parent_tr);
@@ -178,10 +189,55 @@
     });
 
     fetch('/dash/spaces/files')
-      .then(response => response.json())
-      .then(data => {
-        backup_data = data;
-        updatePath("");
-        renderDirectoryListing(data, basePath);
-      });
+    .then(response => response.json())
+    .then(data => {
+            backup_data = data;
+            updatePath("");
+            renderDirectoryListing(data, basePath);
+    });
+
+    // Delete directory and file handler
+    document.body.addEventListener("click", async (event) => {
+        let button = event.target;
+        if (button.classList.contains("browser-delete")) {
+            let will_delete = button.dataset.target;
+
+            let text = `You are about to delete '${will_delete}'. Are you sure?`;
+            if (confirm(text) != true) return;
+
+            if (will_delete.charAt(0) === '/') {
+                will_delete = will_delete.substring(1);
+            }
+
+            const response = await fetch(window.location.origin + "/dash/spaces/files/delete", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "delete": will_delete
+                })
+            });
+
+            let result = await response.json();
+            /*
+            let new_notif = document.createElement('div');
+            new_notif.className = 'notif';
+            new_notif.innerHTML = result.message;
+            new_space_delete
+            notification_area.appendChild(new_notif);
+            
+            if (result.success) location.reload();
+            */
+            console.log(result)
+            console.log("ATTEMPTING TO REBUILD");
+            backup_data = result;
+            updatePath("");
+            renderDirectoryListing(result, basePath);
+        }
+        else if (button.classList.contains("browser-open")) {
+            window.open(`${location.protocol}//${space_domain.innerText}${button.dataset.target}`, '_blank');
+        }
+    });
 })();

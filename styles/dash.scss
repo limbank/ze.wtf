@@ -82,6 +82,7 @@
 	svg {
 		width: 16px;
 		height: 16px;
+		pointer-events: none;
 	}
 }
 
@@ -145,6 +146,7 @@
 
 			th, td {
 				padding: 8px 12px;
+				height: 38px;
 			}
 
 			th {
