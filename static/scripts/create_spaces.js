@@ -41,7 +41,7 @@
             let new_notif = document.createElement('div');
             new_notif.className = 'notif';
             new_notif.innerHTML = result.message;
-            new_space_delete
+            //new_space_delete
             notification_area.appendChild(new_notif);
 
             if (result.success) location.reload();

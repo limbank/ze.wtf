@@ -365,6 +365,7 @@ def delete_space_files(current_user):
 
 def create_space(current_user):
     user_id = current_user['user_id']
+    username = current_user['username']
 
     # Check if the content is sent in JSON
     if (request.content_type != "application/json"):
@@ -395,7 +396,7 @@ def create_space(current_user):
             return dict(success = False, message="Name not allowed")
 
     # Check if name is a username and doesnt belong to current user
-    user_count = User.select().where(((User.username == content['name']) | (User.username == new_name)) & (User.id != user_id)).count()
+    user_count = User.select().where(((User.username == content['name']) | (User.username == new_name)) & (User.users_id != user_id)).count()
     if user_count > 0:
         return dict(success = False, message = "Name already exists")
 
