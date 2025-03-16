@@ -35,8 +35,7 @@ def catch_all(path, subdomain):
 
     # Get user's space directory (slugify username)
     named_file_path = Path(user_spaces) / slugify(space_data.owner.username) / "space"
-    # Do we need secure_filename?
-    secure_path = secure_filename(path)
+    # Do we need secure_filename for path?
 
     # To-Do:
     # Figure out whether we should assume .html for unnamed links
@@ -46,16 +45,16 @@ def catch_all(path, subdomain):
     # Render space
     try:
         # User requested a file
-        return send_from_directory(named_file_path, secure_path)
+        return send_from_directory(named_file_path, path)
     except NotFound as e:
         # File wasn't found, attempt to fetch subdirectory root
-        if not secure_path.endswith(".html"):
-            if secure_path == "":
+        if not path.endswith(".html"):
+            if path == "":
                 # User requested directory root
                 return send_from_directory(named_file_path, "index.html")
             else:
                 # User requested subdirectory root
-                return send_from_directory(named_file_path, secure_path + "/index.html")
+                return send_from_directory(named_file_path, path + "/index.html")
 
         # File not found in user space
         abort(404)

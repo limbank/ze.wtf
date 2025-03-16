@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, current_app, redirect, url_for, re
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
-from utils.crud import create_space, get_space_files, delete_space_files
+from utils.crud import create_space, get_space_files, delete_space_files, upload_space_files
 
 from utils.permissions import has_permission
 
@@ -36,7 +36,7 @@ def index():
 
     return render_template("dash/spaces.html", username=current_user['username'], domain=request.host, spaces = own_spaces, can_delete = can_delete)
 
-@spaces.route("/spaces/files", methods=['GET'])
+@spaces.route("/spaces/files", methods=['GET', 'POST'])
 @limiter.limit("2/second")
 def get_files():
     # Check cookie
@@ -47,9 +47,14 @@ def get_files():
 
     current_user = user_from_cookie(valid_cookie)
 
-    space_files = get_space_files(current_user)
+    if request.method == 'GET':
+        space_files = get_space_files(current_user)
 
-    return space_files
+        return space_files
+    else:
+        upload_file = upload_space_files(current_user)
+
+        return upload_file
 
 @spaces.route("/spaces/files/delete", methods=['POST'])
 @limiter.limit("2/second")

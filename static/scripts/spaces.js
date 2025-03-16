@@ -9,6 +9,14 @@
     const path_address = document.getElementById("path-address");
     const space_domain = document.getElementById("space-domain");
 
+    const cancel_file = document.getElementById("cancel-file");
+    const cancel_directory = document.getElementById("cancel-directory");
+    const save_file = document.getElementById("save-file");
+    const save_directory = document.getElementById("save-directory");
+    const new_directory_name = document.getElementById("new-directory-name");
+    const new_file_name = document.getElementById("new-file-name");
+    const new_file_label = document.getElementById("new-file-label");
+
     const delete_button_template = `
         <svg viewBox="0 0 24 24">
             <g id="icons">
@@ -169,6 +177,7 @@
     create_directory_button.addEventListener("click", (event) => {
         if (create_directory_table.style.display  == "none") {
             create_directory_table.style.display = "table";
+            new_directory_name.focus();
         }
         else {
             create_directory_table.style.display = "none";
@@ -188,12 +197,106 @@
         create_directory_table.style.display = "none";
     });
 
+    function buildTree(data, reset = false) {
+        console.log("Building tree...");
+        backup_data = data;
+        if (reset) updatePath("");
+        renderDirectoryListing(data, basePath);
+    }
+
     fetch('/dash/spaces/files')
     .then(response => response.json())
     .then(data => {
-            backup_data = data;
-            updatePath("");
-            renderDirectoryListing(data, basePath);
+        buildTree(data, true);
+    });
+
+    cancel_file.addEventListener("click", async (event) => {
+        new_file_name.value = "";
+        upload_file_table.style.display = "none";
+        new_file_label.innerHTML = "Click to select file";
+    });
+
+    cancel_directory.addEventListener("click", async (event) => {
+        new_directory_name.value = "";
+        create_directory_table.style.display = "none";
+    });
+
+    save_file.addEventListener("click", async (event) => {
+        let files = new_file_name.files;
+
+        if (files.length) {
+            const formData = new FormData();
+
+            [...files].forEach((file, i) => {
+                formData.append("file", file, file.name);
+            });
+
+            formData.append("destination", basePath);
+
+            console.log(formData)
+
+            try {
+                const response = await fetch(window.location.origin + "/dash/spaces/files", {
+                    method: "POST",
+                    // Set the FormData instance as the request body
+                    body: formData,
+                });
+
+                let result = await response.json();
+
+                if (result.success === false) {
+                    console.log(result);
+                    return console.log("Error attempting to upload...");
+                }
+
+                buildTree(result);
+                new_file_name.value = "";
+                upload_file_table.style.display = "none";
+                new_file_label.innerHTML = "Click to select file";
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    });
+
+    save_directory.addEventListener("click", async (event) => {
+        // To-Do: add input validation
+        let new_name = new_directory_name.value;
+
+        if (new_name != "") {
+            const formData = new FormData();
+
+            formData.append("destination", basePath);
+            formData.append("dirname", new_name);
+
+            console.log(formData)
+
+            try {
+                const response = await fetch(window.location.origin + "/dash/spaces/files", {
+                    method: "POST",
+                    // Set the FormData instance as the request body
+                    body: formData,
+                });
+
+                let result = await response.json();
+
+                if (result.success === false) {
+                    console.log(result);
+                    return console.log("Error attempting to create...");
+                }
+
+                buildTree(result);
+                new_directory_name.value = "";
+                create_directory_table.style.display = "none";
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    });
+
+    new_file_name.addEventListener("change", async (event) => {
+        if (new_file_name.files.length > 0)
+            new_file_label.innerHTML = new_file_name.files[0].name;
     });
 
     // Delete directory and file handler
@@ -221,27 +324,25 @@
             });
 
             let result = await response.json();
-            /*
-            let new_notif = document.createElement('div');
-            new_notif.className = 'notif';
-            new_notif.innerHTML = result.message;
-            new_space_delete
-            notification_area.appendChild(new_notif);
-            
-            if (result.success) location.reload();
-            */
-            console.log(result)
 
             if (result.success === false) {
+                console.log(result);
                 return console.log("Error attempting to delete...");
             }
 
-            console.log("ATTEMPTING TO REBUILD");
-            backup_data = result;
-            renderDirectoryListing(result, basePath);
+            buildTree(result);
         }
         else if (button.classList.contains("browser-open")) {
-            window.open(`${location.protocol}//${space_domain.innerText}${button.dataset.target}`, '_blank');
+            let baseURL = `${location.protocol}//${space_domain.innerText}`;
+
+            if (button.dataset.target.startsWith("/")) {
+                baseURL += button.dataset.target;
+            }
+            else {
+                baseURL += "/" + button.dataset.target;
+            }
+
+            window.open(baseURL, '_blank');
         }
     });
 })();

@@ -2,7 +2,8 @@ from argon2 import PasswordHasher
 import random
 import string
 
-ALLOWED_EXTENSIONS = {'webp', 'tiff', 'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'webp', 'tiff', 'png', 'jpg', 'jpeg', 'gif', 'html', 'css', 'json', 'js', 'txt'}
+# To-Do: make separate list for space-specific file extensions
 
 ph = PasswordHasher()
 
