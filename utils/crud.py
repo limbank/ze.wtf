@@ -263,14 +263,14 @@ def delete_space_files(current_user):
 
     if target_file.exists():
         if target_file.is_file():
-            print("will unlink")
-            #target_file.unlink()  # Deletes the file
+            #print("will unlink")
+            target_file.unlink()  # Deletes the file
         elif target_file.is_dir():
-            print("will rmtree")
-            #shutil.rmtree(target_file)  # Deletes the directory and its contents
+            #print("will rmtree")
+            shutil.rmtree(target_file)  # Deletes the directory and its contents
 
         # return the new file tree here
-        print(f"{target_file} has been deleted.")
+        #print(f"{target_file} has been deleted.")
         return get_space_files(current_user)
     else:
         return dict(success = False, message = "File or directory does not exist")

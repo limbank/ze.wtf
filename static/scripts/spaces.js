@@ -235,10 +235,9 @@
             if (result.success === false) {
                 return console.log("Error attempting to delete...");
             }
-            
+
             console.log("ATTEMPTING TO REBUILD");
             backup_data = result;
-            updatePath("");
             renderDirectoryListing(result, basePath);
         }
         else if (button.classList.contains("browser-open")) {
