@@ -68,12 +68,13 @@
                     body: formData,
                 });
 
+                upload_status.innerText = "Uploading...";
+                upload_status.style.display = "inline-flex";
+                form.style.display = "none";
 
                 let result = await response.json();
 
                 upload_status.innerText = result.message;
-                upload_status.style.display = "inline-flex";
-                form.style.display = "none";
             } catch (e) {
                 console.error(e);
             }
@@ -96,11 +97,13 @@
                     body: formData,
                 });
 
+                upload_status.innerText = "Uploading...";
+                upload_status.style.display = "inline-flex";
+                form.style.display = "none";
+
                 let result = await response.json();
 
                 upload_status.innerText = result.message;
-                upload_status.style.display = "inline-flex";
-                form.style.display = "none";
             } catch (e) {
                 console.error(e);
             }

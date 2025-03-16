@@ -1,3 +1,4 @@
+.table-wrapper,
 .links {
 	width: 100%;
 	overflow: auto;
@@ -61,6 +62,7 @@
 	}
 }
 
+.action-button,
 .delete-item {
 	cursor: pointer;
 	background: transparent;
@@ -90,5 +92,145 @@
 		border: 1px solid #111113;
 		padding: 8px 12px;
 		background: #29292e;
+	}
+}
+
+.file-browser {
+	width: 100%;
+
+	&__controls {
+		background: #111113;
+		border: 1px solid #111113;
+		border-bottom: 0px;
+
+		button {
+			background: #111113;
+			padding: 8px 12px;
+			transition: background 0.2s ease-in;
+			cursor: pointer;
+			color: #cfd3cf;
+			font-size: 14px;
+			border: 0px;
+
+			&:hover {
+				background: lighten(#111113, 20%);
+			}
+		}
+	}
+
+	&__files {
+		overflow: auto;
+		border: 1px solid #111113;
+
+		table {
+			width: 100%;
+	  		border-collapse: collapse;
+
+			tr {
+				&:nth-child(even) {
+					td {
+						background: #29292e;
+					}
+				}
+			}
+
+			th, td {
+				padding: 8px 12px;
+			}
+
+			th {
+				background: #111113;
+			}
+
+			td {
+			}
+		}
+	}
+
+	&__directory {
+		font-weight: bold;
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	&__create-directory {
+		height: 22px;
+		width: 100%;
+		display: inline-flex;
+		align-items: center;
+		background: transparent;
+		border: 0px;
+		color: #cfd3cf;
+		outline: none;
+	}
+
+	&__upload-file {
+		display: none;
+
+		&__label {
+			cursor: pointer;
+			display: block;
+		}
+	}
+}
+
+.table {
+	&__buttons {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	&__reverse {
+		tr {
+			&:nth-child(odd) {
+				td {
+					background: transparent;
+				}
+			}
+
+			&:nth-child(odd) {
+				td {
+					background: #29292e;
+				}
+			}
+		}
+	}
+}
+
+.create-space {
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+.create-table {
+	width: 100%;
+	border: 1px solid #111113;
+	border-collapse: collapse;
+
+	tr {
+		&:nth-child(even) {
+			td {
+				background: #29292e;
+			}
+		}
+	}
+
+	th, td {
+		padding: 8px 12px;
+	}
+
+	th {
+		background: #111113;
+	}
+
+	td {
+		background: #29292e;
+		height: 40px;
 	}
 }

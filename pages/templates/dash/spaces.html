@@ -11,10 +11,12 @@
 		<p>
 			Welcome, {{username}}.
 		</p>
+		<p>
+			Your created spaces:
+		</p>
+		<div class="notifications" id="notifications"></div>
+
 		{% if spaces %}
-			<p>
-				Your created spaces:
-			</p>
 			<div class="links">
 				<table class="links__table">
 					<tr>
@@ -30,10 +32,10 @@
 							<td>{{ space.date_created }}</td>
 							{% if can_delete == True %}
 								<td width="38px">
-									<button class="delete-item" data-urlname="{{ space.name }}">
+									<button class="action-button delete-item" data-target="space" data-name="{{ space.name }}">
 										<svg viewBox="0 0 24 24">
 											<g id="icons">
-												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor" id="exit"/>
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
 											</g>
 										</svg>
 									</button>
@@ -47,18 +49,181 @@
 			        {% endfor %}
 				</table>
 		    </div>
+
 			<p>
 				Your space files:
 			</p>
+
+			<div class="file-browser">
+				<div class="file-browser__controls">
+					<button id="create-directory-button">Create directory</button>
+					<button  id="upload-file-button">Upload file</button>
+				</div>
+				<div class="file-browser__files">
+					<table class="table__reverse" id="upload-file" style="display: none;">
+						<tr>
+							<td>
+								<label for="file" class="file-browser__upload-file__label">Select or drag file</label>
+								<input type="file" name="file" id="file" class="file-browser__upload-file" />
+							</td>
+							<td width="60px"></td>
+							<td width="160px"></td>
+							<td width="68px">
+								<div class="table__buttons">
+									<button class="action-button">
+										<svg viewBox="0 0 24 24" >
+											<g id="icons">
+												<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+									<button class="action-button delete-item">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+					</table>
+					<table class="table__reverse" id="create-directory" style="display: none;">
+						<tr>
+							<td>
+								<input placeholder="directory_name" type="text" name="directory"  class="file-browser__create-directory" />
+							</td>
+							<td width="60px"></td>
+							<td width="160px"></td>
+							<td width="68px">
+								<div class="table__buttons">
+									<button class="action-button">
+										<svg viewBox="0 0 24 24" >
+											<g id="icons">
+												<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+									<button class="action-button delete-item">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+					</table>
+					<table>
+						<tr>
+							<td>
+								<a class="file-browser__directory" href="#">/subdirectory</a>
+							</td>
+							<td width="60px"></td>
+							<td width="160px">2025-03-01 14:00:18</td>
+							<td width="68px">
+								<div class="table__buttons">
+									<button class="action-button delete-item">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td>/index.html</td>
+							<td width="60px">20 Kb</td>
+							<td width="160px">2025-03-01 14:00:18</td>
+							<td width="68px">
+								<div class="table__buttons">
+									<button class="action-button delete-item">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td>/style.css</td>
+							<td width="60px">20 Kb</td>
+							<td width="160px">2025-03-01 14:00:18</td>
+							<td width="68px">
+								<div class="table__buttons">
+									<button class="action-button delete-item">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
         {% else %}
-			<p>
-				You have no spaces created. Create one below.
-			</p>
-			<form class="form" method="POST" action="{{ url_for('dash.spaces.index') }}" autocomplete="off">
-				<input name="name" type="text" placeholder="Name">
-				<input type="submit" value="Create">
-			</form>
-			<div class="notifications" id="notifications"></div>
+			<div class="table-wrapper">
+				<table class="create-table" id="create-space-table">
+					<tr>
+						<td>You have no spaces. <a id="create-space" class="create-space" href="">[Create one]</a></td>
+					</tr>
+				</table>
+				<table class="create-table" id="created-space-table" style="display:none;">
+					<tr>
+						<td>
+							<input placeholder="Name your space" type="text" class="file-browser__create-directory" name="space-name" id="space-name">
+						</td>
+						<td width="68px">
+							<div class="table__buttons">
+								<button class="action-button" id="approve-space">
+									<svg viewBox="0 0 24 24" >
+										<g id="icons">
+											<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+										</g>
+									</svg>
+								</button>
+								<button class="action-button delete-item" id="deny-space">
+									<svg viewBox="0 0 24 24">
+										<g id="icons">
+											<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+										</g>
+									</svg>
+								</button>
+							</div>
+						</td>
+					</tr>
+				</table>
+		    </div>
 		{% endif %}
 	</div>
+
+	{% if not spaces %}
+		<script src="{{ url_for('static', filename='scripts/create_spaces.js') + '?v=' + version }}"></script>
+	{% else %}
+		<script src="{{ url_for('static', filename='scripts/spaces.js') + '?v=' + version }}"></script>
+	{% endif %}
+
+	<!--
+		Here is what we need to implement:
+
+		Create directory in space
+		Upload file to space
+		Delete file in space
+		Delete directory  in space
+
+		This can be done later:
+
+		Download space as zip
+		Create file in space
+		Upload directory to space
+		Upload zip to space and unpack
+	-->
 {% endblock %}

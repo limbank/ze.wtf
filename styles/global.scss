@@ -118,6 +118,7 @@ a {
 		color: #cfd3cf;
 		border: 1px solid #111113;
 		cursor: pointer;
+		display: inline-block;
 
 		&:hover {
 			background: lighten(#111113, 20%);
