@@ -16,9 +16,32 @@
 				Your created invites:
 			</p>
 			{% if can_create == True %}
-				<form action="{{ url_for('dash.invites.index') }}" class="create-invite" method="post">
-			    	<button type="submit" name="your_name">[Create]</button>
-				</form>
+				<button type="submit" id="create-invite" class="create-invite">[Create]</button>
+				<table class="create-table" id="create-invite-table" style="display: none;">
+					<tr>
+						<td>
+							<input placeholder="Alias (Optional)" type="text" class="file-browser__create-directory" name="invite-name" id="invite-alias">
+						</td>
+						<td width="68px">
+							<div class="table__buttons">
+								<button class="action-button" id="approve-invite">
+									<svg viewBox="0 0 24 24" >
+										<g id="icons">
+											<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+										</g>
+									</svg>
+								</button>
+								<button class="action-button" id="deny-invite">
+									<svg viewBox="0 0 24 24">
+										<g id="icons">
+											<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+										</g>
+									</svg>
+								</button>
+							</div>
+						</td>
+					</tr>
+				</table>
 			{% endif %}
 		</div>
 		<div class="notifications" id="notifications"></div>

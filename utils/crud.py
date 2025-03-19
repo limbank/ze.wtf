@@ -119,6 +119,7 @@ def create_link(current_user):
     return dict(url_available=url_slug, error=None)
 
 def create_file(current_user):
+    # To-Do: fix duplication and multiple files at once
     username = current_user['username']
     user_id = current_user['user_id']
 
@@ -329,8 +330,6 @@ def delete_space_files(current_user):
     if users_spaces < 1:
         return dict(success = False, message = "You do not have a space")
 
-    # Check if file exists?
-
     # Create new directory path
     target_file = Path.cwd() / 'uploads' / slugify(username) / 'space' / content['delete']
 
@@ -345,6 +344,7 @@ def delete_space_files(current_user):
     if BASE_DIR not in temp_path.parents:
         return dict(success = False, message = "File or directory does not exist")
 
+    # Check if file exists
     if target_file.exists():
         if target_file.is_file():
             #print("will unlink")
@@ -435,15 +435,36 @@ def check_invite():
         return dict(msg = "Missing invite code", success = False)
 
 def create_invite(current_user):
-    if current_user is not None:
-        # Check if user cas created 5 invites already
-        invite_count = Invites.select().where(Invites.created_by == current_user['user_id']).count()
+    # Check if the content is sent in JSON
+    if (request.content_type != "application/json"):
+        return dict(success = False, message = "Malformed request")
 
-        if invite_count < 5:
-            # Create invite
-            invite_code = random_string(8)
-            # Is this necessary?
-            user = User.get_or_none(User.users_id == current_user['user_id'])
-            Invites.create(created_by=user, created=datetime.now(), expires=datetime.now() + timedelta(days=30), code=invite_code)
+    content = request.json
 
-    return "hi"
+    if current_user is None:
+        return dict(success = False, message = "Unauthorized.")
+
+    # Check if user cas created 5 invites already
+    invite_count = Invites.select().where(Invites.created_by == current_user['user_id']).count()
+
+    # Check if user can add aliases ?
+
+    # Check if user is banned
+    if current_user['role'] == 3:
+        return dict(success = False, message = "You cannot create any more invites.")
+
+    # Check if user can bypass limit
+    if not has_permission(current_user, "ignore:inviteLimit") and invite_count > 4:
+        return dict(success = False, message = "You cannot create any more invites.")
+
+    invite_code = random_string(8)
+
+    # Check if the content contains an alias
+    if 'create' in content and content['create'] != "":
+        invite_code = slugify(content['create'])
+
+    # Create invite
+    Invites.create(created_by=current_user['user_id'], expires=datetime.now() + timedelta(days=30), code=invite_code)
+
+    return dict(success = True, message = "Invite created")
+

@@ -47,7 +47,7 @@ class Invites(Model):
   invites_id = IntegerField(primary_key=True)
   created_by = ForeignKeyField(User, backref='created_invites', column_name='created_by')  
   used_by = ForeignKeyField(User, backref='used_invites', null=True, column_name='used_by')
-  created = DateTimeField()
+  created = DateTimeField(default=datetime.now)
   expires = DateTimeField()
   code = CharField()
 

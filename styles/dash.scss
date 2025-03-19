@@ -43,22 +43,22 @@
 	.create-invite {
 		float: right;
 		display: inline-block;
+		border: none;
+		background: transparent;
+		font-size: 14px;
+		color: #cfd3cf;
+		text-underline-offset: 2px;
+		padding: 0;
+		transform: translateY(-1px);
+		cursor: pointer;
 
-		button {
-			border: none;
-			background: transparent;
-			font-size: 14px;
-			color: #cfd3cf;
-			display: inline-block;
-			text-underline-offset: 2px;
-			padding: 0;
-			transform: translateY(-1px);
-			cursor: pointer;
-
-			&:hover {
-				text-decoration: underline;
-			}
+		&:hover {
+			text-decoration: underline;
 		}
+	}
+
+	.create-table {
+		margin-bottom: 10px;
 	}
 }
 

@@ -102,7 +102,6 @@ def index(post):
         username = current_user['username']
         user_id = current_user['user_id']
 
-
     # list all the files in the posts directory
     filenames = get_content()
 

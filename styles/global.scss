@@ -60,10 +60,33 @@ a {
 	font-size: 12px;
 	color: #29292e;
 
+	.item-left {
+		margin-right: auto;
+	}
+
 	&__inner {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+	}
+
+	&__link {
+		font-size: 12px;
+		color: #29292e;
+		margin: 0 0 0 5px;
+		text-decoration: none;
+
+		&:before {
+			content: '[ ';
+		}
+
+		&:after {
+			content: ' ]';
+		}
+
+		&:hover {
+			text-decoration: underline;
+		}
 	}
 }
 

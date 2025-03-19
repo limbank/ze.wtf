@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "nerds" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="nerds">
+		<div class="container">
+			{% if data %}
+				<p>
+					Application info:
+				</p>
+				<div class="table-wrapper">
+					<table class="table">
+						<tr>
+							<td width="200px">Current build</td>
+							<td>{{ version }}</td>
+						</tr>
+						<tr>
+							<td width="200px">Uptime</td>
+							<td>{{ data.uptime }}</td>
+						</tr>
+						<tr>
+							<td width="200px">Total filesize</td>
+							<td>{{ data.size }}</td>
+						</tr>
+					</table>
+			    </div>
+				<p>
+					User info:
+				</p>
+				<div class="table-wrapper">
+					<table class="table">
+						<tr>
+							<td width="200px">Users</td>
+							<td>{{ data.users }}</td>
+						</tr>
+						<tr>
+							<td width="200px">Links</td>
+							<td>{{ data.links }}</td>
+						</tr>
+						<tr>
+							<td width="200px">Files</td>
+							<td>{{ data.files }}</td>
+						</tr>
+						<tr>
+							<td width="200px">Invites</td>
+							<td>{{ data.invites }}</td>
+						</tr>
+						<tr>
+							<td width="200px">Spaces</td>
+							<td>{{ data.spaces }}</td>
+						</tr>
+					</table>
+			    </div>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}

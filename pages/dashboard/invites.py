@@ -34,8 +34,8 @@ def index():
             return(deleted_invite)
 
     if request.method == 'POST':
-        create_invite(current_user)
-        return redirect(url_for('dash.invites.index'))
+        created_invite = create_invite(current_user)
+        return created_invite
 
     # Retrieve the invites created by user
     invites = Invites.select().join(User, JOIN.LEFT_OUTER, on=(Invites.used_by == User.users_id)).where(Invites.created_by == current_user['user_id'])

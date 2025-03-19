@@ -21,8 +21,6 @@ def catch_all(path, subdomain):
     # This request runs for all files, static files included
 
     space_data = get_space(subdomain)
-    #print(f"Space Name: {space_data.name}")
-    #print(f"Owner: {space_data.owner.username} (ID: {space_data.owner.role})")
 
     # Check if a space exists
     if space_data is None:
@@ -39,22 +37,33 @@ def catch_all(path, subdomain):
 
     # To-Do:
     # Figure out whether we should assume .html for unnamed links
-    # Return file router when index.html is not present
-    # Allow custom 404 pages
+    # Return file router when index.html is not present ?
 
     # Render space
     try:
         # User requested a file
         return send_from_directory(named_file_path, path)
-    except NotFound as e:
+    except:
         # File wasn't found, attempt to fetch subdirectory root
         if not path.endswith(".html"):
             if path == "":
                 # User requested directory root
+                print("12312")
                 return send_from_directory(named_file_path, "index.html")
             else:
-                # User requested subdirectory root
-                return send_from_directory(named_file_path, path + "/index.html")
+                target_file = Path.cwd() / 'uploads' / slugify(space_data.owner.username) / 'space' / path
+
+                if target_file.exists():
+                    return send_from_directory(named_file_path, path + "/index.html")
+                
+                pass
 
         # File not found in user space
-        abort(404)
+
+        # Check if user has a custom 404 page
+        target_file = Path.cwd() / 'uploads' / slugify(space_data.owner.username) / 'space' / '404.html'
+        if target_file.exists():
+            return send_from_directory(named_file_path, "404.html")
+        else:
+            # Custom 404 page doesn't exist, draw default
+            abort(404)

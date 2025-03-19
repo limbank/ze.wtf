@@ -4,6 +4,12 @@
     const notification_area = document.getElementById('notifications');
     const delete_buttons = document.querySelectorAll('.delete-item');
 
+    const create_invite = document.getElementById('create-invite');
+    const invite_alias = document.getElementById('invite-alias');
+    const create_invite_table = document.getElementById('create-invite-table');
+    const approve_invite = document.getElementById('approve-invite');
+    const deny_invite = document.getElementById('deny-invite');
+
     delete_buttons.forEach(button => {
         button.addEventListener('click', async () => {
             let target_invite = button.dataset.invitename;
@@ -55,4 +61,43 @@
         });
     });
 
+    create_invite.addEventListener('click', () => {
+        if (create_invite_table.style.display  == "none") {
+            create_invite_table.style.display = "table";
+            invite_alias.focus();
+        }
+        else {
+            create_invite_table.style.display = "none";
+        }
+    });
+
+    deny_invite.addEventListener('click', () => {
+        create_invite_table.style.display = "none";
+        invite_alias.value = "";
+    });
+
+    approve_invite.addEventListener('click', async () => {
+        try {
+            const response = await fetch(window.location.origin + "/dash/invites", {
+                method: "POST",
+                // Set the FormData instance as the request body
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "create": invite_alias.value
+                }),
+            });
+
+            let result = await response.json();
+
+            create_invite_table.style.display = "none";
+            invite_alias.value = "";
+
+            if (result.success) location.reload();
+        } catch (e) {
+            console.error(e);
+        }
+    });
 })()
