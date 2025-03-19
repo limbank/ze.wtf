@@ -330,10 +330,7 @@
             const formData = new FormData();
 
             [...files].forEach((file, i) => {
-                //console.log("haii", file)
-                //console.log(file.webkitRelativePath)
-                formData.append("file", file, file.name);
-                formData.append(`path_${file.name}`, file.webkitRelativePath);
+                formData.append("file", file, file.webkitRelativePath);
             });
 
             formData.append("entire-dir", true);

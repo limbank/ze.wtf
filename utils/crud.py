@@ -214,16 +214,12 @@ def upload_space_files(current_user):
             if not allowed_files(file.filename):
                 continue
 
-            webkit_relative_path = request.form.get(f'path_{file.filename}', '')  # Get relative path
-            if not webkit_relative_path:
-                continue  # Skip if no path
-
             # Determine the root directory (first part before '/')
             if root_folder is None:
-                root_folder = webkit_relative_path.split('/')[0]  # Extract the first directory
+                root_folder = file.filename.split('/')[0]  # Extract the first directory
 
             # Strip the root folder from the path
-            relative_path = Path(webkit_relative_path).relative_to(root_folder)
+            relative_path = Path(file.filename).relative_to(root_folder)
 
             # Convert username to slug
             username_as_slug = slugify(username)
@@ -241,7 +237,6 @@ def upload_space_files(current_user):
             # Check new path against basedir
             if BASE_DIR not in temp_path.parents:
                 return dict(success = False, message = "File or directory incorrect")
-
 
             # Ensure the parent directory exists before saving
             file_dest.parent.mkdir(parents=True, exist_ok=True)
