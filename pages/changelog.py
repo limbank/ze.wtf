@@ -57,8 +57,8 @@ def sort_posts(posts, lock=True):
 
     for post in posts:
         #To-Do: Change this to absolute path
-        f = open("./changelog/" + post + ".md", "r")
-        file_content = f.read()
+        with open("./changelog/" + post + ".md", "r") as f:
+            file_content = f.read()
         file_metadata = parse(file_content)
         new_date = file_metadata[0]['date']
         new_title = file_metadata[0]['title']
@@ -119,8 +119,8 @@ def index(post):
         return Response(xml, mimetype='text/xml')
     elif post in filenames:
         #To-Do: Change this to absolute path
-        f = open("./changelog/" + post + ".md", "r")
-        file_content = f.read()
+        with open("./changelog/" + post + ".md", "r") as f:
+            file_content = f.read()
 
         file_metadata = parse(file_content)
         post_content = mistune.html(file_metadata[1])
