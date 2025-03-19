@@ -149,7 +149,7 @@ def handle_login():
             # User authenticated, set cookie, then redirect...
 
             response = make_response(redirect(url_for('dash.handle_dash')))
-            response.set_cookie('loggedin', check_auth['cookie'])
+            response.set_cookie('loggedin', check_auth['cookie'], secure=True, httponly=True, samesite='Lax')
 
             return response
         else:
@@ -174,7 +174,7 @@ def handle_register():
             # User registered, set cookie, then redirect...
 
             response = make_response(redirect(url_for('dash.handle_dash')))
-            response.set_cookie('loggedin', check_reg['cookie'])
+            response.set_cookie('loggedin', check_reg['cookie'], secure=True, httponly=True, samesite='Lax')
 
             return response
         else:
