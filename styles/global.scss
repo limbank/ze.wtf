@@ -71,21 +71,26 @@ a {
 	}
 
 	&__link {
-		font-size: 12px;
-		color: #29292e;
 		margin: 0 0 0 5px;
-		text-decoration: none;
 
 		&:before {
-			content: '[ ';
+			content: '[';
 		}
 
 		&:after {
-			content: ' ]';
+			content: ']';
+		}
+
+		a {
+			text-decoration: none;
+			font-size: 12px;
+			color: #29292e;
 		}
 
 		&:hover {
-			text-decoration: underline;
+			a {
+				text-decoration: underline;
+			}
 		}
 	}
 }

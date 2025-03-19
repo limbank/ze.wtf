@@ -166,7 +166,7 @@ def create_file(current_user):
     else:
         # File not allowed
         print(file.filename)
-        print(allowed_file(file.filename))
+        print(allowed_files(file.filename))
         return dict(success = False, message="Filetype not allowed.")
 
 def get_space(space_name):
@@ -239,7 +239,7 @@ def upload_space_files(current_user):
         else:
             # File not allowed
             print(file.filename)
-            print(allowed_file(file.filename))
+            print(allowed_files(file.filename))
             return dict(success = False, message="Filetype not allowed.")
     else:
         # User is creating a directory

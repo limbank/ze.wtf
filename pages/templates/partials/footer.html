@@ -3,7 +3,9 @@
 		<div class="footer__inner">
 			<span class="item-left">Page generated in {{ g.request_time() }}</span>
 			<span>v{{version}}</span>
-			<a href="{{ url_for('nerds.index') }}" class="footer__link">Nerd stuff</a>
+			<span class="footer__link">
+				<a href="{{ url_for('nerds.index') }}">Nerd stuff</a>
+			</span>
 		</div>
 	</div>
 </div>

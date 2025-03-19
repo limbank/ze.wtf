@@ -3,6 +3,7 @@ from flask_limiter import Limiter
 import time
 from pathlib import Path
 from flask_limiter.util import get_remote_address
+from utils.cookies import check_cookie, user_from_cookie
 
 from models import *
 
@@ -51,6 +52,15 @@ def get_directory_size(path='.'):
 @nerds.route("/nerds")
 @limiter.limit("2/minute")
 def index():
+    valid_cookie = check_cookie()
+    username = None
+    user_id = None
+    if valid_cookie != False:
+        # Get user if logged in
+        current_user = user_from_cookie(valid_cookie)
+        username = current_user['username']
+        user_id = current_user['user_id']
+
     start_time = current_app.config.get('START_TIME', time.time())  # Get start time
     uptime_seconds = time.time() - start_time
     project_size = get_directory_size()
@@ -72,4 +82,4 @@ def index():
         spaces=space_count
     )
 
-    return render_template("nerds.html", data=appinfo)
+    return render_template("nerds.html", data=appinfo, username=username)
