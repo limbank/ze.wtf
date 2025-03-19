@@ -17,6 +17,13 @@
     const new_file_name = document.getElementById("new-file-name");
     const new_file_label = document.getElementById("new-file-label");
 
+    const upload_directory_button = document.getElementById("upload-directory-button");
+    const upload_directory = document.getElementById("upload-directory");
+    const confirm_upload_directory = document.getElementById("confirm-upload-directory");
+    const cancel_upload_directory = document.getElementById("cancel-upload-directory");
+    const upload_new_directory = document.getElementById("upload-new-directory");
+    const upload_new_directory_label = document.getElementById("upload-new-directory-label");
+
     const delete_button_template = `
         <svg viewBox="0 0 24 24">
             <g id="icons">
@@ -174,6 +181,24 @@
         renderDirectoryListing(data, basePath);
     }
 
+    upload_directory_button.addEventListener("click", (event) => {
+        if (upload_directory.style.display  == "none") {
+            upload_directory.style.display = "table";
+        }
+        else {
+            upload_directory.style.display = "none";
+        }
+
+        create_directory_table.style.display = "none";
+        upload_file_table.style.display = "none";
+    });
+
+    cancel_upload_directory.addEventListener("click", (event) => {
+        upload_directory.style.display = "none";
+        upload_new_directory.value = "";
+        upload_new_directory_label.innerHTML = "Click to select directory";
+    });
+
     create_directory_button.addEventListener("click", (event) => {
         if (create_directory_table.style.display  == "none") {
             create_directory_table.style.display = "table";
@@ -183,6 +208,7 @@
             create_directory_table.style.display = "none";
         }
 
+        upload_directory.style.display = "none";
         upload_file_table.style.display = "none";
     });
 
@@ -194,6 +220,7 @@
             upload_file_table.style.display = "none";
         }
 
+        upload_directory.style.display = "none";
         create_directory_table.style.display = "none";
     });
 
@@ -233,7 +260,7 @@
 
             formData.append("destination", basePath);
 
-            console.log(formData)
+            //console.log(formData)
 
             try {
                 const response = await fetch(window.location.origin + "/dash/spaces/files", {
@@ -291,6 +318,59 @@
             } catch (e) {
                 console.error(e);
             }
+        }
+    });
+
+    confirm_upload_directory.addEventListener("click", async (event) => {
+        // To-Do: add input validation
+        //upload_new_directory
+        let files = upload_new_directory.files;
+
+        if (files.length) {
+            const formData = new FormData();
+
+            [...files].forEach((file, i) => {
+                //console.log("haii", file)
+                //console.log(file.webkitRelativePath)
+                formData.append("file", file, file.name);
+                formData.append(`path_${file.name}`, file.webkitRelativePath);
+            });
+
+            formData.append("entire-dir", true);
+
+            try {
+                const response = await fetch(window.location.origin + "/dash/spaces/files", {
+                    method: "POST",
+                    // Set the FormData instance as the request body
+                    body: formData,
+                });
+
+                let result = await response.json();
+
+                if (result.success === false) {
+                    console.log(result);
+                    return console.log("Error attempting to upload...");
+                }
+
+                buildTree(result);
+
+                upload_directory.style.display = "none";
+                upload_new_directory.value = "";
+                upload_new_directory_label.innerHTML = "Click to select directory";
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    });
+
+    upload_new_directory.addEventListener("change", async (event) => {
+        let files = upload_new_directory.files;
+
+        if (files.length) {
+            let file_path = files[0].webkitRelativePath;
+            let source_dir = file_path.substr(0, file_path.indexOf("/") + 1);
+
+            upload_new_directory_label.innerHTML = source_dir;
         }
     });
 

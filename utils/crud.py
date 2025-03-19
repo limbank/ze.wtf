@@ -185,6 +185,7 @@ def upload_space_files(current_user):
     user_id = current_user['user_id']
 
     destination = request.form.get('destination')
+    entire_dir = request.form.get('entire-dir')
     dirname = request.form.get('dirname')
 
     # Check if the user can create files
@@ -192,9 +193,67 @@ def upload_space_files(current_user):
     if not can_create:
         return dict(success = False, message = "Missing permission.")
 
-    if dirname is None:
-        # User is uploading a file
 
+    if entire_dir is not None:
+        print("Uploading whole dir")
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            # No file part
+            return dict(success = False, message="No files found.")
+
+        # Prevent file creation if the user is not allowed to
+        if not has_permission(current_user, "create:ownFiles"):
+            return dict(success=False, message="Permission denied.")
+
+        files = request.files.getlist('file')
+
+        root_folder = None  # To track the first directory (root)
+
+        for file in files:
+            # Check if file is allowed
+            if not allowed_files(file.filename):
+                continue
+
+            webkit_relative_path = request.form.get(f'path_{file.filename}', '')  # Get relative path
+            if not webkit_relative_path:
+                continue  # Skip if no path
+
+            # Determine the root directory (first part before '/')
+            if root_folder is None:
+                root_folder = webkit_relative_path.split('/')[0]  # Extract the first directory
+
+            # Strip the root folder from the path
+            relative_path = Path(webkit_relative_path).relative_to(root_folder)
+
+            # Convert username to slug
+            username_as_slug = slugify(username)
+
+            # Get new destination
+            file_dest = Path.cwd() / 'uploads' / username_as_slug / 'space' / relative_path
+
+            # Define the trusted base directory
+            temp_base = Path.cwd() / 'uploads' / username_as_slug / 'space'
+            BASE_DIR = Path(temp_base).resolve()
+
+            # Resolve new path
+            temp_path = Path(file_dest).resolve()
+
+            # Check new path against basedir
+            if BASE_DIR not in temp_path.parents:
+                return dict(success = False, message = "File or directory incorrect")
+
+
+            # Ensure the parent directory exists before saving
+            file_dest.parent.mkdir(parents=True, exist_ok=True)
+
+            # Save the file
+            file.save(file_dest)
+
+        # Rebuild file tree
+        return get_space_files(current_user)
+
+    # User is uploading a file
+    if dirname is None:
         # check if the post request has the file part
         if 'file' not in request.files:
             # No file part
@@ -236,13 +295,17 @@ def upload_space_files(current_user):
             print(file_dest)
 
             file.save(file_dest)
+
+            # Rebuild file tree
+            return get_space_files(current_user)
         else:
             # File not allowed
             print(file.filename)
             print(allowed_files(file.filename))
             return dict(success = False, message="Filetype not allowed.")
-    else:
-        # User is creating a directory
+
+    # User is creating a directory
+    if dirname is not None:
         target_dir = Path.cwd() / 'uploads' / slugify(username) / 'space' / destination / slugify(dirname)
 
         # Define the trusted base directory
@@ -259,8 +322,8 @@ def upload_space_files(current_user):
         # Create directory
         target_dir.mkdir()
 
-    # Rebuild file tree
-    return get_space_files(current_user)
+        # Rebuild file tree
+        return get_space_files(current_user)
 
 def space_file_tree(working_dir):
     base_path = working_dir  # This is the root path for the listing
