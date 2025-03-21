@@ -14,6 +14,34 @@ from models import *
 
 UPLOAD_FOLDER = Path.cwd() / 'uploads'
 
+def in_userspace(current_user, target, in_space = False):
+    username = current_user['username']
+    user_id = current_user['user_id']
+
+    # Create target base
+    temp_base = Path.cwd() / 'uploads' / slugify(username)
+
+    if in_space:
+        temp_base = Path.cwd() / 'uploads' / slugify(username) / 'space'
+
+    # Resolve base directory
+    BASE_DIR = Path(temp_base).resolve()
+
+    # Ensure local path
+    target = target.lstrip("/")
+
+    # Create destination
+    target_destination = temp_base / target
+
+    # Resolve target
+    TARGET_DIR = Path(target_destination).resolve()
+
+    #Check new path against basedir
+    if BASE_DIR not in TARGET_DIR.parents:
+        return False
+
+    return True
+
 def delete_invite(slug, current_user):
     user_id = current_user['user_id']
 
@@ -228,22 +256,17 @@ def upload_space_files(current_user):
             # Strip the root folder from the path
             relative_path = Path(file.filename).relative_to(root_folder)
 
+            dest_in_userspace = in_userspace(current_user, relative_path, True)
+
+            # Check new path against basedir
+            if not dest_in_userspace:
+                return dict(success = False, message = "Invalid destination")
+
             # Convert username to slug
             username_as_slug = slugify(username)
 
             # Get new destination
             file_dest = Path.cwd() / 'uploads' / username_as_slug / 'space' / relative_path
-
-            # Define the trusted base directory
-            temp_base = Path.cwd() / 'uploads' / username_as_slug / 'space'
-            BASE_DIR = Path(temp_base).resolve()
-
-            # Resolve new path
-            temp_path = Path(file_dest).resolve()
-
-            # Check new path against basedir
-            if BASE_DIR not in temp_path.parents:
-                return dict(success = False, message = "File or directory incorrect")
 
             # Ensure the parent directory exists before saving
             file_dest.parent.mkdir(parents=True, exist_ok=True)
@@ -278,24 +301,19 @@ def upload_space_files(current_user):
             # Convert username to slug
             username_as_slug = slugify(username)
 
-            # Get new destination
-            file_dest = Path(UPLOAD_FOLDER) / username_as_slug / 'space' / destination / filename
-
-            # Define the trusted base directory
-            temp_base = Path.cwd() / 'uploads' / username_as_slug / 'space'
-            BASE_DIR = Path(temp_base).resolve()
-
-            # Resolve new path
-            temp_path = Path(file_dest).resolve()
+            # Merge destination and file
+            file_with_destination = Path(destination).joinpath(filename)
 
             # Check new path against basedir
-            if BASE_DIR not in temp_path.parents:
-                return dict(success = False, message = "File or directory does not exist")
+            file_in_userpsace = in_userspace(current_user, str(file_with_destination), True)
+            if not file_in_userpsace:
+                return dict(success = False, message = "Invalid destination")
+
+
+            # Get new destination
+            file_dest = Path(UPLOAD_FOLDER) / username_as_slug / 'space' / file_with_destination
 
             # Save file
-            #print("Will write...")
-            #print(file_dest)
-
             file.save(file_dest)
 
             # Rebuild file tree
@@ -308,18 +326,16 @@ def upload_space_files(current_user):
 
     # User is creating a directory
     if dirname is not None:
-        target_dir = Path.cwd() / 'uploads' / slugify(username) / 'space' / destination / slugify(dirname)
-
-        # Define the trusted base directory
-        temp_base = Path.cwd() / 'uploads' / slugify(username) / 'space'
-        BASE_DIR = Path(temp_base).resolve()
-
-        # Resolve new path
-        temp_path = Path(target_dir).resolve()
+        # Merge destination and directory name
+        directory_with_destination = Path(destination).joinpath(slugify(dirname))
 
         # Check new path against basedir
-        if BASE_DIR not in temp_path.parents:
-            return dict(success = False, message = "File or directory does not exist")
+        dest_in_userspace = in_userspace(current_user, str(directory_with_destination), True)
+        if not dest_in_userspace:
+            return dict(success = False, message = "Invalid destination")
+
+        # Create new path
+        target_dir = Path.cwd() / 'uploads' / slugify(username) / 'space' / directory_with_destination
 
         # Create directory
         target_dir.mkdir()
@@ -393,32 +409,15 @@ def get_space_file(current_user):
 
     space_file = content['edit']
 
-    #print("Our file?")
-    #print(space_file)
-
     #To-Do: filter which files can be edited
+
+    # Check if file address is in userspace
+    file_in_userpsace = in_userspace(current_user, space_file, True)
+    if not file_in_userpsace:
+        return dict(success = False, message = "File or directory does not exist")
 
     # Create new directory path
     target_file = Path.cwd() / 'uploads' / slugify(username) / 'space' / space_file
-
-    #print("testing....")
-    #print(Path.cwd() / 'uploads' / slugify(username) / 'space')
-    # Define the trusted base directory
-    temp_base = Path.cwd() / 'uploads' / slugify(username) / 'space'
-    BASE_DIR = Path(temp_base).resolve()
-
-    #print("Our target?")
-    #print(target_file)
-
-    # Resolve new path
-    temp_path = Path(target_file).resolve()
-
-    #print("Our path?")
-    #print(temp_path)
-
-    # Check new path against basedir
-    if BASE_DIR not in temp_path.parents:
-        return dict(success = False, message = "File or directory does not exist")
 
     # Check if file exists
     if target_file.exists():
@@ -452,19 +451,14 @@ def delete_space_files(current_user):
     if users_spaces < 1:
         return dict(success = False, message = "You do not have a space")
 
-    # Create new directory path
-    target_file = Path.cwd() / 'uploads' / slugify(username) / 'space' / content['delete']
-
-    # Define the trusted base directory
-    temp_base = Path.cwd() / 'uploads' / slugify(username) / 'space'
-    BASE_DIR = Path(temp_base).resolve()
-
-    # Resolve new path
-    temp_path = Path(target_file).resolve()
+    file_in_userspace = in_userspace(current_user, content['delete'], True)
 
     # Check new path against basedir
-    if BASE_DIR not in temp_path.parents:
+    if not file_in_userspace:
         return dict(success = False, message = "File or directory does not exist")
+
+    # Create new directory path
+    target_file = Path.cwd() / 'uploads' / slugify(username) / 'space' / content['delete']
 
     # Check if file exists
     if target_file.exists():
