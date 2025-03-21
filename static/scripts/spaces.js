@@ -24,9 +24,15 @@
     const upload_new_directory = document.getElementById("upload-new-directory");
     const upload_new_directory_label = document.getElementById("upload-new-directory-label");
 
+    const create_file_table = document.getElementById("create-file");
+    const new_created_file_name = document.getElementById("new-created-file-name");
+    const create_new_file = document.getElementById("create-new-file");
+    const cancel_new_file = document.getElementById("cancel-new-file");
+    const create_new_file_button = document.getElementById("create-new-file-button");
+
     const delete_button_template = `
         <svg viewBox="0 0 24 24">
-            <g id="icons">
+            <g>
                 <path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
             </g>
         </svg>
@@ -34,7 +40,7 @@
 
     const save_button_template = `
         <svg viewBox="0 0 24 24" >
-            <g id="icons">
+            <g>
                 <path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
             </g>
         </svg>
@@ -42,8 +48,19 @@
 
     const open_button_template = `
         <svg viewBox="0 0 24 24">
-            <g id="icons">
+            <g>
                 <path d="M21.7,10.2l-6.6-6C14.6,3.7,14,4.2,14,5v3c-4.7,0-8.7,2.9-10.6,6.8c-0.7,1.3-1.1,2.7-1.4,4.1   c-0.2,1,1.3,1.5,1.9,0.6C6.1,16,9.8,13.7,14,13.7V17c0,0.8,0.6,1.3,1.1,0.8l6.6-6C22.1,11.4,22.1,10.6,21.7,10.2z" fill="currentColor"/>
+            </g>
+        </svg>
+    `;
+
+    const edit_button_template = `
+        <svg viewBox="0 0 24 24">
+            <g id="icons">
+                <g>
+                    <path d="M2,20c0,1.1,0.9,2,2,2h2.6L2,17.4V20z" fill="currentColor"/>
+                    <path d="M21.6,5.6l-3.2-3.2c-0.8-0.8-2-0.8-2.8,0l-0.2,0.2C15,3,15,3.6,15.4,4L20,8.6c0.4,0.4,1,0.4,1.4,0l0.2-0.2    C22.4,7.6,22.4,6.4,21.6,5.6z"/><path d="M14,5.4c-0.4-0.4-1-0.4-1.4,0l-9.1,9.1C3,15,3,15.6,3.4,16L8,20.6c0.4,0.4,1,0.4,1.4,0l9.1-9.1c0.4-0.4,0.4-1,0-1.4    L14,5.4z" fill="currentColor"/>
+                </g>
             </g>
         </svg>
     `;
@@ -51,6 +68,10 @@
     let maxDepth = 1;  // Controls depth
     let basePath = ""; // Stores the current directory level
     let backup_data;
+
+    let editable_files = [
+        'html', 'css', 'js', 'json'
+    ];
 
     function updatePath(newPath) {
         basePath = newPath;
@@ -81,6 +102,15 @@
         current_button.className = "action-button browser-delete";
         current_button.dataset.target = target;
         current_button.insertAdjacentHTML('afterbegin', delete_button_template);
+        button_container.appendChild(current_button);
+    }
+
+    function addEditButton(parent, target) {
+        let button_container = parent.firstChild;
+        const current_button = document.createElement('button');
+        current_button.className = "action-button browser-edit";
+        current_button.dataset.target = target;
+        current_button.insertAdjacentHTML('afterbegin', edit_button_template);
         button_container.appendChild(current_button);
     }
 
@@ -129,7 +159,7 @@
             dirElement.appendChild(navLink);
             parent_tr.appendChild(dirElement);
             let button_parent = makeButtonWrapper();
-            addDeleteButton(button_parent, path + "/" + filtered_dirname)
+            addDeleteButton(button_parent, path + "/" + filtered_dirname);
             parent_tr.appendChild(button_parent);
             container.appendChild(parent_tr);
         });
@@ -142,8 +172,13 @@
             fileElement.textContent = filtered_filename;
             parent_tr.appendChild(fileElement);
             let button_parent = makeButtonWrapper();
-            addOpenButton(button_parent, path + "/" + filtered_filename)
-            addDeleteButton(button_parent, path + "/" + filtered_filename)
+            addOpenButton(button_parent, path + "/" + filtered_filename);
+
+            if (editable_files.some(s => filtered_filename.endsWith(s))) {
+                addEditButton(button_parent, path + "/" + filtered_filename);
+            }
+
+            addDeleteButton(button_parent, path + "/" + filtered_filename);
             parent_tr.appendChild(button_parent);
             container.appendChild(parent_tr);
         });
@@ -191,6 +226,7 @@
 
         create_directory_table.style.display = "none";
         upload_file_table.style.display = "none";
+        create_file_table.style.display = "none";
     });
 
     cancel_upload_directory.addEventListener("click", (event) => {
@@ -210,6 +246,7 @@
 
         upload_directory.style.display = "none";
         upload_file_table.style.display = "none";
+        create_file_table.style.display = "none";
     });
 
     upload_file_button.addEventListener("click", (event) => {
@@ -222,9 +259,23 @@
 
         upload_directory.style.display = "none";
         create_directory_table.style.display = "none";
+        create_file_table.style.display = "none";
     });
 
-    function buildTree(data, reset = false) {
+    create_new_file_button.addEventListener("click", (event) => {
+        if (create_file_table.style.display == "none") {
+            create_file_table.style.display = "table";
+        }
+        else {
+            create_file_table.style.display = "none";
+        }
+
+        upload_directory.style.display = "none";
+        create_directory_table.style.display = "none";
+        upload_file_table.style.display = "none";
+    });
+
+    window.buildTree = (data, reset = false) => {
         console.log("Building tree...");
         backup_data = data;
         if (reset) updatePath("");
@@ -246,6 +297,50 @@
     cancel_directory.addEventListener("click", async (event) => {
         new_directory_name.value = "";
         create_directory_table.style.display = "none";
+    });
+
+    cancel_new_file.addEventListener("click", async (event) => {
+        new_created_file_name.value = "";
+        create_file_table.style.display = "none";
+    });
+
+    create_new_file.addEventListener("click", async (event) => {
+        let created_file_slug = new_created_file_name.value;
+        //return to here
+
+        if (editable_files.some(s => created_file_slug.endsWith(s)) == false) {
+            //file name not allowed
+            return;
+        }
+
+        const formData = new FormData();
+
+        let fileBlob = new Blob([""], { type: "text/plain" });
+        formData.append("file", fileBlob, created_file_slug);
+
+        formData.append("destination", basePath);
+
+        try {
+            const response = await fetch(window.location.origin + "/dash/spaces/files", {
+                method: "POST",
+                // Set the FormData instance as the request body
+                body: formData,
+            });
+
+            let result = await response.json();
+
+            if (result.success === false) {
+                console.log(result);
+                return console.log("Error attempting to upload...");
+            }
+            console.log("File created!")
+            buildTree(result);
+            
+            new_created_file_name.value = "";
+            create_file_table.style.display = "none";
+        } catch (e) {
+            console.error(e);
+        }
     });
 
     save_file.addEventListener("click", async (event) => {

@@ -98,6 +98,7 @@
 
 .file-browser {
 	width: 100%;
+	margin-bottom: 10px;
 
 	&__controls {
 		background: #111113;
@@ -186,6 +187,54 @@
 		&__label {
 			cursor: pointer;
 			display: block;
+		}
+	}
+}
+
+.file-editor {
+	width: 100%;
+	display: none;
+	margin-bottom: 10px;
+
+	.editor {
+		border: 1px solid #111113;
+		height: 400px;
+
+		.cm-editor {
+			height: 100%;
+		}
+	}
+
+	&.open {
+		display: block;
+	}
+
+	&__controls {
+		background: #111113;
+		border: 1px solid #111113;
+		border-bottom: 0px;
+		display: flex;
+
+		&__address {
+			margin-right: auto;
+			display: inline-flex;
+			align-items: center;
+			color: #29292E;
+			padding: 8px 12px;
+		}
+
+		button {
+			background: #111113;
+			padding: 8px 12px;
+			transition: background 0.2s ease-in;
+			cursor: pointer;
+			color: #cfd3cf;
+			font-size: 14px;
+			border: 0px;
+
+			&:hover {
+				background: lighten(#111113, 20%);
+			}
 		}
 	}
 }

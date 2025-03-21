@@ -1,6 +1,6 @@
 import validators
 import json
-from flask import request
+from flask import request, send_file
 from pathlib import Path
 import shutil
 from slugify import slugify
@@ -101,22 +101,22 @@ def create_link(current_user):
         url_name = ''.join(random_string(6))
     else:
         # Check if url alias is allowed
-        url_slug = slugify(url_name)
+        url_name = slugify(url_name)
 
         with open('utils/usernames.json') as f:
             data = json.load(f)
-            if url_slug in data['usernames']:
+            if url_name in data['usernames']:
                 return dict(error="URL alias not allowed.", url_available=None)
 
-        # Verify alias not existing
-        alias_count = Link.select().where(Link.ref == url_slug).count()
-        if alias_count > 0:
-            return dict(error="URL alias already exists.", url_available=None)
+    # Verify alias not existing
+    alias_count = Link.select().where(Link.ref == url_name).count()
+    if alias_count > 0:
+        return dict(error="URL alias already exists.", url_available=None)
 
     # Add URL to database
-    Link.create(url=url, date_created=datetime.now(), ref=url_slug, owner=user_id)
+    Link.create(url=url, date_created=datetime.now(), ref=url_name, owner=user_id)
 
-    return dict(url_available=url_slug, error=None)
+    return dict(url_available=url_name, error=None)
 
 def create_file(current_user):
     # To-Do: fix duplication and multiple files at once
@@ -183,6 +183,13 @@ def get_space(space_name):
 def upload_space_files(current_user):
     username = current_user['username']
     user_id = current_user['user_id']
+
+    # Capture JSON here TEMPORARILY
+
+    # Check if the content is sent in JSON
+    if (request.content_type == "application/json"):
+        single_space_file = get_space_file(current_user)
+        return single_space_file
 
     destination = request.form.get('destination')
     entire_dir = request.form.get('entire-dir')
@@ -286,8 +293,8 @@ def upload_space_files(current_user):
                 return dict(success = False, message = "File or directory does not exist")
 
             # Save file
-            print("Will write...")
-            print(file_dest)
+            #print("Will write...")
+            #print(file_dest)
 
             file.save(file_dest)
 
@@ -363,6 +370,63 @@ def get_space_files(current_user):
         return space_file_tree(working_dir)
 
     return dict(success = False, message = "Incomplete")
+
+def get_space_file(current_user):
+    username = current_user['username']
+    user_id = current_user['user_id']
+
+    if (request.content_type != "application/json"):
+        return dict(success = False, message = "Malformed request")
+
+    content = request.json
+
+    # Retrieve the spaces created by user
+    own_spaces = Space.select().where(Space.owner == user_id)
+
+    if own_spaces.count() == 0:
+        return dict(success = False, message = "You do not have a space")
+
+    # Check if the user can edit files
+    can_delete = has_permission(current_user, "edit:ownFiles")
+    if not can_delete:
+        return dict(success = False, message = "Missing permission.")
+
+    space_file = content['edit']
+
+    #print("Our file?")
+    #print(space_file)
+
+    #To-Do: filter which files can be edited
+
+    # Create new directory path
+    target_file = Path.cwd() / 'uploads' / slugify(username) / 'space' / space_file
+
+    #print("testing....")
+    #print(Path.cwd() / 'uploads' / slugify(username) / 'space')
+    # Define the trusted base directory
+    temp_base = Path.cwd() / 'uploads' / slugify(username) / 'space'
+    BASE_DIR = Path(temp_base).resolve()
+
+    #print("Our target?")
+    #print(target_file)
+
+    # Resolve new path
+    temp_path = Path(target_file).resolve()
+
+    #print("Our path?")
+    #print(temp_path)
+
+    # Check new path against basedir
+    if BASE_DIR not in temp_path.parents:
+        return dict(success = False, message = "File or directory does not exist")
+
+    # Check if file exists
+    if target_file.exists():
+        if target_file.is_file():
+            # Return the file contents
+            return send_file(target_file, as_attachment=True)
+
+    return dict(success = False, message = "Error editing file")
 
 def delete_space_files(current_user):
     user_id = current_user['user_id']

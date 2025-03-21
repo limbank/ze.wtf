@@ -21,15 +21,21 @@
 				<table class="links__table">
 					<tr>
 						<th>Name</th>
-						<th>Created</th>
+						<th>URL</th>
+						<th width="160px">Created</th>
 						{% if can_delete == True %}
 							<th></th>
 						{% endif %}
 					</tr>
 			        {% for space in spaces %}
 						<tr>
-							<td id="space-domain">{{ space.name }}.{{ domain }}</td>
-							<td>{{ space.date_created }}</td>
+							<td>{{ space.name }}</td>
+							<td id="space-domain">
+								<a href="http://{{ space.name }}.{{ domain }}" target="_blank" class="open-space">
+									{{ space.name }}.{{ domain }}
+								</a>
+							</td>
+							<td>{{ space.date_created.strftime('%Y-%m-%d %H:%M') }}</td>
 							{% if can_delete == True %}
 								<td width="38px">
 									<button style="display: none;" class="action-button" data-target="space" data-name="{{ space.name }}">
@@ -62,6 +68,7 @@
 					<button id="upload-directory-button">Upload directory</button>
 					<button id="create-directory-button">Create directory</button>
 					<button  id="upload-file-button">Upload file</button>
+					<button id="create-new-file-button">Create file</button>
 				</div>
 				<div class="file-browser__files">
 					<table class="table__reverse" id="upload-directory" style="display: none;">
@@ -120,6 +127,33 @@
 							</td>
 						</tr>
 					</table>
+					<table class="table__reverse" id="create-file" style="display: none;">
+						<tr>
+							<td>
+								<input id="new-created-file-name" placeholder="file_name.html" type="text" name="directory"  class="file-browser__create-directory" />
+							</td>
+							<td width="60px"></td>
+							<td width="160px"></td>
+							<td width="68px">
+								<div class="table__buttons">
+									<button class="action-button" id="create-new-file">
+										<svg viewBox="0 0 24 24" >
+											<g id="icons">
+												<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+									<button class="action-button" id="cancel-new-file">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+					</table>
 					<table class="table__reverse" id="create-directory" style="display: none;">
 						<tr>
 							<td>
@@ -152,6 +186,15 @@
 						<tbody></tbody>
 					</table>
 				</div>
+			</div>
+
+			<div class="file-editor" id="file-editor">
+				<div class="file-editor__controls">
+					<div class="file-editor__controls__address" id="edit-address"></div>
+					<button id="save-edit-button">Save</button>
+					<button id="cancel-edit-button">Cancel</button>
+				</div>
+				<div class="editor" id="codemirror"></div>
 			</div>
         {% else %}
 			<div class="table-wrapper">
@@ -193,6 +236,8 @@
 		<script src="{{ url_for('static', filename='scripts/create_spaces.js') + '?v=' + version }}"></script>
 	{% else %}
 		<script src="{{ url_for('static', filename='scripts/spaces.js') + '?v=' + version }}"></script>
+		<script src="{{ url_for('static', filename='scripts/editor.bundle.js') + '?v=' + version }}"></script>
+		<script src="{{ url_for('static', filename='scripts/editor.js') + '?v=' + version }}"></script>
 	{% endif %}
 
 	<!--
@@ -200,7 +245,6 @@
 
 		Download space as zip
 		Create file in space
-		Upload directory to space
 		Upload zip to space and unpack
 	-->
 {% endblock %}

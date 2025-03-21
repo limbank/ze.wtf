@@ -48,7 +48,7 @@
 		<div class="links">
 			<table class="links__table">
 				<tr>
-					<th>Expires</th>
+					<th width="160px">Expires</th>
 					<th>Code</th>
 					<th>Used by</th>
 					{% if can_delete == True %}
@@ -57,7 +57,7 @@
 				</tr>
 		        {% for invite in invites %}
 					<tr>
-						<td>{{invite.expires}}</td>
+						<td>{{invite.expires.strftime('%Y-%m-%d %H:%M')}}</td>
 						<td>{{invite.code}}</td>
 						<td>{{invite.used_by.username}}</td>
 						{% if can_delete == True %}

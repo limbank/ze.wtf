@@ -9,3 +9,4 @@ Latest changes:
 - Allowed video files and archives to be uploaded on the homepage
 - Added .MOV and fixed the reject case error (Thanks Charlie)
 - Fixed the footer missing on the files tab in dashboard
+- Fixed an error with creating new short urls
