@@ -22,20 +22,6 @@
 		</ul>
 	</div>
 </div>
-{% if username and active_page == "home" %}
-	<div class="header header-secondary">
-		<div class="container">
-			<ul class="nav">
-				<li>
-					<a href="{{ url_for('home.links') }}">Links</a>
-				</li>
-				<li>
-					<a href="{{ url_for('home.images') }}">Images</a>
-				</li>
-			</ul>
-		</div>
-	</div>
-{% endif %}
 {% if username and active_page == "dash" %}
 	<div class="header header-secondary">
 		<div class="container">

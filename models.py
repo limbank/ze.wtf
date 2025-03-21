@@ -10,7 +10,7 @@ db = PostgresqlDatabase(os.getenv('DB_NAME'), host=os.getenv('DB_HOST'), port=os
 class Cookie(Model):
   cookies_id = IntegerField(primary_key=True)
   user_id = IntegerField()
-  created = DateTimeField()
+  created = DateTimeField(default=datetime.now)
   expires = DateTimeField()
   cookie_token = CharField()
   cookie_hash = CharField()
@@ -21,7 +21,7 @@ class Cookie(Model):
 
 class User(Model):
   users_id = IntegerField(primary_key=True)
-  date_joined = DateTimeField()
+  date_joined = DateTimeField(default=datetime.now)
   username = CharField(unique=True)
   email = CharField()
   password = CharField()
@@ -34,7 +34,7 @@ class User(Model):
 class File(Model):
   files_id = IntegerField(primary_key=True)
   owner = IntegerField()
-  created = DateTimeField()
+  created = DateTimeField(default=datetime.now)
   filename = CharField(unique=True)
   location = CharField()
   original = CharField()
@@ -57,7 +57,7 @@ class Invites(Model):
 
 class Link(Model):
   links_id = IntegerField(primary_key=True)
-  date_created = DateTimeField()
+  date_created = DateTimeField(default=datetime.now)
   url = CharField()
   ref = CharField(unique=True)
   owner = IntegerField(default=0)

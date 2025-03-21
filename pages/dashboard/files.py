@@ -3,7 +3,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
 from utils.permissions import has_permission
-from utils.crud import delete_file
+from utils.crud import delete_file, upload_files
 
 from models import *
 
@@ -32,6 +32,10 @@ def index():
         if 'delete' in content:
             deleted_file = delete_file(content['delete'], current_user)
             return(deleted_file)
+
+    if request.method == 'POST':
+        uploaded_files = upload_files(current_user)
+        return uploaded_files
 
     # Retrieve the files created by user
     files = File.select().where(File.owner == current_user['user_id'])

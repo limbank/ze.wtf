@@ -15,20 +15,20 @@ from models import *
 UPLOAD_FOLDER = Path.cwd() / 'uploads'
 
 def in_userspace(current_user, target, in_space = False):
-    username = current_user['username']
-    user_id = current_user['user_id']
+    username = slugify(current_user['username'])
 
     # Create target base
-    temp_base = Path.cwd() / 'uploads' / slugify(username)
+    temp_base = Path.cwd() / 'uploads' / username
 
     if in_space:
-        temp_base = Path.cwd() / 'uploads' / slugify(username) / 'space'
+        temp_base = Path.cwd() / 'uploads' / username / 'space'
 
     # Resolve base directory
     BASE_DIR = Path(temp_base).resolve()
 
     # Ensure local path
-    target = target.lstrip("/")
+    if type(target) is str and target.startswith("/"):
+        target = target.lstrip("/")
 
     # Create destination
     target_destination = temp_base / target
@@ -107,97 +107,49 @@ def create_link(current_user):
 
     # Create URL
     url = request.form.get('url')
-    url_name = request.form.get('name')
+    alias = request.form.get('alias')
     error = None
 
-    gen_msg = "Not a valid URL! Remember to include the schema."
+    generic_message = "Not a valid URL! Remember to include the schema."
 
     if url is None:
         # Form submitted without URL
-        return dict(error=gen_msg, url_available=None)
+        return dict(error=generic_message, success=False)
 
     if not validators.url(url):
         # URL is invalid
-        return dict(error=gen_msg, url_available=None)
+        return dict(error=generic_message, success=False)
 
     # Prevent link creation if the user is not allowed to
     if not has_permission(current_user, "create:ownLinks"):
-        return dict(error="Permission denied.", url_available=None)
+        return dict(error="Permission denied.", success=False)
 
     # Validate alias if available
-    if url_name == "":
-        url_name = ''.join(random_string(6))
+    if alias == "":
+        # If no alias is defined, add a random string
+        alias = ''.join(random_string(6))
     else:
-        # Check if url alias is allowed
-        url_name = slugify(url_name)
+        # Format the alias as a slug
+        alias = slugify(alias)
 
+        # Check alias against banned name list
         with open('utils/usernames.json') as f:
             data = json.load(f)
-            if url_name in data['usernames']:
-                return dict(error="URL alias not allowed.", url_available=None)
+            if alias in data['usernames']:
+                return dict(error="URL alias not allowed.", success=False)
 
     # Verify alias not existing
-    alias_count = Link.select().where(Link.ref == url_name).count()
+    alias_count = Link.select().where(Link.ref == alias).count()
     if alias_count > 0:
-        return dict(error="URL alias already exists.", url_available=None)
+        return dict(error="URL alias already exists.", success=False)
 
     # Add URL to database
-    Link.create(url=url, date_created=datetime.now(), ref=url_name, owner=user_id)
+    Link.create(url=url, ref=alias, owner=user_id)
 
-    return dict(url_available=url_name, error=None)
-
-def create_file(current_user):
-    # To-Do: fix duplication and multiple files at once
-    username = current_user['username']
-    user_id = current_user['user_id']
-
-    # check if the post request has the file part
-    if 'file' not in request.files:
-        # No file part
-        return dict(success = False, message="File not found.")
-
-    file = request.files['file']
-
-    # If the user does not select a file, the browser submits an empty file without a filename.
-    if file.filename == '':
-        # No selected file
-        return dict(success = False, message="File not found.")
-
-    # Prevent file creation if the user is not allowed to
-    if not has_permission(current_user, "create:ownFiles"):
-        return dict(success=False, message="Permission denied.")
-
-    if file and allowed_files(file.filename):
-        filename = secure_filename(file.filename)
-
-        # Convert username to slug
-        username_as_slug = slugify(username)
-        # Make a directory for a user if none exist
-        UPLOAD_FOLDER.joinpath(username_as_slug).mkdir(parents=True, exist_ok=True)
-
-        # Generate new random filename
-        file_slug = random_string(8)
-        new_filename = file_slug + "." + filename.rsplit('.', 1)[1].lower()
-        # Get new destination
-        file_dest = Path(UPLOAD_FOLDER) / username_as_slug / new_filename
-
-        # Save file
-        file.save(file_dest)
-
-        # Write file to DB
-        # To-Do: make sure file name is unique in db without throwing error
-        relative_path = Path(username_as_slug) / new_filename
-        File.create(owner=user_id, created=datetime.now(), filename=file_slug, location=relative_path, original=filename)
-
-        # Inform user of success
-        return dict(success = True, message="Success! Your file is available at: " + request.host + "/" + file_slug)
-    else:
-        # File not allowed
-        print(file.filename)
-        print(allowed_files(file.filename))
-        return dict(success = False, message="Filetype not allowed.")
+    return dict(url_available=alias, success=True)
 
 def get_space(space_name):
+    # Used in pages/spaces.py
     try:
         query = (Space
                  .select(Space, User)
@@ -208,12 +160,68 @@ def get_space(space_name):
     except Space.DoesNotExist:
         return None 
 
+def upload_files(current_user):
+    username = current_user['username']
+    user_id = current_user['user_id']
+
+    # Check if the user can create files
+    can_create = has_permission(current_user, "create:ownFiles")
+    if not can_create:
+        return dict(success = False, message = "Missing permission.")
+
+    if 'file' not in request.files:
+        # No file part
+        return dict(success = False, message="No files found.")
+
+    files = request.files.getlist('file')
+
+    file_records = []
+
+    for file in files:
+        filename = file.filename
+
+        # Check if file is allowed
+        if not allowed_files(filename):
+            continue
+
+        # Convert username to slug
+        username_as_slug = slugify(username)
+
+        # Make a directory for a user if none exist
+        UPLOAD_FOLDER.joinpath(username_as_slug).mkdir(parents=True, exist_ok=True)
+
+        # Generate new random filename
+        file_slug = random_string(8)
+        new_filename = file_slug + "." + filename.rsplit('.', 1)[1].lower()
+        # Get new destination
+        file_dest = Path(UPLOAD_FOLDER) / username_as_slug / new_filename
+
+        # Save the file
+        file.save(file_dest)
+
+        # Save for DB query
+        relative_path = Path(username_as_slug) / new_filename
+        file_records.append({
+            "owner": user_id,
+            "filename": file_slug,
+            "location": str(relative_path),
+            "original": filename
+        })
+
+    # Insert created files into DB
+    if file_records:
+        File.insert_many(file_records).execute()
+    else:
+        # No files passed the filter
+        return dict(success = False, message="No files uploaded.")
+
+    return dict(success = True, message="Success! Your file is available at: " + request.host + "/" + file_slug)
+
 def upload_space_files(current_user):
     username = current_user['username']
     user_id = current_user['user_id']
 
     # Capture JSON here TEMPORARILY
-
     # Check if the content is sent in JSON
     if (request.content_type == "application/json"):
         single_space_file = get_space_file(current_user)
@@ -228,17 +236,12 @@ def upload_space_files(current_user):
     if not can_create:
         return dict(success = False, message = "Missing permission.")
 
-
     if entire_dir is not None:
         print("Uploading whole dir")
         # check if the post request has the file part
         if 'file' not in request.files:
             # No file part
             return dict(success = False, message="No files found.")
-
-        # Prevent file creation if the user is not allowed to
-        if not has_permission(current_user, "create:ownFiles"):
-            return dict(success=False, message="Permission denied.")
 
         files = request.files.getlist('file')
 
@@ -583,4 +586,3 @@ def create_invite(current_user):
     Invites.create(created_by=current_user['user_id'], expires=datetime.now() + timedelta(days=30), code=invite_code)
 
     return dict(success = True, message = "Invite created")
-

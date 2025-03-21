@@ -32,6 +32,26 @@
 		td {
 		}
 	}
+
+	.table {
+		border-bottom-width: 0;
+
+		tr:last-child {
+			th, td {
+				border-bottom-width: 0;
+			}
+		}
+
+		&:last-child {
+			border-bottom-width: 1px;
+
+			tr {
+				th, td {
+					border-bottom-width: 1px;
+				}
+			}
+		}
+	}
 }
 
 .invites-header {
@@ -82,6 +102,12 @@
 	svg {
 		width: 16px;
 		height: 16px;
+		pointer-events: none;
+	}
+
+	.smaller {
+		width: 12px;
+		height: 12px;
 		pointer-events: none;
 	}
 }
@@ -187,6 +213,11 @@
 		&__label {
 			cursor: pointer;
 			display: block;
+			/*
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			*/
 		}
 	}
 }
@@ -240,6 +271,9 @@
 }
 
 .table {
+	width: 100%;
+	border-collapse: collapse;
+
 	&__button-cell {
 		width:0.1%;
 		white-space: nowrap;
@@ -250,6 +284,11 @@
 		justify-content: flex-end;
 	}
 
+	th, td {
+		padding: 8px 12px;
+	}
+
+	&-reverse,
 	&__reverse {
 		tr {
 			&:nth-child(odd) {
@@ -264,6 +303,34 @@
 				}
 			}
 		}
+	}
+
+	&-standard {
+		border: 1px solid #111113;
+
+		tr {
+			&:nth-child(even) {
+				td {
+					background: #29292e;
+				}
+			}
+		}
+
+		th, td {
+			border: 1px solid #111113;
+		}
+
+		th {
+			background: #111113;
+		}
+
+		td {
+		}
+	}
+
+	&-borderless {
+		border-left: 1px solid #111113;
+		border-right: 1px solid #111113;
 	}
 }
 

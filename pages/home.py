@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, abort, url_for, send_from_directory
 from utils.cookies import check_cookie, user_from_cookie
-from utils.crud import create_link, create_file
 from utils.general import random_string
 
 from pathlib import Path
@@ -25,54 +24,9 @@ def index(path):
         user_id = current_user['user_id']
 
     if username is not None:
-        return redirect(url_for('home.links'))
+        return redirect(url_for('dash.handle_dash'))
     else: 
         return render_template("home/index.html")
-
-@home.route("/links", methods=['GET', 'POST'], defaults={'path': ''})
-def links(path):
-    # Check cookie
-    valid_cookie = check_cookie()
-    username = None
-    user_id = None
-
-    if valid_cookie == False:
-        return redirect(url_for('home.index'))
-    else:
-        # Get user if logged in
-        current_user = user_from_cookie(valid_cookie)
-        username = current_user['username']
-        user_id = current_user['user_id']
-
-    # Prepare return variable default
-    new_url = dict(error=None, url_available=None)
-
-    if request.method == 'POST':
-        # If a POST request was submitted, create URL
-        new_url = create_link(current_user)
-
-    return render_template("home/links.html", error=new_url['error'], url_available = new_url['url_available'], domain=request.host, username=username)
-
-@home.route("/images", methods=['GET', 'POST'], defaults={'path': ''})
-def images(path):
-    # Check cookie
-    valid_cookie = check_cookie()
-    username = None
-    user_id = None
-
-    if valid_cookie == False:
-        return redirect(url_for('home.index'))
-    else:
-        # Get user if logged in
-        current_user = user_from_cookie(valid_cookie)
-        username = current_user['username']
-        user_id = current_user['user_id']
-
-    if request.method == 'POST':
-        file_status = create_file(current_user)
-        return file_status
-
-    return render_template("home/images.html", domain=request.host, username=username)
 
 #If the files are too large
 @home.app_errorhandler(413)

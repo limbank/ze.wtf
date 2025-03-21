@@ -51,6 +51,7 @@ def catch_all(path, subdomain):
                 print("12312")
                 return send_from_directory(named_file_path, "index.html")
             else:
+                #To-Do: If /blogs isnt found, look for blogs.html first, then index html in /blog/
                 target_file = Path.cwd() / 'uploads' / slugify(space_data.owner.username) / 'space' / path
 
                 if target_file.exists():

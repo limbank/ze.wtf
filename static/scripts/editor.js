@@ -37,7 +37,7 @@
 
             let contentType = response.headers.get("Content-Type");
 
-            if (contentType && contentType.includes("application/json")) {
+            if (contentType && contentType.includes("application/json") && !will_edit.endsWith(".json")) {
                 // The response is JSON (an error case)
                 let result = await response.json();
                 if (result.success === false) {

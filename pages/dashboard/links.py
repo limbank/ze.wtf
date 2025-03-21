@@ -3,7 +3,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
 from utils.permissions import has_permission
-from utils.crud import delete_link
+from utils.crud import delete_link, create_link
 
 from models import *
 
@@ -32,6 +32,10 @@ def index():
         if 'delete' in content:
             deleted_url = delete_link(content['delete'], current_user)
             return(deleted_url)
+
+    if request.method == 'POST':
+        created_link = create_link(current_user)
+        return created_link
 
     # Retrieve the URLs created by user
     own_links = Link.select().where(Link.owner == current_user['user_id'])
