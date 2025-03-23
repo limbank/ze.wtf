@@ -68,7 +68,7 @@ def index():
     link_count = Link.select().count()
     user_count = User.select().count()
     file_count = File.select().count()
-    invite_count = Invites.select().count()
+    invite_count = Invite.select().count()
     space_count = Space.select().count()
 
     appinfo = dict(

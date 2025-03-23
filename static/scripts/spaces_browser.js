@@ -289,7 +289,7 @@
         console.log("Getting file tree...");
 
         try {
-            const response = await fetch(window.location.origin + "/dash/spaces/files", {
+            const response = await fetch(window.location.origin + "/dash/spaces/files/", {
                 method: "GET",
                 // Set the FormData instance as the request body
                 headers: {
