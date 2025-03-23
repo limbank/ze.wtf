@@ -1,38 +1,24 @@
-from flask import Blueprint, render_template, request, redirect, abort, url_for, send_from_directory
-from utils.cookies import check_cookie, user_from_cookie
-from utils.general import random_string
-
+from flask import Blueprint, render_template, redirect, abort, url_for, send_from_directory, g
+from utils.auth import authenticate
 from pathlib import Path
-
-# Only import urls here instead
-from models import *
+from models import Link, File
 
 UPLOAD_FOLDER = Path.cwd() / 'uploads'
 
 home = Blueprint('home', __name__, template_folder='templates')
 
 @home.route("/", defaults={'path': ''})
+@authenticate
 def index(path):
-    # Check cookie
-    valid_cookie = check_cookie()
-    username = None
-    user_id = None
-    if valid_cookie != False:
-        # Get user if logged in
-        current_user = user_from_cookie(valid_cookie)
-        username = current_user['username']
-        user_id = current_user['user_id']
-
-    if username is not None:
-        return redirect(url_for('dash.handle_dash'))
-    else: 
+    if g.current_user == None:
         return render_template("home/index.html")
+    else: 
+        return redirect(url_for('dash.handle_dash'))
 
 #If the files are too large
 @home.app_errorhandler(413)
 def request_entity_too_large(error):
     #return dict(success = False, message="File too large."), 413
-    # PNG image of Ed Sheeran raises this error for some reason. Multipart encoding bug?
     print("Too large raised")
     return dict(success = False, message="File too large.")
 

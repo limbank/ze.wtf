@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template, current_app, redirect, url_for, request
+from flask import Blueprint, render_template, current_app, redirect, url_for, request, g
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from utils.cookies import check_cookie, user_from_cookie
 from utils.permissions import has_permission
-from utils.crud import authorize_user, get_invites, delete_invites, create_invites
-
-from models import *
+from utils.crud import get_invites, delete_invites, create_invites
+from utils.auth import authenticate
+from models import Invite, User
+from peewee import JOIN
 
 limiter = Limiter(
     get_remote_address,
@@ -20,6 +20,7 @@ invites = Blueprint('invites', __name__, template_folder='templates')
 @invites.route("/invites/<string:path>", methods=['GET', 'POST'])
 @invites.route("/invites/<path:path>", methods=['GET', 'POST'])
 @limiter.limit("2/second")
+@authenticate
 def index(path):
     # Handle JSON requests for the API
     if request.method == 'POST' and request.content_type == "application/json":
@@ -46,21 +47,18 @@ def index(path):
     if path != "":
         return redirect(url_for('dash.invites.index'))
 
-    # Authenticate user
-    current_user = authorize_user()
-
-    if current_user == None:
+    if  g.current_user == None:
         # User unauthenticated, return to homepage
         return redirect(url_for('home.index'))
     else:
         # User authenticated, proceed
 
         # Retrieve the invites created by user
-        invites = Invite.select().join(User, JOIN.LEFT_OUTER, on=(Invite.used_by == User.users_id)).where(Invite.created_by == current_user['user_id'])
+        invites = Invite.select().join(User, JOIN.LEFT_OUTER, on=(Invite.used_by == User.users_id)).where(Invite.created_by ==  g.current_user['user_id'])
 
         # Retreive invite-related permissions for user
-        can_delete = has_permission(current_user, "delete:ownInvites")
-        can_create = has_permission(current_user, "create:ownInvites")
+        can_delete = has_permission(g.current_user, "delete:ownInvites")
+        can_create = has_permission(g.current_user, "create:ownInvites")
 
         # Render dashboard page
-        return render_template("dash/invites.html", username=current_user['username'], domain=request.host, invites = invites, can_delete = can_delete, can_create=can_create)
+        return render_template("dash/invites.html", username= g.current_user['username'], domain=request.host, invites = invites, can_delete = can_delete, can_create=can_create)

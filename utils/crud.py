@@ -1,6 +1,6 @@
 import validators
 import json
-from flask import request, send_file, jsonify
+from flask import request, send_file, jsonify, g
 from pathlib import Path
 import shutil
 from slugify import slugify

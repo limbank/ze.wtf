@@ -1,13 +1,21 @@
-from flask import Blueprint, render_template, current_app, redirect, url_for, request
+from flask import Blueprint, render_template, current_app, redirect, url_for, request, g
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from utils.cookies import check_cookie, user_from_cookie
 from utils.permissions import has_permission
+from utils.auth import authenticate
+from utils.crud import (
+    authorize_user,
+    get_spaces,
+    delete_spaces,
+    create_spaces,
+    get_space_files,
+    delete_space_files,
+    upload_space_files,
+    create_space_files,
+    download_space_files,
+)
 
-from utils.crud import authorize_user, get_spaces, delete_spaces, create_spaces, get_space_files, delete_space_files, upload_space_files, create_space_files, download_space_files
-
-
-from models import *
+from models import Space
 
 limiter = Limiter(
     get_remote_address,
@@ -22,6 +30,7 @@ spaces = Blueprint('spaces', __name__, template_folder='templates')
 @spaces.route("/spaces/<string:path>", methods=['GET', 'POST'])
 @spaces.route("/spaces/<path:path>", methods=['GET', 'POST'])
 @limiter.limit("2/second")
+@authenticate
 def index(path):
     # Handle requests for the API
     if request.method == 'POST':
@@ -48,26 +57,28 @@ def index(path):
     if path != "":
         return redirect(url_for('dash.spaces.index'))
 
-    # Authenticate user
-    current_user = authorize_user()
-
-    if current_user == None:
+    if g.current_user == None:
         # User unauthenticated, return to homepage
         return redirect(url_for('home.index'))
     else:
         # Retrieve the spaces created by user
-        own_spaces = Space.select().where(Space.owner == current_user['user_id'])
+        own_spaces = Space.select().where(Space.owner == g.current_user['user_id'])
 
         # Retreive space-related permissions for user
-        can_delete = has_permission(current_user, "delete:ownSpaces")
+        can_delete = has_permission(g.current_user, "delete:ownSpaces")
 
-        return render_template("dash/spaces.html", username=current_user['username'], domain=request.host, spaces = own_spaces, can_delete = can_delete)
+        return render_template("dash/spaces.html", username=g.current_user['username'], domain=request.host, spaces = own_spaces, can_delete = can_delete)
 
 @spaces.route("/spaces/files/", methods=['GET', 'POST'], defaults={'path': ''})
 @spaces.route("/spaces/files/<string:path>", methods=['GET', 'POST'])
 @spaces.route("/spaces/files/<path:path>", methods=['GET', 'POST'])
 @limiter.limit("2/second")
+@authenticate
 def files(path):
+    if g.current_user == None:
+        # User unauthenticated
+        return dict(success = False, message = "Unauthorized."), 403
+
     # Handle requests for the API
     if request.method == 'POST':
         if path == "upload" and request.content_type.startswith("multipart/form-data"):

@@ -1,10 +1,7 @@
-from flask import Blueprint, current_app, redirect, url_for
+from flask import Blueprint, current_app, redirect, url_for, g
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from utils.cookies import check_cookie
-from pathlib import Path
-
-from models import *
+from utils.auth import authenticate
 
 from .dashboard.spaces import spaces
 from .dashboard.invites import invites
@@ -29,11 +26,9 @@ dash.register_blueprint(keys)
 
 @dash.route("/")
 @limiter.limit("2/second")
+@authenticate
 def handle_dash():
-    # Check cookie
-    valid_cookie = check_cookie()
-
-    if valid_cookie == False:
+    if g.current_user == None:
         return redirect(url_for('home.index'))
     else:
         return redirect(url_for('dash.links.index'))

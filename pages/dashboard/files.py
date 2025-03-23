@@ -1,12 +1,11 @@
-from flask import Blueprint, render_template, current_app, redirect, url_for, request
+from flask import Blueprint, render_template, current_app, redirect, url_for, request, g
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from utils.cookies import check_cookie, user_from_cookie
 from utils.permissions import has_permission
+from utils.auth import authenticate
+from utils.crud import get_files, delete_files, upload_files
 
-from utils.crud import authorize_user, get_files, delete_files, upload_files
-
-from models import *
+from models import File
 
 limiter = Limiter(
     get_remote_address,
@@ -21,6 +20,7 @@ files = Blueprint('files', __name__, template_folder='templates')
 @files.route("/files/<string:path>", methods=['GET', 'POST'])
 @files.route("/files/<path:path>", methods=['GET', 'POST'])
 @limiter.limit("2/second")
+@authenticate
 def index(path):
     # Handle requests for the API
     if request.method == 'POST':
@@ -36,7 +36,7 @@ def index(path):
 
     elif request.method == 'GET' and request.content_type == "application/json":
         if path is None or path == "":
-            # Get invites
+            # Get files
             user_files = get_files()
             return user_files
         else:
@@ -48,17 +48,14 @@ def index(path):
     if path != "":
         return redirect(url_for('dash.files.index'))
 
-    # Authenticate user
-    current_user = authorize_user()
-
-    if current_user == None:
+    if g.current_user == None:
         # User unauthenticated, return to homepage
         return redirect(url_for('home.index'))
     else:
         # Retrieve the files created by user
-        files = File.select().where(File.owner == current_user['user_id'])
+        files = File.select().where(File.owner == g.current_user['user_id'])
 
         # Retreive image-related permissions for user
-        can_delete = has_permission(current_user, "delete:ownFiles")
+        can_delete = has_permission(g.current_user, "delete:ownFiles")
 
-        return render_template("dash/files.html", username=current_user['username'], domain=request.host, files = files, can_delete = can_delete)
+        return render_template("dash/files.html", username=g.current_user['username'], domain=request.host, files = files, can_delete = can_delete)
