@@ -125,4 +125,4 @@ class Key(Model):
     return datetime.now() > self.expires
 
 db.connect()
-#db.create_tables([Link, Invite, File, User, Cookie, Role, Permission, RolePerm])
+db.create_tables([Link, Invite, File, User, Cookie, Role, Permission, RolePerm, Space, Key])

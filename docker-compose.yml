@@ -1,0 +1,15 @@
+services:
+  database:
+    image: postgres
+    container_name: postgres_db
+    restart: always
+    env_file:
+      - database.env
+    ports:
+      - 5432:5432
+    volumes:
+      - ze_wtf_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  ze_wtf_postgres_data:
+    driver: local
