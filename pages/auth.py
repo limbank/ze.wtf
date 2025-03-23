@@ -1,17 +1,18 @@
-from flask import Blueprint, render_template, current_app, session, send_file, redirect, url_for, request, make_response
+from flask import Blueprint, render_template, current_app, session, send_file, redirect, url_for, request, make_response, g
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from argon2 import PasswordHasher
 from captcha.image import ImageCaptcha
-from slugify import slugify
 import os
 import json
 from dotenv import load_dotenv
 from datetime import datetime
 
-from utils.cookies import check_cookie, create_cookie
+from utils.cookies import create_cookie
 from utils.crud import check_invite
 from utils.general import random_string, check_argon
+
+from utils.auth import authenticate
 
 # Change to only import users later
 from models import *
@@ -133,15 +134,12 @@ def dash_captcha():
 
     return send_file(data, mimetype='image/png')
 
-@auth.route("/auth/login", methods=['GET', 'POST'])
+@auth.route("/auth/login/", methods=['GET', 'POST'])
 @limiter.limit("2/second")
+@authenticate
 def handle_login():
-    valid_cookie = check_cookie()
-
-    if valid_cookie is not False:
+    if g.current_user is not None:
         return redirect(url_for('dash.handle_dash'))
-
-    msg = ''
 
     if request.method == 'POST':
         check_auth = authenticate_user()
@@ -156,17 +154,14 @@ def handle_login():
         else:
             return render_template("login.html", msg=check_auth['msg'])
 
-    return render_template("login.html", msg=msg)
+    return render_template("login.html", msg='')
 
 @auth.route("/auth/register", methods=['GET', 'POST'])
 @limiter.limit("2/second")
+@authenticate
 def handle_register():
-    valid_cookie = check_cookie()
-
-    if valid_cookie is not False:
+    if g.current_user is not None:
         return redirect(url_for('dash.handle_dash'))
-
-    msg = ''
 
     if request.method == 'POST':
         check_reg = register_user()
@@ -181,9 +176,13 @@ def handle_register():
         else:
             return render_template("register.html", msg=check_reg['msg'])
 
-    return render_template("register.html", msg=msg)
+    return render_template("register.html", msg='')
 
-@auth.route("/auth")
+@auth.route("/auth/")
 @limiter.limit("2/second")
+@authenticate
 def handle_auth():
-    return redirect(url_for('auth.handle_login'))
+    if g.current_user == None:
+        return redirect(url_for('auth.handle_login'))
+    else: 
+        return redirect(url_for('dash.handle_dash'))
