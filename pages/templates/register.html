@@ -23,12 +23,14 @@
 	        <a href="#" class="captcha__button" onclick="document.getElementById('captcha_image').src = '/captcha?' + Math.random(); return false">
 	            Refresh
 	        </a>
-	        <input type="text"name="captcha" placeholder="Captcha" id="captcha" required />
-	        <input type="text"name="invite" placeholder="Invite" required />
+	        <input type="text" name="captcha" placeholder="Captcha" id="captcha" required />
+	        <input type="text" name="invite" placeholder="Invite" id="invite" required />
 
 			<input type="submit" value="Submit">
 
 			<a href="{{ url_for('auth.handle_login') }}">Login</a>
 		</form>
 	</div>
+
+	<script src="{{ url_for('static', filename='scripts/register.js') + '?v=' + version }}"></script>
 {% endblock %}

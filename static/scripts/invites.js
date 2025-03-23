@@ -79,7 +79,7 @@
             let target_link = button.dataset.target;
 
             try {
-                navigator.clipboard.writeText('https://' + target_link).then(() => {
+                navigator.clipboard.writeText(window.location.origin + "/auth/register?invite=" + target_link).then(() => {
                     notify("Copied link!", 3000);
                 }, (e) => {
                     console.log(e);
