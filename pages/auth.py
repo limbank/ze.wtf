@@ -110,7 +110,7 @@ def register_user():
         new_user = User.create(username=username, password=phash, date_joined=datetime.now())
 
         # Mark invite as used
-        invite = Invites.get(Invites.code == request.form['invite'])
+        invite = Invite.get(Invite.code == request.form['invite'])
         invite.used_by = new_user.users_id
         invite.save()
 
