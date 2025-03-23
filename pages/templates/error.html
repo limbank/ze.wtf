@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "error" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="error">
+		<div class="error__message">
+			<div class="error__message__code">{{error.code}}</div>
+			<div class="error__message__text">{{error.text}}</div>
+			<a class="error__message__link" href="{{ url_for('home.index') }}">Back to home</a>
+		</div>
+	</div>
+{% endblock %}

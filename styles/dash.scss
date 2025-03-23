@@ -1,0 +1,372 @@
+.table-wrapper,
+.links {
+	width: 100%;
+	overflow: auto;
+
+	&__not-found {
+		text-align: center;
+	}
+
+	&__table {
+		width: 100%;
+		border: 1px solid #111113;
+  		border-collapse: collapse;
+
+		tr {
+			&:nth-child(even) {
+				td {
+					background: #29292e;
+				}
+			}
+		}
+
+		th, td {
+			border: 1px solid #111113;
+			padding: 8px 12px;
+		}
+
+		th {
+			background: #111113;
+		}
+
+		td {
+		}
+	}
+
+	.table {
+		border-bottom-width: 0;
+
+		tr:last-child {
+			th, td {
+				border-bottom-width: 0;
+			}
+		}
+
+		&:last-child {
+			border-bottom-width: 1px;
+
+			tr {
+				th, td {
+					border-bottom-width: 1px;
+				}
+			}
+		}
+	}
+
+	.progress {
+		border-top: 0;
+		border-bottom: 0;
+	}
+}
+
+.action-button {
+	cursor: pointer;
+	background: transparent;
+	border: 0px;
+	color: inherit;
+	height: 22px;
+	width: 22px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s ease-in;
+
+	&:hover {
+		background: #414149;
+	}
+
+	svg {
+		width: 16px;
+		height: 16px;
+		pointer-events: none;
+	}
+
+	.smaller {
+		width: 12px;
+		height: 12px;
+		pointer-events: none;
+	}
+}
+
+.notifications {
+	.notif {
+		margin-bottom: 10px;
+		width: 100%;
+		border: 1px solid #111113;
+		padding: 8px 12px;
+		background: #29292e;
+	}
+}
+
+.file-browser {
+	width: 100%;
+	margin-bottom: 10px;
+
+	&__controls {
+		background: #111113;
+		border: 1px solid #111113;
+		border-bottom: 0px;
+		display: flex;
+
+		&__address {
+			margin-right: auto;
+			display: inline-flex;
+			align-items: center;
+			color: #29292E;
+			padding: 8px 12px;
+		}
+
+		button {
+			background: #111113;
+			padding: 8px 12px;
+			transition: background 0.2s ease-in;
+			cursor: pointer;
+			color: #cfd3cf;
+			font-size: 14px;
+			border: 0px;
+
+			&:hover {
+				background: lighten(#111113, 20%);
+			}
+		}
+	}
+
+	&__files {
+		overflow: auto;
+		border: 1px solid #111113;
+		border-top: 0;
+
+		table {
+			width: 100%;
+	  		border-collapse: collapse;
+
+			tr {
+				&:nth-child(even) {
+					td {
+						background: #29292e;
+					}
+				}
+			}
+
+			th, td {
+				padding: 8px 12px;
+				height: 38px;
+			}
+
+			th {
+				background: #111113;
+			}
+
+			td {
+			}
+		}
+	}
+
+	&__directory {
+		font-weight: bold;
+		text-decoration: none;
+		cursor: pointer;
+		display: block;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	&__create-directory {
+		height: 22px;
+		width: 100%;
+		display: inline-flex;
+		align-items: center;
+		background: transparent;
+		border: 0px;
+		color: #cfd3cf;
+		outline: none;
+	}
+
+	&__upload-file {
+		display: none;
+
+		&__label {
+			cursor: pointer;
+			display: block;
+			/*
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			*/
+		}
+	}
+}
+
+.file-editor {
+	width: 100%;
+	display: none;
+	margin-bottom: 10px;
+
+	.editor {
+		border: 1px solid #111113;
+		height: 400px;
+
+		.cm-editor {
+			height: 100%;
+		}
+	}
+
+	&.open {
+		display: block;
+	}
+
+	&__controls {
+		background: #111113;
+		border: 1px solid #111113;
+		border-bottom: 0px;
+		display: flex;
+
+		&__address {
+			margin-right: auto;
+			display: inline-flex;
+			align-items: center;
+			color: #29292E;
+			padding: 8px 12px;
+		}
+
+		button {
+			background: #111113;
+			padding: 8px 12px;
+			transition: background 0.2s ease-in;
+			cursor: pointer;
+			color: #cfd3cf;
+			font-size: 14px;
+			border: 0px;
+
+			&:hover {
+				background: lighten(#111113, 20%);
+			}
+		}
+	}
+}
+
+.table {
+	width: 100%;
+	border-collapse: collapse;
+
+	&__button-cell {
+		width:0.1%;
+		white-space: nowrap;
+	}
+
+	&__long-cell {
+		line-break: anywhere;
+	}
+
+	&__buttons {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	th, td {
+		padding: 8px 12px;
+	}
+
+	&-reverse,
+	&__reverse {
+		tr {
+			&:nth-child(odd) {
+				td {
+					background: transparent;
+				}
+			}
+
+			&:nth-child(odd) {
+				td {
+					background: #29292e;
+				}
+			}
+		}
+	}
+
+	&-standard {
+		border: 1px solid #111113;
+
+		tr {
+			&:nth-child(even) {
+				td {
+					background: #29292e;
+				}
+			}
+		}
+
+		th, td {
+			border: 1px solid #111113;
+		}
+
+		th {
+			background: #111113;
+		}
+
+		td {
+		}
+	}
+
+	&-borderless {
+		border-left: 1px solid #111113;
+		border-right: 1px solid #111113;
+	}
+}
+
+.create-space {
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+.create-table {
+	width: 100%;
+	border: 1px solid #111113;
+	border-collapse: collapse;
+
+	tr {
+		&:nth-child(even) {
+			td {
+				background: #29292e;
+			}
+		}
+	}
+
+	th, td {
+		padding: 8px 12px;
+	}
+
+	th {
+		background: #111113;
+	}
+
+	td {
+		background: #29292e;
+		height: 40px;
+	}
+}
+
+.progress {
+	width: 100%;
+	height: 10px;
+	border: 1px solid #111113;
+	overflow: hidden;
+
+	&__inner {
+		width: 0%;
+		height: 10px;
+		border-right: 1px solid #111113;
+		transition: width 0.2s ease-out;
+		background: repeating-linear-gradient(
+			135deg,
+		  rgba(41,41,46,1),
+		  rgba(41,41,46,1) 10px,
+		  rgba(17,17,19,1) 10px,
+		  rgba(17,17,19,1) 20px
+		);
+	}
+}

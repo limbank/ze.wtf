@@ -1,0 +1,259 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "dash" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<p>
+			Welcome, {{username}}.
+		</p>
+		<p>
+			Your created spaces:
+		</p>
+		<script src="{{ url_for('static', filename='scripts/notifications.js') + '?v=' + version }}"></script>
+		<div class="table-wrapper">
+			<table class="table table-standard">
+				<tr>
+					<th width="200px">Name</th>
+					<th>URL</th>
+					<th width="160px">Created</th>
+					<th class="table__button-cell">
+						<div class="table__buttons">
+							<button class="action-button" id="create-space-toggle">
+								<svg viewBox="0 0 24 24">
+									<path d="M18,10h-4V6c0-1.104-0.896-2-2-2s-2,0.896-2,2l0.071,4H6c-1.104,0-2,0.896-2,2s0.896,2,2,2l4.071-0.071L10,18  c0,1.104,0.896,2,2,2s2-0.896,2-2v-4.071L18,14c1.104,0,2-0.896,2-2S19.104,10,18,10z" fill="currentColor"/>
+								</svg>
+							</button>
+						</div>
+					</th>
+				</tr>
+			</table>
+			<table class="table table-borderless table-reverse" id="create-space-table" style="display: none;">
+				<tr>
+					<td>
+						<input id="create-space-name" placeholder="name" type="text" name="space-name"  class="file-browser__create-directory" />
+					</td>
+					<td class="table__button-cell">
+						<div class="table__buttons">
+							<button class="action-button" id="create-space-confirm">
+								<svg viewBox="0 0 24 24" >
+									<g id="icons">
+										<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+									</g>
+								</svg>
+							</button>
+							<button class="action-button" id="create-space-cancel">
+								<svg viewBox="0 0 24 24">
+									<g id="icons">
+										<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+									</g>
+								</svg>
+							</button>
+						</div>
+					</td>
+				</tr>
+			</table>
+			<table class="table table-standard">
+		        {% for space in spaces %}
+					<tr>
+						<td width="200px">{{ space.name }}</td>
+						<td id="space-domain">
+							<a href="https://{{ space.name }}.{{ domain }}" target="_blank" class="open-space">
+								{{ space.name }}.{{ domain }}
+							</a>
+						</td>
+						<td width="160px">{{ space.date_created.strftime('%Y-%m-%d %H:%M') }}</td>
+						<td class="table__button-cell">
+							<div class="table__buttons">
+								<button class="action-button copy-item" data-target="space"  data-spacelink="{{ space.name }}.{{ domain }}">
+									<svg viewBox="0 0 384 512" class="smaller">
+										<path d="M336 64h-80c0-35.3-28.7-64-64-64s-64 28.7-64 64H48C21.5 64 0 85.5 0 112v352c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zM96 424c-13.3 0-24-10.7-24-24s10.7-24 24-24 24 10.7 24 24-10.7 24-24 24zm0-96c-13.3 0-24-10.7-24-24s10.7-24 24-24 24 10.7 24 24-10.7 24-24 24zm0-96c-13.3 0-24-10.7-24-24s10.7-24 24-24 24 10.7 24 24-10.7 24-24 24zm96-192c13.3 0 24 10.7 24 24s-10.7 24-24 24-24-10.7-24-24 10.7-24 24-24zm128 368c0 4.4-3.6 8-8 8H168c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16zm0-96c0 4.4-3.6 8-8 8H168c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16zm0-96c0 4.4-3.6 8-8 8H168c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16z" fill="currentColor"/>
+									</svg>
+								</button>
+								{% if can_delete == True %}
+									<button class="action-button delete-item" data-target="space" data-spacename="{{ space.name }}">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor" id="exit"/>
+											</g>
+										</svg>
+									</button>
+								{% endif %}
+							</div>
+						</td>
+					</tr>
+		        {% else %}
+					<tr>
+						<td colspan="3" class="links__not-found">No items found.</td>
+					</tr>
+		        {% endfor %}
+			</table>
+	    </div>
+
+		{% if spaces %}
+			<p>
+				Your space files:
+			</p>
+
+			<div id="file-listing"></div>
+
+			<div class="file-browser">
+				<div class="file-browser__controls">
+					<div class="file-browser__controls__address" id="path-address"></div>
+					<button id="upload-directory-button">Upload directory</button>
+					<button id="create-directory-button">Create directory</button>
+					<button  id="upload-file-button">Upload files</button>
+					<button id="create-new-file-button">Create file</button>
+				</div>
+				<div class="progress" id="progress" style="display: none;">
+					<div class="progress__inner" id="progress-inner"></div>
+				</div>
+				<div class="file-browser__files">
+					<table class="table__reverse" id="upload-directory" style="display: none;">
+						<tr>
+							<td>
+								<label for="upload-new-directory" id="upload-new-directory-label" class="file-browser__upload-file__label">Click to select directory</label>
+								<input type="file" name="file" id="upload-new-directory" class="file-browser__upload-file" webkitdirectory directory multiple />
+							</td>
+							<td width="60px"></td>
+							<td width="160px"></td>
+							<td width="68px">
+								<div class="table__buttons">
+									<button class="action-button" id="confirm-upload-directory">
+										<svg viewBox="0 0 24 24" >
+											<g id="icons">
+												<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+									<button class="action-button" id="cancel-upload-directory">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+					</table>
+					<table class="table__reverse" id="upload-file" style="display: none;">
+						<tr>
+							<td>
+								<label for="new-file-name" id="new-file-label" class="file-browser__upload-file__label">Click to select file</label>
+								<input type="file" name="file" id="new-file-name" class="file-browser__upload-file" multiple />
+							</td>
+							<td width="60px"></td>
+							<td width="160px"></td>
+							<td width="68px">
+								<div class="table__buttons">
+									<button class="action-button" id="save-file">
+										<svg viewBox="0 0 24 24" >
+											<g id="icons">
+												<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+									<button class="action-button" id="cancel-file">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+					</table>
+					<table class="table__reverse" id="create-file" style="display: none;">
+						<tr>
+							<td>
+								<input id="new-created-file-name" placeholder="file_name.html" type="text" name="directory"  class="file-browser__create-directory" />
+							</td>
+							<td width="60px"></td>
+							<td width="160px"></td>
+							<td width="68px">
+								<div class="table__buttons">
+									<button class="action-button" id="create-new-file">
+										<svg viewBox="0 0 24 24" >
+											<g id="icons">
+												<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+									<button class="action-button" id="cancel-new-file">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+					</table>
+					<table class="table__reverse" id="create-directory" style="display: none;">
+						<tr>
+							<td>
+								<input id="new-directory-name" placeholder="directory_name" type="text" name="directory"  class="file-browser__create-directory" />
+							</td>
+							<td width="60px"></td>
+							<td width="160px"></td>
+							<td width="68px">
+								<div class="table__buttons">
+									<button class="action-button" id="save-directory">
+										<svg viewBox="0 0 24 24" >
+											<g id="icons">
+												<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+									<button class="action-button" id="cancel-directory">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+											</g>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+					</table>
+
+					<table id="file-browser">
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="file-editor" id="file-editor">
+				<div class="file-editor__controls">
+					<div class="file-editor__controls__address" id="edit-address"></div>
+					<button id="save-edit-button">Save</button>
+					<button id="cancel-edit-button">Cancel</button>
+				</div>
+				<div class="editor" id="codemirror"></div>
+			</div>
+		{% endif %}
+	</div>
+
+	<script src="{{ url_for('static', filename='scripts/spaces.js') + '?v=' + version }}"></script>
+
+	{% if spaces %}
+		<script src="{{ url_for('static', filename='scripts/spaces_browser.js') + '?v=' + version }}"></script>
+		<script src="{{ url_for('static', filename='scripts/editor.bundle.js') + '?v=' + version }}"></script>
+		<script src="{{ url_for('static', filename='scripts/editor.js') + '?v=' + version }}"></script>
+	{% endif %}
+
+	<!--
+		Here is what we need to implement:
+
+		Download space as zip
+		Create file in space
+		Upload zip to space and unpack
+	-->
+{% endblock %}

@@ -1,0 +1,73 @@
+.main {
+	&__inner {
+		position: relative;
+	}
+}
+
+.register {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow-y: auto;
+	padding: 20px 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	&__message {
+		font-size: 14px;
+		background: #29292e;
+		padding: 8px 12px;
+		border: 1px solid #111113;
+		text-align: left;
+		width: 250px;
+		max-width: 100%;
+		margin-bottom: 10px;
+	}
+
+	input {
+		width: 250px;
+		max-width: 100%;
+		margin: 5px 0;
+
+		&[type='submit'] {
+			transition: background 0.2s ease-in;
+			cursor: pointer;
+
+			&:hover {
+				background: lighten(#111113, 20%);
+			}
+		}
+	}
+
+	a {
+		text-decoration: none;
+		font-size: 14px;
+		display: inline-block;
+		padding: 8px 12px;
+		text-underline-offset: 2px;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	.captcha {
+		border: 1px solid #111113;
+		margin: 5px 0 0 0;
+
+		&__button {
+			margin-bottom: -5px;
+		}
+	}
+}

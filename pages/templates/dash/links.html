@@ -1,0 +1,100 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "dash" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<p>
+			Welcome, {{username}}.
+		</p>
+		<p>
+			Your created links:
+		</p>
+		<script src="{{ url_for('static', filename='scripts/notifications.js') + '?v=' + version }}"></script>
+		<div class="table-wrapper">
+			<table class="table table-standard">
+				<tr>
+					<th width="200px">Short</th>
+					<th>URL</th>
+					<th width="60px">Visits</th>
+					<th class="table__button-cell" style="width: 69px;">
+						<div class="table__buttons">
+							<button class="action-button" id="create-link-toggle">
+								<svg viewBox="0 0 24 24">
+									<path d="M18,10h-4V6c0-1.104-0.896-2-2-2s-2,0.896-2,2l0.071,4H6c-1.104,0-2,0.896-2,2s0.896,2,2,2l4.071-0.071L10,18  c0,1.104,0.896,2,2,2s2-0.896,2-2v-4.071L18,14c1.104,0,2-0.896,2-2S19.104,10,18,10z" fill="currentColor"/>
+								</svg>
+							</button>
+						</div>
+					</th>
+				</tr>
+			</table>
+			<table class="table table-borderless table-reverse" id="create-link-table" style="display: none;">
+				<tr>
+					<td width="200px">
+						<input id="create-link-alias" placeholder="Link alias (Optional)" type="text" name="link-alias"  class="file-browser__create-directory" />
+					</td>
+					<td>
+						<input id="create-link-url" placeholder="URL" type="text" name="link-url"  class="file-browser__create-directory" />
+					</td>
+					<td class="table__button-cell">
+						<div class="table__buttons">
+							<button class="action-button" id="create-link-confirm">
+								<svg viewBox="0 0 24 24" >
+									<g id="icons">
+										<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
+									</g>
+								</svg>
+							</button>
+							<button class="action-button" id="create-link-cancel">
+								<svg viewBox="0 0 24 24">
+									<g id="icons">
+										<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
+									</g>
+								</svg>
+							</button>
+						</div>
+					</td>
+				</tr>
+			</table>
+			<table class="table table-standard">
+		        {% for link in links %}
+					<tr>
+						<td width="200px"><a href="/{{ link.ref }}">{{ domain }}/{{ link.ref }}</a></td>
+						<td><a href="{{ link.url }}">{{ link.url }}</a></td>
+						<td width="60px">{{link.visits}}</td>
+						<td class="table__button-cell" style="width: 69px;">
+							<div class="table__buttons">
+								<button class="action-button copy-item" data-target="{{ domain }}/{{ link.ref }}">
+									<svg viewBox="0 0 384 512" class="smaller">
+										<path d="M336 64h-80c0-35.3-28.7-64-64-64s-64 28.7-64 64H48C21.5 64 0 85.5 0 112v352c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zM96 424c-13.3 0-24-10.7-24-24s10.7-24 24-24 24 10.7 24 24-10.7 24-24 24zm0-96c-13.3 0-24-10.7-24-24s10.7-24 24-24 24 10.7 24 24-10.7 24-24 24zm0-96c-13.3 0-24-10.7-24-24s10.7-24 24-24 24 10.7 24 24-10.7 24-24 24zm96-192c13.3 0 24 10.7 24 24s-10.7 24-24 24-24-10.7-24-24 10.7-24 24-24zm128 368c0 4.4-3.6 8-8 8H168c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16zm0-96c0 4.4-3.6 8-8 8H168c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16zm0-96c0 4.4-3.6 8-8 8H168c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16z" fill="currentColor"/>
+									</svg>
+								</button>
+								{% if can_delete == True %}
+									<button class="action-button delete-item" data-urlname="{{ link.ref }}">
+										<svg viewBox="0 0 24 24">
+											<g id="icons">
+												<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor" id="exit"/>
+											</g>
+										</svg>
+									</button>
+								{% endif %}
+							</div>
+						</td>
+					</tr>
+		        {% else %}
+					<tr>
+						<td colspan="3" class="links__not-found">No items found.</td>
+					</tr>
+		        {% endfor %}
+			</table>
+	    </div>
+	</div>
+
+	{% if can_delete == True %}
+		<script src="{{ url_for('static', filename='scripts/links.js') + '?v=' + version }}"></script>
+	{% endif %}
+{% endblock %}

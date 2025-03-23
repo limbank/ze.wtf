@@ -1,0 +1,47 @@
+<div class="header">
+	<div class="container">
+		<ul class="nav">
+			<li>
+				<a href="{{ url_for('home.index') }}">Home</a>
+			</li>
+			<li class="item-left">
+				<a href="{{ url_for('changelog.index') }}">Changelog</a>
+			</li>
+			{% if username %}
+				<li>
+					<a href="{{ url_for('dash.handle_dash') }}">Dash</a>
+				</li>
+				<li>
+					<a href="{{ url_for('logout.handle_logout') }}">Logout</a>
+				</li>
+			{% else %}
+				<li>
+					<a href="{{ url_for('auth.handle_auth') }}">Login</a>
+				</li>
+			{% endif %}
+		</ul>
+	</div>
+</div>
+{% if username and active_page == "dash" %}
+	<div class="header header-secondary">
+		<div class="container">
+			<ul class="nav">
+				<li>
+					<a href="{{ url_for('dash.links.index') }}">Links</a>
+				</li>
+				<li>
+					<a href="{{ url_for('dash.files.index') }}">Files</a>
+				</li>
+				<li>
+					<a href="{{ url_for('dash.invites.index') }}">Invites</a>
+				</li>
+				<li>
+					<a href="{{ url_for('dash.spaces.index') }}">Spaces</a>
+				</li>
+				<li>
+					<a href="{{ url_for('dash.keys.index') }}">Keys</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+{% endif %}

@@ -1,0 +1,36 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "register" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="register">
+		<form class="form" action="{{ url_for('auth.handle_register') }}" method="post" autocomplete="off">
+			{% if msg != "" %}
+				<div class="form__message">{{msg}}</div>
+			{% endif %}
+			{% if error != None %}
+				{{error}}
+			{% endif %}
+			<input name="username" type="text" placeholder="Username" required />
+			<input name="password" type="password" placeholder="Password" required />
+			<input name="password-confirm" type="password" placeholder="Password confirm" required />
+
+	        <img src="{{ url_for('auth.dash_captcha') }}" id="captcha_image" class="captcha" />
+	        <a href="#" class="captcha__button" onclick="document.getElementById('captcha_image').src = '/captcha?' + Math.random(); return false">
+	            Refresh
+	        </a>
+	        <input type="text" name="captcha" placeholder="Captcha" id="captcha" required />
+	        <input type="text" name="invite" placeholder="Invite" id="invite" required />
+
+			<input type="submit" value="Submit">
+
+			<a href="{{ url_for('auth.handle_login') }}">Login</a>
+		</form>
+	</div>
+
+	<script src="{{ url_for('static', filename='scripts/register.js') + '?v=' + version }}"></script>
+{% endblock %}
