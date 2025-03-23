@@ -2,9 +2,10 @@ from flask import Blueprint, render_template, current_app, redirect, url_for, re
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
-from utils.crud import create_space, get_space_files, delete_space_files, upload_space_files
-
 from utils.permissions import has_permission
+
+from utils.crud import authorize_user, get_spaces, delete_spaces, create_spaces, get_space_files, delete_space_files, upload_space_files, create_space_files, download_space_files
+
 
 from models import *
 
@@ -17,75 +18,80 @@ limiter = Limiter(
 
 spaces = Blueprint('spaces', __name__, template_folder='templates')
 
-@spaces.route("/spaces", methods=['GET', 'POST'])
+@spaces.route("/spaces/", methods=['GET', 'POST'], defaults={'path': ''})
+@spaces.route("/spaces/<string:path>", methods=['GET', 'POST'])
+@spaces.route("/spaces/<path:path>", methods=['GET', 'POST'])
 @limiter.limit("2/second")
-def index():
-    # Check cookie
-    valid_cookie = check_cookie()
+def index(path):
+    # Handle requests for the API
+    if request.method == 'POST':
+        if path == "create" and request.content_type == "application/json":
+            created_spaces = create_spaces()
+            return created_spaces
+        elif path == "delete" and request.content_type == "application/json":
+            deleted_spaces = delete_spaces()
+            return deleted_spaces
 
-    if valid_cookie == False:
+        return dict(success = False, message = "Invalid request."), 400
+
+    elif request.method == 'GET' and request.content_type == "application/json":
+        if path is None or path == "":
+            # Get spaces
+            user_spaces = get_spaces()
+            return user_spaces
+        else:
+            return dict(success = False, message = "Invalid request."), 400
+
+    # Handle non-JSON requests
+
+    # Clean up path if its used wrong
+    if path != "":
+        return redirect(url_for('dash.spaces.index'))
+
+    # Authenticate user
+    current_user = authorize_user()
+
+    if current_user == None:
+        # User unauthenticated, return to homepage
         return redirect(url_for('home.index'))
-
-    current_user = user_from_cookie(valid_cookie)
-
-    # Retrieve the spaces created by user
-    own_spaces = Space.select().where(Space.owner == current_user['user_id'])
-
-    # Retreive space-related permissions for user
-    can_delete = has_permission(current_user, "delete:ownSpaces")
-
-    return render_template("dash/spaces.html", username=current_user['username'], domain=request.host, spaces = own_spaces, can_delete = can_delete)
-
-@spaces.route("/spaces/files", methods=['GET', 'POST'])
-@limiter.limit("2/second")
-def get_files():
-    # Check cookie
-    valid_cookie = check_cookie()
-
-    if valid_cookie == False:
-        return redirect(url_for('home.index'))
-
-    current_user = user_from_cookie(valid_cookie)
-
-    if request.method == 'GET':
-        space_files = get_space_files(current_user)
-
-        return space_files
     else:
-        upload_file = upload_space_files(current_user)
+        # Retrieve the spaces created by user
+        own_spaces = Space.select().where(Space.owner == current_user['user_id'])
 
-        return upload_file
+        # Retreive space-related permissions for user
+        can_delete = has_permission(current_user, "delete:ownSpaces")
 
-@spaces.route("/spaces/files/delete", methods=['POST'])
+        return render_template("dash/spaces.html", username=current_user['username'], domain=request.host, spaces = own_spaces, can_delete = can_delete)
+
+@spaces.route("/spaces/files/", methods=['GET', 'POST'], defaults={'path': ''})
+@spaces.route("/spaces/files/<string:path>", methods=['GET', 'POST'])
+@spaces.route("/spaces/files/<path:path>", methods=['GET', 'POST'])
 @limiter.limit("2/second")
-def delete_files():
-    # Check cookie
-    valid_cookie = check_cookie()
+def files(path):
+    # Handle requests for the API
+    if request.method == 'POST':
+        if path == "upload" and request.content_type.startswith("multipart/form-data"):
+            # Multipart here
+            uploaded_files = upload_space_files()
+            return uploaded_files
+        elif path == "delete" and request.content_type == "application/json":
+            deleted_files = delete_space_files()
+            return deleted_files
+        elif path == "create" and request.content_type == "application/json":
+            created_files = create_space_files()
+            return created_files
+        elif path == "download" and request.content_type == "application/json":
+            space_file = download_space_files()
+            return space_file
 
-    if valid_cookie == False:
-        return redirect(url_for('home.index'))
+        return dict(success = False, message = "Invalid request."), 400
 
-    current_user = user_from_cookie(valid_cookie)
+    elif request.method == 'GET' and request.content_type == "application/json":
+        if path is None or path == "":
+            space_files = get_space_files()
+            return space_files
+        else:
+            return dict(success = False, message = "Invalid request."), 400
 
-    deleted_files = delete_space_files(current_user)
-
-    return deleted_files
-
-@spaces.route("/spaces/create", methods=['POST'])
-@limiter.limit("2/second")
-def create():
-    # Check cookie
-    valid_cookie = check_cookie()
-
-    if valid_cookie == False:
-        return dict(success = False, message = "Unauthorized")
-
-    current_user = user_from_cookie(valid_cookie)
-
-    new_space = create_space(current_user)
-    
-    return new_space
-
-# deleted_invite = delete_invite(content['delete'], current_user)
-    #return "Test"
-    return dict(success = True, message = "Authorized")
+    # Handle non-JSON requests
+    return redirect(url_for('dash.spaces.index'))

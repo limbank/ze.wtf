@@ -3,6 +3,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from argon2 import PasswordHasher
 from captcha.image import ImageCaptcha
+from slugify import slugify
 import os
 import json
 from dotenv import load_dotenv
@@ -92,7 +93,7 @@ def register_user():
         # Check if username is allowed
         with open('utils/usernames.json') as f:
             data = json.load(f)
-            if username in data['usernames']:
+            if username.lower() in data['usernames']:
                 return dict(msg = "Username not allowed", success = False)
 
         # Check username

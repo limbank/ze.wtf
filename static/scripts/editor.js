@@ -24,15 +24,13 @@
             var n = will_edit.lastIndexOf('.');
             let file_language = will_edit.substring(n + 1);
 
-            const response = await fetch(window.location.origin + "/dash/spaces/files", {
+            const response = await fetch(window.location.origin + "/dash/spaces/files/download", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    "edit": will_edit
-                })
+                body: JSON.stringify([will_edit])
             });
 
             let contentType = response.headers.get("Content-Type");

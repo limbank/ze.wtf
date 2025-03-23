@@ -3,7 +3,8 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.cookies import check_cookie, user_from_cookie
 from utils.permissions import has_permission
-from utils.crud import delete_file, upload_files
+
+from utils.crud import authorize_user, get_files, delete_files, upload_files
 
 from models import *
 
@@ -16,31 +17,48 @@ limiter = Limiter(
 
 files = Blueprint('files', __name__, template_folder='templates')
 
-@files.route("/files", methods=['GET', 'POST'])
+@files.route("/files/", methods=['GET', 'POST'], defaults={'path': ''})
+@files.route("/files/<string:path>", methods=['GET', 'POST'])
+@files.route("/files/<path:path>", methods=['GET', 'POST'])
 @limiter.limit("2/second")
-def index():
-    # Check cookie
-    valid_cookie = check_cookie()
-
-    if valid_cookie == False:
-        return redirect(url_for('home.index'))
-
-    current_user = user_from_cookie(valid_cookie)
-
-    if (request.content_type == "application/json"):
-        content = request.json
-        if 'delete' in content:
-            deleted_file = delete_file(content['delete'], current_user)
-            return(deleted_file)
-
+def index(path):
+    # Handle requests for the API
     if request.method == 'POST':
-        uploaded_files = upload_files(current_user)
-        return uploaded_files
+        if path == "upload" and request.content_type.startswith("multipart/form-data"):
+            # Multipart here
+            uploaded_files = upload_files()
+            return uploaded_files
+        elif path == "delete" and request.content_type == "application/json":
+            deleted_files = delete_files()
+            return deleted_files
 
-    # Retrieve the files created by user
-    files = File.select().where(File.owner == current_user['user_id'])
+        return dict(success = False, message = "Invalid request."), 400
 
-    # Retreive image-related permissions for user
-    can_delete = has_permission(current_user, "delete:ownFiles")
+    elif request.method == 'GET' and request.content_type == "application/json":
+        if path is None or path == "":
+            # Get invites
+            user_files = get_files()
+            return user_files
+        else:
+            return dict(success = False, message = "Invalid request."), 400
 
-    return render_template("dash/files.html", username=current_user['username'], domain=request.host, files = files, can_delete = can_delete)
+    # Handle non-JSON requests
+
+    # Clean up path if its used wrong
+    if path != "":
+        return redirect(url_for('dash.files.index'))
+
+    # Authenticate user
+    current_user = authorize_user()
+
+    if current_user == None:
+        # User unauthenticated, return to homepage
+        return redirect(url_for('home.index'))
+    else:
+        # Retrieve the files created by user
+        files = File.select().where(File.owner == current_user['user_id'])
+
+        # Retreive image-related permissions for user
+        can_delete = has_permission(current_user, "delete:ownFiles")
+
+        return render_template("dash/files.html", username=current_user['username'], domain=request.host, files = files, can_delete = can_delete)

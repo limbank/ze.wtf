@@ -1,4 +1,5 @@
 from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 import random
 import string
 
@@ -38,9 +39,8 @@ ph = PasswordHasher()
 
 def check_argon(chash, value):
     try:
-        ph.verify(chash, value)
-        return True
-    except:
+        return ph.verify(chash, value)
+    except VerifyMismatchError:
         return False
 
 def random_string(length = 5):

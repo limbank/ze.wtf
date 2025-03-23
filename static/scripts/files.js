@@ -1,7 +1,7 @@
 (function(){
     //To-Do: Clean this up
-    console.log("Loaded");
-    const notification_area = document.getElementById('notifications');
+    console.log("File script loaded");
+
     const delete_buttons = document.querySelectorAll('.delete-item');
     const copy_buttons = document.querySelectorAll('.copy-item');
 
@@ -12,7 +12,11 @@
     const upload_file_confirm = document.getElementById("upload-file-confirm");
     const upload_file_cancel = document.getElementById("upload-file-cancel");
 
+    const progress = document.getElementById("progress");
+    const progress_inner = document.getElementById("progress-inner");
+
     function reset_upload() {
+        progress.style.display = "none";
         upload_file_table.style.display = "none";
         upload_file_input.value = "";
         upload_file_label.innerHTML = "Click to select file";
@@ -56,20 +60,46 @@
             });
 
             try {
-                const response = await fetch(window.location.origin + "/dash/files", {
-                    method: "POST",
-                    body: formData,
-                });
+                progress.style.display = "block";
 
-                let result = await response.json();
+                let xhr = new XMLHttpRequest();
 
-                if (result.success === false) {
-                    console.log(result);
-                    return console.log("Error attempting to upload...");
-                }
+                xhr.open("POST", window.location.origin + "/dash/files/upload", true);
+                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
-                reset_upload();
-                location.reload();
+                xhr.upload.onprogress = function (event) {
+                    if (event.lengthComputable) {
+                        let percentComplete = (event.loaded / event.total) * 100;
+                        progress_inner.style.width = percentComplete + "%";
+                        console.log(Math.round(percentComplete) + "%")
+                    }
+                };
+
+                // When the upload is complete
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        try {
+                            let response = JSON.parse(xhr.responseText);
+
+                            if (response.success === false) {
+                                notify("Error attempting to upload...");
+                                return console.log(result);
+                            }
+
+                            reset_upload();
+                            location.reload();
+                        }
+                        catch (error) {
+                            notify("Error parsing server response...");
+                            return console.log(error);
+                        }
+                    }
+                    else {
+                        notify("Upload Failed: " + xhr.statusText);
+                    }
+                };
+
+                xhr.send(formData);
             } catch (e) {
                 console.error(e);
             }
@@ -86,42 +116,34 @@
             }
 
             try {
-                const response = await fetch(window.location.origin + "/dash/files", {
+                const response = await fetch(window.location.origin + "/dash/files/delete", {
                     method: "POST",
                     // Set the FormData instance as the request body
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        "delete": target_file
-                    }),
+                    body: JSON.stringify([target_file]),
                 });
 
                 let result = await response.json();
                 console.log(result)
-
-                let new_notif = document.createElement('div');
-                new_notif.className = 'notif';
 
                 if (result.success === true && result.message && result.message != "") {
                     // Delete parent to avoid page reload
                     let closest_tr = button.parentNode.closest('tr');
                     closest_tr.remove();
 
-                    new_notif.innerHTML = result.message;
-                    notification_area.appendChild(new_notif);
+                    notify(result.message);
                 }
                 else if (result.success === false && result.message && result.message != "") {
-                    // To-Do: make them autodisappear
-                    new_notif.innerHTML = result.message;
-                    notification_area.appendChild(new_notif);
+                    notify(result.message);
                 }
                 else {
-                    new_notif.innerHTML = "An unknown error has occurred.";
-                    notification_area.appendChild(new_notif);
+                    notify("An unknown error has occurred...");
                 }
-            } catch (e) {
+            }
+            catch (e) {
                 console.error(e);
             }
         });
@@ -133,15 +155,16 @@
 
             try {
                 navigator.clipboard.writeText('https://' + target_file).then(() => {
-                    console.log("Copied link");
+                    notify("Copied link!", 3000);
                 }, (e) => {
                     console.log(e);
-                    console.log("Couldn't copy link");
+                    notify("Couldn't copy link.", 3000);
                 });
+
                 document.execCommand("copy");
             } catch (e) {
                 console.error(e);
-                console.log("Couldn't copy link");
+                notify("Couldn't copy link.", 3000);
             }
         });
     });

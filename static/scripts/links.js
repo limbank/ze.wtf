@@ -1,7 +1,7 @@
 (function(){
     //To-Do: Clean this up
-    console.log("Loaded");
-    const notification_area = document.getElementById('notifications');
+    console.log("Link script loaded");
+
     const delete_buttons = document.querySelectorAll('.delete-item');
     const copy_buttons = document.querySelectorAll('.copy-item');
 
@@ -21,6 +21,7 @@
     create_link_toggle.addEventListener('click', async () => {
         if (create_link_table.style.display  == "none") {
             create_link_table.style.display = "table";
+            create_link_alias.focus();
         }
         else {
             create_link_table.style.display = "none";
@@ -36,27 +37,34 @@
 
         if (url == "") return;
 
-        const formData = new FormData();
-
-        formData.append("alias", alias);
-        formData.append("url", url);
-
         try {
-            const response = await fetch(window.location.origin + "/dash/links", {
+            const response = await fetch(window.location.origin + "/dash/links/create", {
                 method: "POST",
-                body: formData,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify([
+                    {
+                        "url": url,
+                        "alias": alias
+                    }
+                ]),
             });
 
             let result = await response.json();
 
             if (result.success === false) {
-                console.log(result);
-                return console.log("Error attempting to upload...");
+                notify(result.message || "Unknown error...");
+                return console.log(result);
             }
+
+            // Instead of reloading, just append the newly created tr
 
             reset_create();
             location.reload();
         } catch (e) {
+            notify("Error attempting to create link...");
             console.error(e);
         }
     });
@@ -71,39 +79,31 @@
             }
 
             try {
-                const response = await fetch(window.location.origin + "/dash/links", {
+                const response = await fetch(window.location.origin + "/dash/links/delete", {
                     method: "POST",
                     // Set the FormData instance as the request body
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        "delete": target_url
-                    }),
+                    body: JSON.stringify([target_url]),
                 });
 
                 let result = await response.json();
-
-                let new_notif = document.createElement('div');
-                new_notif.className = 'notif';
 
                 if (result.success === true && result.message && result.message != "") {
                     // Delete parent to avoid page reload
                     let closest_tr = button.parentNode.closest('tr');
                     closest_tr.remove();
 
-                    new_notif.innerHTML = result.message;
-                    notification_area.appendChild(new_notif);
+                    notify(result.message);
                 }
                 else if (result.success === false && result.message && result.message != "") {
                     // To-Do: make them autodisappear
-                    new_notif.innerHTML = result.message;
-                    notification_area.appendChild(new_notif);
+                    notify(result.message);
                 }
                 else {
-                    new_notif.innerHTML = "An unknown error has occurred.";
-                    notification_area.appendChild(new_notif);
+                    notify("An unknown error has occurred.");
                 }
             } catch (e) {
                 console.error(e);
@@ -113,19 +113,20 @@
 
     copy_buttons.forEach(button => {
         button.addEventListener('click', async () => {
-            let target_file = button.dataset.target;
+            let target_link = button.dataset.target;
 
             try {
-                navigator.clipboard.writeText('https://' + target_file).then(() => {
-                    console.log("Copied link");
+                navigator.clipboard.writeText('https://' + target_link).then(() => {
+                    notify("Copied link!", 3000);
                 }, (e) => {
                     console.log(e);
-                    console.log("Couldn't copy link");
+                    notify("Couldn't copy link.", 3000);
                 });
+
                 document.execCommand("copy");
             } catch (e) {
                 console.error(e);
-                console.log("Couldn't copy link");
+                notify("Couldn't copy link.", 3000);
             }
         });
     });

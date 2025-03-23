@@ -43,17 +43,22 @@ class File(Model):
     database = db
     db_table = 'files'
 
-class Invites(Model):
+class Invite(Model):
   invites_id = IntegerField(primary_key=True)
   created_by = ForeignKeyField(User, backref='created_invites', column_name='created_by')  
   used_by = ForeignKeyField(User, backref='used_invites', null=True, column_name='used_by')
   created = DateTimeField(default=datetime.now)
-  expires = DateTimeField()
+  expires = DateTimeField(null=True)
   code = CharField()
 
   class Meta:
     database = db
     db_table = 'invites'
+
+  def is_expired(self):
+    if self.expires is None:
+      return False  # Never expires
+    return datetime.now() > self.expires
 
 class Link(Model):
   links_id = IntegerField(primary_key=True)
@@ -102,5 +107,22 @@ class Space(Model):
     database = db
     db_table = 'spaces'
 
+class Key(Model):
+  keys_id = AutoField(primary_key=True)
+  value = CharField()
+  name = CharField()
+  owner = ForeignKeyField(User, backref='keys')
+  date_created = DateTimeField(default=datetime.now)
+  expires = DateTimeField(null=True)
+
+  class Meta:
+    database = db
+    db_table = 'keys'
+
+  def is_expired(self):
+    if self.expires is None:
+      return False  # Never expires
+    return datetime.now() > self.expires
+
 db.connect()
-#db.create_tables([Link, Invites, File, User, Cookie, Role, Permission, RolePerm])
+#db.create_tables([Link, Invite, File, User, Cookie, Role, Permission, RolePerm])

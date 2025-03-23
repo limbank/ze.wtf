@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request, redirect, abort, url_for,
 from pathlib import Path
 from werkzeug.exceptions import NotFound
 from slugify import slugify
-from utils.crud import get_space
 
 from models import *
 
@@ -13,6 +12,18 @@ user_spaces = Path.cwd() / "uploads"
 spaces = Blueprint('spaces', __name__, template_folder=user_spaces, subdomain='<subdomain>')
 
 UPLOAD_FOLDER = Path.cwd() / 'uploads'
+
+def get_space(space_name):
+    # Used in pages/spaces.py
+    try:
+        query = (Space
+                 .select(Space, User)
+                 .join(User, on=(Space.owner == User.users_id))
+                 .where(Space.name == space_name)
+                 .get())
+        return query
+    except Space.DoesNotExist:
+        return None 
 
 @spaces.route("/", subdomain='<subdomain>', defaults={'path': ''})
 @spaces.route("/<string:path>", subdomain='<subdomain>')

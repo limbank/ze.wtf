@@ -52,38 +52,14 @@
 			}
 		}
 	}
-}
 
-.invites-header {
-	p {
-		display: inline-block;
-		margin: 0 0 14px;
-	}
-
-	.create-invite {
-		float: right;
-		display: inline-block;
-		border: none;
-		background: transparent;
-		font-size: 14px;
-		color: #cfd3cf;
-		text-underline-offset: 2px;
-		padding: 0;
-		transform: translateY(-1px);
-		cursor: pointer;
-
-		&:hover {
-			text-decoration: underline;
-		}
-	}
-
-	.create-table {
-		margin-bottom: 10px;
+	.progress {
+		border-top: 0;
+		border-bottom: 0;
 	}
 }
 
-.action-button,
-.delete-item {
+.action-button {
 	cursor: pointer;
 	background: transparent;
 	border: 0px;
@@ -158,6 +134,7 @@
 	&__files {
 		overflow: auto;
 		border: 1px solid #111113;
+		border-top: 0;
 
 		table {
 			width: 100%;
@@ -279,6 +256,10 @@
 		white-space: nowrap;
 	}
 
+	&__long-cell {
+		line-break: anywhere;
+	}
+
 	&__buttons {
 		display: flex;
 		justify-content: flex-end;
@@ -366,5 +347,26 @@
 	td {
 		background: #29292e;
 		height: 40px;
+	}
+}
+
+.progress {
+	width: 100%;
+	height: 10px;
+	border: 1px solid #111113;
+	overflow: hidden;
+
+	&__inner {
+		width: 0%;
+		height: 10px;
+		border-right: 1px solid #111113;
+		transition: width 0.2s ease-out;
+		background: repeating-linear-gradient(
+			135deg,
+		  rgba(41,41,46,1),
+		  rgba(41,41,46,1) 10px,
+		  rgba(17,17,19,1) 10px,
+		  rgba(17,17,19,1) 20px
+		);
 	}
 }

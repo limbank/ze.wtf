@@ -11,66 +11,47 @@
 		<p>
 			Welcome, {{username}}.
 		</p>
-		<div class="invites-header">
-			<p>
-				Your created invites:
-			</p>
-			{% if can_create == True %}
-				<button type="submit" id="create-invite" class="create-invite">[Create]</button>
-				<table class="create-table" id="create-invite-table" style="display: none;">
-					<tr>
-						<td>
-							<input placeholder="Alias (Optional)" type="text" class="file-browser__create-directory" name="invite-name" id="invite-alias">
-						</td>
-						<td width="68px">
-							<div class="table__buttons">
-								<button class="action-button" id="approve-invite">
-									<svg viewBox="0 0 24 24" >
-										<g id="icons">
-											<path d="M10,18c-0.5,0-1-0.2-1.4-0.6l-4-4c-0.8-0.8-0.8-2,0-2.8c0.8-0.8,2.1-0.8,2.8,0l2.6,2.6l6.6-6.6   c0.8-0.8,2-0.8,2.8,0c0.8,0.8,0.8,2,0,2.8l-8,8C11,17.8,10.5,18,10,18z" fill="currentColor"/>
-										</g>
-									</svg>
-								</button>
-								<button class="action-button" id="deny-invite">
-									<svg viewBox="0 0 24 24">
-										<g id="icons">
-											<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor"/>
-										</g>
-									</svg>
-								</button>
-							</div>
-						</td>
-					</tr>
-				</table>
-			{% endif %}
-		</div>
-		<div class="notifications" id="notifications"></div>
+		<p>
+			Your created invites:
+		</p>
+		<script src="{{ url_for('static', filename='scripts/notifications.js') + '?v=' + version }}"></script>
 		<div class="links">
 			<table class="links__table">
 				<tr>
 					<th width="160px">Expires</th>
 					<th>Code</th>
 					<th>Used by</th>
-					{% if can_delete == True %}
-						<th></th>
-					{% endif %}
+					<th class="table__button-cell">
+						<div class="table__buttons">
+							<button class="action-button" id="create-invite">
+								<svg viewBox="0 0 24 24">
+									<path d="M18,10h-4V6c0-1.104-0.896-2-2-2s-2,0.896-2,2l0.071,4H6c-1.104,0-2,0.896-2,2s0.896,2,2,2l4.071-0.071L10,18  c0,1.104,0.896,2,2,2s2-0.896,2-2v-4.071L18,14c1.104,0,2-0.896,2-2S19.104,10,18,10z" fill="currentColor"/>
+								</svg>
+							</button>
+						</div>
+					</th>
 				</tr>
 		        {% for invite in invites %}
 					<tr>
 						<td>{{invite.expires.strftime('%Y-%m-%d %H:%M')}}</td>
 						<td>{{invite.code}}</td>
 						<td>{{invite.used_by.username}}</td>
-						{% if can_delete == True %}
-							<td width="38px">
-								<button class="delete-item" data-invitename="{{ invite.code }}">
+						<td class="table__button-cell">
+							<div class="table__buttons">
+								<button class="action-button copy-item" data-target="{{invite.code}}">
+									<svg viewBox="0 0 384 512" class="smaller">
+										<path d="M336 64h-80c0-35.3-28.7-64-64-64s-64 28.7-64 64H48C21.5 64 0 85.5 0 112v352c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zM96 424c-13.3 0-24-10.7-24-24s10.7-24 24-24 24 10.7 24 24-10.7 24-24 24zm0-96c-13.3 0-24-10.7-24-24s10.7-24 24-24 24 10.7 24 24-10.7 24-24 24zm0-96c-13.3 0-24-10.7-24-24s10.7-24 24-24 24 10.7 24 24-10.7 24-24 24zm96-192c13.3 0 24 10.7 24 24s-10.7 24-24 24-24-10.7-24-24 10.7-24 24-24zm128 368c0 4.4-3.6 8-8 8H168c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16zm0-96c0 4.4-3.6 8-8 8H168c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16zm0-96c0 4.4-3.6 8-8 8H168c-4.4 0-8-3.6-8-8v-16c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16z" fill="currentColor"/>
+									</svg>
+								</button>
+								<button class="action-button delete-item" data-invitename="{{ invite.code }}">
 									<svg viewBox="0 0 24 24">
 										<g id="icons">
 											<path d="M14.8,12l3.6-3.6c0.8-0.8,0.8-2,0-2.8c-0.8-0.8-2-0.8-2.8,0L12,9.2L8.4,5.6c-0.8-0.8-2-0.8-2.8,0   c-0.8,0.8-0.8,2,0,2.8L9.2,12l-3.6,3.6c-0.8,0.8-0.8,2,0,2.8C6,18.8,6.5,19,7,19s1-0.2,1.4-0.6l3.6-3.6l3.6,3.6   C16,18.8,16.5,19,17,19s1-0.2,1.4-0.6c0.8-0.8,0.8-2,0-2.8L14.8,12z" fill="currentColor" id="exit"/>
 										</g>
 									</svg>
 								</button>
-							</td>
-						{% endif %}
+							</div>
+						</td>
 					</tr>
 		        {% else %}
 					<tr>
@@ -81,7 +62,5 @@
 	    </div>
 	</div>
 
-	{% if can_delete == True %}
-		<script src="{{ url_for('static', filename='scripts/invites.js') + '?v=' + version }}"></script>
-	{% endif %}
+	<script src="{{ url_for('static', filename='scripts/invites.js') + '?v=' + version }}"></script>
 {% endblock %}

@@ -10,6 +10,7 @@ from .dashboard.spaces import spaces
 from .dashboard.invites import invites
 from .dashboard.files import files
 from .dashboard.links import links
+from .dashboard.keys import keys
 
 limiter = Limiter(
     get_remote_address,
@@ -24,6 +25,7 @@ dash.register_blueprint(spaces)
 dash.register_blueprint(invites)
 dash.register_blueprint(files)
 dash.register_blueprint(links)
+dash.register_blueprint(keys)
 
 @dash.route("/")
 @limiter.limit("2/second")

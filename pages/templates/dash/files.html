@@ -14,7 +14,7 @@
 		<p>
 			Your created files:
 		</p>
-		<div class="notifications" id="notifications"></div>
+		<script src="{{ url_for('static', filename='scripts/notifications.js') + '?v=' + version }}"></script>
 		<div class="table-wrapper">
 			<table class="table table-standard">
 				<tr>
@@ -31,6 +31,9 @@
 					</th>
 				</tr>
 			</table>
+			<div class="progress" id="progress" style="display: none;">
+				<div class="progress__inner" id="progress-inner"></div>
+			</div>
 			<table class="table table-borderless table-reverse" id="upload-file-table" style="display: none;">
 				<tr>
 					<td>
@@ -91,7 +94,5 @@
 	    </div>
 	</div>
 
-	{% if can_delete == True %}
-		<script src="{{ url_for('static', filename='scripts/files.js') + '?v=' + version }}"></script>
-	{% endif %}
+	<script src="{{ url_for('static', filename='scripts/files.js') + '?v=' + version }}"></script>
 {% endblock %}

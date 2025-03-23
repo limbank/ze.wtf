@@ -161,3 +161,49 @@ a {
 		}
 	}
 }
+
+.notifications {
+	transition: height 0.3s ease-out;
+
+	.notification {
+		margin-bottom: 10px;
+		width: 100%;
+		position: relative;
+		border: 1px solid #111113;
+		padding: 0 34px 0 0;
+		background: #29292e;
+		opacity: 1;
+		transition: opacity 0.5s ease-out;
+		min-height: 33px;
+
+		&__inner {
+			padding: 8px 12px;
+		}
+
+		&__close {
+			background: #29292E;
+			border: 0;
+  			cursor: pointer;
+  			color: #cfd3cf;
+			height: 22px;
+			width: 22px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			transition: background 0.2s ease-in;
+			position: absolute;
+			right: 6px;
+  			top: 6px;
+
+			&:hover {
+				background: #414149;
+			}
+
+			svg {
+				width: 16px;
+				height: 16px;
+				pointer-events: none;
+			}
+		}
+	}
+}
