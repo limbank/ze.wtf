@@ -21,7 +21,7 @@ ordered-set==4.1.0
 packaging==24.2
 peewee==3.17.6
 pillow==11.1.0
-psycopg2==2.9.10
+psycopg2-binary==2.9.10
 pycparser==2.22
 Pygments==2.19.1
 python-dotenv==1.0.1
