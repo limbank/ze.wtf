@@ -1,11 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, abort, url_for, send_from_directory
+from flask import Blueprint, abort, send_from_directory
 from pathlib import Path
-from werkzeug.exceptions import NotFound
 from slugify import slugify
 
 from models import *
 
-from werkzeug.utils import secure_filename
 
 user_spaces = Path.cwd() / "uploads"
 
