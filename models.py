@@ -124,5 +124,6 @@ class Key(Model):
       return False  # Never expires
     return datetime.now() > self.expires
 
-db.connect()
-#db.create_tables([Link, Invite, File, User, Cookie, Role, Permission, RolePerm])
+def create_tables():
+  with db:
+    db.create_tables([Link, Invite, File, User, Cookie, Role, Permission, RolePerm, Space, Key], safe=True)
