@@ -402,7 +402,7 @@ def create_invites():
         return jsonify({"success": False, "message": "Invalid value in JSON body."}), 400
 
     # Check if user cas created 5 invites already
-    invite_count = Invites.select().where(Invites.created_by == g.current_user['user_id']).count()
+    invite_count = Invite.select().where(Invite.created_by == g.current_user['user_id']).count()
 
     MAX_INVITES = 5
 
