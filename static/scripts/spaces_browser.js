@@ -285,7 +285,7 @@
         renderDirectoryListing(data, basePath);
     }
 
-    async function get_file_tree(reset) {
+    window.get_file_tree = async (reset) => {
         console.log("Getting file tree...");
 
         try {
@@ -430,7 +430,7 @@
                         }
                     }
                     else {
-                        notify("Upload Failed: " + xhr.statusText);
+                        notify("Upload failed: " + xhr.statusText);
                     }
                 };
 

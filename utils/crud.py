@@ -82,89 +82,6 @@ def is_file(path):
 
 # GENERAL END
 
-# AUTH VALIDATION START
-
-def check_cookie():
-    cookie_token = request.cookies.get('loggedin')
-
-    if cookie_token is not None:
-        cookie_details = cookie_token.split('.')
-
-        cookie = Cookie.get_or_none(Cookie.cookie_token == cookie_details[0])
-        return cookie
-
-        # Check cookie expiration 
-        if datetime.now() > cookie.expires:
-            return None
-
-        # Validate cookie
-        try:
-            ph.verify(cookie.cookie_hash, cookie_details[1] + request.remote_addr)
-            # To-do, invalidate cookie if the hash verification fails
-        except:
-            # Cookie invalid
-            return None
-
-        return cookie
-    else:
-        return None
-
-def user_from_cookie(cookie):
-    if cookie is None:
-        # No cookie
-        return None
-
-    current_user = User.get(User.users_id == cookie.user_id)
-    return dict(username=current_user.username, user_id=current_user.users_id, role=current_user.role)
-
-def user_from_token(token):
-    if token is None:
-        # No token
-        return None
-
-    # Validate key
-    key_records = Key.select().where(Key.expires.is_null(True) | (Key.expires > datetime.now()))
-
-    for key in key_records:
-        if check_argon(key.value, token):  # Check hashed key
-            # Key verified, get user here
-            current_user = User.get(User.users_id == key.owner)
-            return dict(username=current_user.username, user_id=current_user.users_id, role=current_user.role)
-
-def check_token():
-    auth_header = request.headers.get('Authorization')
-
-    if auth_header is None or auth_header == "":
-        return None
-
-    try:
-        token = auth_header.split()[1]
-
-        return token
-    except:
-        return None
-
-def authorize_user():
-    # Authenticate user by token
-    token = check_token()
-
-    if token is not None:
-        # Get user by token
-        current_user = user_from_token(token)
-        return current_user
-    
-    # Authenticate user by cookie
-    cookie = check_cookie()
-
-    if cookie is not None:
-        # Get user by cookie
-        current_user = user_from_cookie(cookie)
-        return current_user
-
-    return None
-
-# AUTH VALIDATION END
-
 # KEYS START
 
 def generate_api_key():
@@ -178,14 +95,12 @@ def hash_api_key(api_key):
     return ph.hash(api_key)
 
 def delete_keys():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can delete keys
-    if not has_permission(current_user, "delete:ownKeys"):
+    if not has_permission(g.current_user, "delete:ownKeys"):
         return dict(success = False, message = "Permission denied."), 403 
 
     json_data = get_json_data()
@@ -197,7 +112,7 @@ def delete_keys():
         return jsonify({"success": False, "message": "Invalid request. No keys provided."}), 400
 
     existing_keys = Key.select().where(
-        Key.name.in_(json_data) & (Key.owner == current_user['user_id'])
+        Key.name.in_(json_data) & (Key.owner == g.current_user['user_id'])
     )
 
     if not existing_keys.exists():
@@ -215,14 +130,12 @@ def delete_keys():
     return dict(success=False, message="Permission denied.")
 
 def create_keys():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can create links
-    if not has_permission(current_user, "create:ownKeys"):
+    if not has_permission(g.current_user, "create:ownKeys"):
         return dict(success = False, message = "Permission denied."), 403
 
     json_data = get_json_data()
@@ -263,12 +176,12 @@ def create_keys():
 
         # Check if a user owns any non expired keys
         key_count = Key.select().where(
-            (Key.owner == current_user['user_id']) & 
+            (Key.owner == g.current_user['user_id']) & 
             ((Key.expires.is_null(True)) | (Key.expires > datetime.now()))
         ).count()
 
         # Check if user can bypass limit
-        if not has_permission(current_user, "ignore:keyLimit") and key_count > MAX_KEYS:
+        if not has_permission(g.current_user, "ignore:keyLimit") and key_count > MAX_KEYS:
             return jsonify({"success": False, "message": "You cannot create any more keys."}), 403
 
         # Generate key
@@ -276,10 +189,10 @@ def create_keys():
         hashed_key = hash_api_key(api_key)
 
         valid_keyvalues.append(dict(name = key['name'], key = api_key))
-        valid_keys.append(dict(name = key['name'], value = hashed_key, owner = current_user['user_id'], expires = expires))
+        valid_keys.append(dict(name = key['name'], value = hashed_key, owner = g.current_user['user_id'], expires = expires))
 
     existing_keys = Key.select().where(
-        Key.name.in_([key['name'] for key in valid_keys]) & (Key.owner == current_user['user_id'])
+        Key.name.in_([key['name'] for key in valid_keys]) & (Key.owner == g.current_user['user_id'])
     )
 
     # Convert existing query objects to a set of refs for fast lookup
@@ -303,13 +216,11 @@ def create_keys():
 # LINKS START
 
 def get_links():
-    current_user = authorize_user()
-
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Get all links created by user
-    own_links = Link.select().where(Link.owner == current_user['user_id'])
+    own_links = Link.select().where(Link.owner == g.current_user['user_id'])
 
     # Format links as a JSON array
     links_as_dicts = [
@@ -321,14 +232,12 @@ def get_links():
     return jsonify(success = True, links = links_as_dicts), 200
 
 def delete_links():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can delete links
-    if not has_permission(current_user, "delete:ownLinks"):
+    if not has_permission(g.current_user, "delete:ownLinks"):
         return dict(success = False, message = "Permission denied."), 403 
 
     json_data = get_json_data()
@@ -340,7 +249,7 @@ def delete_links():
         return jsonify({"success": False, "message": "Invalid request. No links provided."}), 400
 
     existing_links = Link.select().where(
-        Link.ref.in_(json_data) & (Link.owner == current_user['user_id'])
+        Link.ref.in_(json_data) & (Link.owner == g.current_user['user_id'])
     )
 
     if not existing_links.exists():
@@ -355,14 +264,12 @@ def delete_links():
     return jsonify(success=True, message=f"{deleted_count} link{'s' if deleted_count != 1 else ''} deleted."), 200
 
 def create_links():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can create links
-    if not has_permission(current_user, "create:ownLinks"):
+    if not has_permission(g.current_user, "create:ownLinks"):
         return dict(success = False, message = "Permission denied."), 403
 
     json_data = get_json_data()
@@ -392,7 +299,7 @@ def create_links():
         else:
             new_alias = link['alias']
 
-        valid_links.append(dict(ref = new_alias, url = link['url'], owner = current_user['user_id']))
+        valid_links.append(dict(ref = new_alias, url = link['url'], owner = g.current_user['user_id']))
 
     existing_links = Link.select().where(
         Link.ref.in_([link['ref'] for link in valid_links])
@@ -418,13 +325,11 @@ def create_links():
 # INVITES START
 
 def get_invites():
-    current_user = authorize_user()
-
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Get all invites created by the user
-    own_invites = Invite.select().where(Invite.created_by == current_user['user_id'])
+    own_invites = Invite.select().where(Invite.created_by == g.current_user['user_id'])
 
     # Format invites as a JSON array
     invites_as_dicts = [
@@ -439,14 +344,12 @@ def get_invites():
     return jsonify(success = True, invites = invites_as_dicts), 200
 
 def delete_invites():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can delete invites
-    if not has_permission(current_user, "delete:ownInvites"):
+    if not has_permission(g.current_user, "delete:ownInvites"):
         return dict(success = False, message = "Permission denied."), 403 
 
     json_data = get_json_data()
@@ -459,7 +362,7 @@ def delete_invites():
 
     existing_invites = Invite.select().where(
         Invite.code.in_(json_data) & 
-        (Invite.created_by == current_user['user_id']) & 
+        (Invite.created_by == g.current_user['user_id']) & 
         Invite.used_by.is_null(True)
     )
 
@@ -475,14 +378,12 @@ def delete_invites():
     return jsonify(success=True, message=f"{deleted_count} invite{'s' if deleted_count != 1 else ''} deleted."), 200
 
 def create_invites():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can create invites
-    if not has_permission(current_user, "create:ownInvites"):
+    if not has_permission(g.current_user, "create:ownInvites"):
         return dict(success = False, message = "Permission denied."), 403 
 
     json_data = get_json_data()
@@ -501,12 +402,12 @@ def create_invites():
         return jsonify({"success": False, "message": "Invalid value in JSON body."}), 400
 
     # Check if user cas created 5 invites already
-    invite_count = Invites.select().where(Invites.created_by == current_user['user_id']).count()
+    invite_count = Invites.select().where(Invites.created_by == g.current_user['user_id']).count()
 
     MAX_INVITES = 5
 
     # If user has permission, they can create unlimited invites
-    if has_permission(current_user, "ignore:inviteLimit"):
+    if has_permission(g.current_user, "ignore:inviteLimit"):
         remaining_invites = float("inf")  # Unlimited
     else:
         remaining_invites = MAX_INVITES - invite_count  # Calculate how many they can create
@@ -523,7 +424,7 @@ def create_invites():
             dict(
                 code = random_string(8),
                 expires = datetime.now() + timedelta(days=30),
-                created_by = current_user['user_id']
+                created_by = g.current_user['user_id']
             )
         )
 
@@ -552,13 +453,11 @@ def create_invites():
 # FILES START
 
 def get_files():
-    current_user = authorize_user()
-
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Get all links created by user
-    own_files = File.select().where(File.owner == current_user['user_id'])
+    own_files = File.select().where(File.owner == g.current_user['user_id'])
 
     # Format links as a JSON array
     files_as_dicts = [
@@ -570,14 +469,12 @@ def get_files():
     return jsonify(success = True, files = files_as_dicts), 200
 
 def delete_files():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can delete files
-    if not has_permission(current_user, "delete:ownFiles"):
+    if not has_permission(g.current_user, "delete:ownFiles"):
         return dict(success = False, message = "Permission denied."), 403 
 
     json_data = get_json_data()
@@ -589,7 +486,7 @@ def delete_files():
         return jsonify({"success": False, "message": "Invalid request. No files provided."}), 400
 
     existing_files = File.select().where(
-        File.filename.in_(json_data) & (File.owner == current_user['user_id'])
+        File.filename.in_(json_data) & (File.owner == g.current_user['user_id'])
     )
 
     if not existing_files.exists():
@@ -619,14 +516,12 @@ def delete_files():
     return jsonify(success=True, message=f"{deleted_count} file{'s' if deleted_count != 1 else ''} deleted."), 200
 
 def upload_files():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can create files
-    if not has_permission(current_user, "create:ownFiles"):
+    if not has_permission(g.current_user, "create:ownFiles"):
         return dict(success = False, message = "Permission denied."), 403
 
     # Check if the request has files in it
@@ -637,7 +532,7 @@ def upload_files():
     files = request.files.getlist('file')
 
     # Convert username to slug
-    username_as_slug = slugify(current_user['username'])
+    username_as_slug = slugify(g.current_user['username'])
 
     # Make a directory for a user if none exist
     UPLOAD_FOLDER.joinpath(username_as_slug).mkdir(parents=True, exist_ok=True)
@@ -665,7 +560,7 @@ def upload_files():
         relative_path = Path(username_as_slug) / new_filename
 
         file_records.append({
-            "owner": current_user['user_id'],
+            "owner": g.current_user['user_id'],
             "filename": file_slug,
             "location": str(relative_path),
             "original": filename
@@ -714,13 +609,11 @@ def space_file_tree(working_dir):
     return listing
 
 def get_spaces():
-    current_user = authorize_user()
-
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Get all spaces created by user
-    own_spaces = Space.select().where(Space.owner == current_user['user_id'])
+    own_spaces = Space.select().where(Space.owner == g.current_user['user_id'])
 
     # Format spaces as a JSON array
     spaces_as_dicts = [
@@ -732,14 +625,12 @@ def get_spaces():
     return jsonify(success = True, spaces = spaces_as_dicts), 200
 
 def delete_spaces():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can delete spaces
-    if not has_permission(current_user, "delete:ownSpaces"):
+    if not has_permission(g.current_user, "delete:ownSpaces"):
         return dict(success = False, message = "Permission denied."), 403 
 
     json_data = get_json_data()
@@ -750,7 +641,7 @@ def delete_spaces():
     if not isinstance(json_data, list) or len(json_data) < 1:
         return jsonify({"success": False, "message": "Invalid request. No spaces provided."}), 400
 
-    existing_spaces = Space.select().where((Space.owner == current_user['user_id']))
+    existing_spaces = Space.select().where((Space.owner == g.current_user['user_id']))
 
     if not existing_spaces.exists():
         return jsonify({"success": False, "message": "No spaces found."}), 404
@@ -760,7 +651,7 @@ def delete_spaces():
 
     # Delete spaces on disk
     for space in existing_spaces:
-        dir_path = Path(UPLOAD_FOLDER) / current_user['username'] / 'space'  # Convert to Path object
+        dir_path = Path(UPLOAD_FOLDER) / g.current_user['username'] / 'space'  # Convert to Path object
 
         if dir_path.exists() and dir_path.is_dir():
             shutil.rmtree(dir_path)  # Delete directory and all contents
@@ -776,14 +667,12 @@ def delete_spaces():
     return jsonify(success=True, message=f"{deleted_count} space{'s' if deleted_count != 1 else ''} deleted."), 200
 
 def create_spaces():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can create spaces
-    if not has_permission(current_user, "create:ownSpaces"):
+    if not has_permission(g.current_user, "create:ownSpaces"):
         return dict(success = False, message = "Permission denied."), 403 
 
     json_data = get_json_data()
@@ -795,12 +684,12 @@ def create_spaces():
         return jsonify({"success": False, "message": "Invalid request. No spaces provided."}), 400
 
     # Check if user cas created a space already
-    space_count = Space.select().where(Space.owner == current_user['user_id']).count()
+    space_count = Space.select().where(Space.owner == g.current_user['user_id']).count()
 
     MAX_SPACES = 1
 
     # If user has permission, they can create unlimited invites
-    if has_permission(current_user, "ignore:spaceLimit"):
+    if has_permission(g.current_user, "ignore:spaceLimit"):
         remaining_spaces = float("inf")  # Unlimited
     else:
         remaining_spaces = MAX_SPACES - space_count  # Calculate how many they can create
@@ -819,7 +708,7 @@ def create_spaces():
 
     # Get existing usernames
     existing_usernames = [
-        user.username for user in User.select(User.username).where(User.users_id != current_user['user_id'])
+        user.username for user in User.select(User.username).where(User.users_id != g.current_user['user_id'])
     ]
 
     valid_spaces = []
@@ -831,7 +720,7 @@ def create_spaces():
             # Space name does not pass name filter
             continue
 
-        valid_spaces.append(dict(name = new_name, owner = current_user['user_id']))
+        valid_spaces.append(dict(name = new_name, owner = g.current_user['user_id']))
 
     existing_spaces = Space.select().where(
         Space.name.in_([space['name'] for space in valid_spaces])
@@ -847,7 +736,7 @@ def create_spaces():
         return jsonify({"success": False, "message": "Couldn't create spaces. Aliases are invalid."}), 400
 
     # Create a 'space' directory for a user if it doesn't exist
-    users_space_directory = Path(UPLOAD_FOLDER) / current_user['username'] / 'space'
+    users_space_directory = Path(UPLOAD_FOLDER) / g.current_user['username'] / 'space'
     users_space_directory.mkdir(parents=True, exist_ok=True)
 
     # Add created spaces to database
@@ -858,35 +747,31 @@ def create_spaces():
     return jsonify(success=True, message=f"{created_count} space{'s' if created_count != 1 else ''} created."), 200
 
 def get_space_files():
-    current_user = authorize_user()
-
     # Retrieve the spaces created by user
-    own_spaces = Space.select().where(Space.owner == current_user['user_id'])
+    own_spaces = Space.select().where(Space.owner == g.current_user['user_id'])
 
     if not own_spaces.exists():
         return jsonify({"success": False, "message": "No spaces found."}), 404
 
     space_files = None
 
-    working_dir = Path.cwd() / 'uploads' / current_user['username'] / 'space'
+    working_dir = Path.cwd() / 'uploads' / g.current_user['username'] / 'space'
     
     get_tree = space_file_tree(working_dir)
 
     return jsonify(success=True, files=get_tree), 200
 
 def delete_space_files():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can delete files
-    if not has_permission(current_user, "delete:ownFiles"):
+    if not has_permission(g.current_user, "delete:ownFiles"):
         return dict(success = False, message = "Permission denied."), 403 
 
     # Retrieve the spaces created by user
-    own_spaces = Space.select().where(Space.owner == current_user['user_id'])
+    own_spaces = Space.select().where(Space.owner == g.current_user['user_id'])
 
     if not own_spaces.exists():
         return jsonify({"success": False, "message": "No spaces found."}), 404
@@ -903,12 +788,12 @@ def delete_space_files():
 
     for file in json_data:
         # Check if file destination is in users space
-        dest_in_userspace = in_userspace(current_user, file, True)
+        dest_in_userspace = in_userspace(g.current_user, file, True)
 
         if not dest_in_userspace:
             continue
 
-        file_path = Path(UPLOAD_FOLDER) / current_user['username'] / 'space' / file
+        file_path = Path(UPLOAD_FOLDER) / g.current_user['username'] / 'space' / file
 
         if file_path.exists():
             # Path exists
@@ -928,18 +813,16 @@ def delete_space_files():
     return jsonify(success=True, message=f"{deleted_count} file{'s' if deleted_count != 1 else ''} deleted."), 200
 
 def upload_space_files():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can create files
-    if not has_permission(current_user, "create:ownFiles"):
+    if not has_permission(g.current_user, "create:ownFiles"):
         return dict(success = False, message = "Permission denied."), 403
 
     # Retrieve the spaces created by user
-    own_spaces = Space.select().where(Space.owner == current_user['user_id'])
+    own_spaces = Space.select().where(Space.owner == g.current_user['user_id'])
 
     if not own_spaces.exists():
         return jsonify({"success": False, "message": "No spaces found."}), 404
@@ -948,7 +831,7 @@ def upload_space_files():
     files = request.files.getlist('file')
 
     # Convert username to slug
-    username_as_slug = slugify(current_user['username'])
+    username_as_slug = slugify(g.current_user['username'])
 
     uploaded_count = 0
 
@@ -964,7 +847,7 @@ def upload_space_files():
             continue
 
         # Check if file destination is in users space
-        dest_in_userspace = in_userspace(current_user, new_filename, True)
+        dest_in_userspace = in_userspace(g.current_user, new_filename, True)
         if not dest_in_userspace:
             continue
 
@@ -985,14 +868,12 @@ def upload_space_files():
     return jsonify(success=True, message=f"{uploaded_count} file{'s' if uploaded_count != 1 else ''} uploaded."), 200
 
 def create_space_files():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     # Check if the user can create files
-    if not has_permission(current_user, "create:ownFiles"):
+    if not has_permission(g.current_user, "create:ownFiles"):
         return dict(success = False, message = "Permission denied."), 403
 
     json_data = get_json_data()
@@ -1004,13 +885,13 @@ def create_space_files():
         return jsonify({"success": False, "message": "Invalid request. No filenames provided."}), 400
 
     # Convert username to slug
-    username_as_slug = slugify(current_user['username'])
+    username_as_slug = slugify(g.current_user['username'])
 
     uploaded_count = 0
 
     for file in json_data:
         # Check if file destination is in users space
-        dest_in_userspace = in_userspace(current_user, file, True)
+        dest_in_userspace = in_userspace(g.current_user, file, True)
         if not dest_in_userspace:
             continue
 
@@ -1048,10 +929,8 @@ def create_space_files():
     return jsonify(success=True, message=f"{uploaded_count} file{'s' if uploaded_count != 1 else ''} or director{'ies' if uploaded_count != 1 else 'y'} created."), 200
 
 def download_space_files():
-    current_user = authorize_user()
-
     # Check if the user exists
-    if current_user is None:
+    if g.current_user is None:
         return dict(success = False, message = "Unauthorized."), 403
 
     json_data = get_json_data()
@@ -1061,7 +940,7 @@ def download_space_files():
     print(json_data)
 
     # Retrieve the spaces created by user
-    own_spaces = Space.select().where(Space.owner == current_user['user_id'])
+    own_spaces = Space.select().where(Space.owner == g.current_user['user_id'])
 
     if not own_spaces.exists():
         return jsonify({"success": False, "message": "No spaces found."}), 404
@@ -1071,7 +950,7 @@ def download_space_files():
         return jsonify({"success": False, "message": "Invalid request. No files provided."}), 400
 
     # Convert username to slug
-    username_as_slug = slugify(current_user['username'])
+    username_as_slug = slugify(g.current_user['username'])
 
     if len(json_data) > 1:
         # Download as zip here...
@@ -1085,7 +964,7 @@ def download_space_files():
             return jsonify({"success": False, "message": "Invalid request."}), 400
 
         # Check if file destination is in users space
-        dest_in_userspace = in_userspace(current_user, file, True)
+        dest_in_userspace = in_userspace(g.current_user, file, True)
         if not dest_in_userspace:
             return jsonify({"success": False, "message": "Invalid request."}), 400
 

@@ -2,6 +2,9 @@
     //To-Do: Clean this up
     console.log("Loaded");
 
+    const progress = document.getElementById("progress");
+    const progress_inner = document.getElementById("progress-inner");
+
     const editor_parent = document.getElementById("file-editor");
     const edit_address = document.getElementById("edit-address");
 
@@ -91,23 +94,53 @@
         formData.append("file", fileBlob, new_name);
 
         formData.append("destination", new_destination);
-
+        
         try {
-            const response = await fetch(window.location.origin + "/dash/spaces/files", {
-                method: "POST",
-                // Set the FormData instance as the request body
-                body: formData,
-            });
+            progress.style.display = "block";
 
-            let result = await response.json();
+            let xhr = new XMLHttpRequest();
 
-            if (result.success === false) {
-                console.log(result);
-                return console.log("Error attempting to upload...");
-            }
+            xhr.open("POST", window.location.origin + "/dash/spaces/files/upload", true);
+            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
-            close_editor();
-            buildTree(result);
+            xhr.upload.onprogress = function (event) {
+                if (event.lengthComputable) {
+                    let percentComplete = (event.loaded / event.total) * 100;
+                    progress_inner.style.width = percentComplete + "%";
+                    console.log(Math.round(percentComplete) + "%")
+                }
+            };
+
+            // When the upload is complete
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    try {
+                        let response = JSON.parse(xhr.responseText);
+
+                        notify(response.message);
+
+                        if (response.success === false) {
+                            notify("Error attempting to save...");
+                            return console.log(result);
+                        }
+
+                        // Should i rerun this request?
+                        get_file_tree();
+                        close_editor();
+
+                        progress.style.display = "none";
+                    }
+                    catch (error) {
+                        notify("Error parsing server response...");
+                        return console.log(error);
+                    }
+                }
+                else {
+                    notify("Save failed: " + xhr.statusText);
+                }
+            };
+
+            xhr.send(formData);
         } catch (e) {
             console.error(e);
         }

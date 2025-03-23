@@ -4,7 +4,6 @@ from flask_limiter.util import get_remote_address
 from utils.permissions import has_permission
 from utils.auth import authenticate
 from utils.crud import (
-    authorize_user,
     get_spaces,
     delete_spaces,
     create_spaces,
