@@ -850,6 +850,7 @@ def upload_space_files():
             continue
 
         # Get new destination
+        new_filename = Path(new_filename).name
         file_dest = Path(UPLOAD_FOLDER) / username_as_slug / 'space' / new_filename
 
         # Ensure the parent directories exist
