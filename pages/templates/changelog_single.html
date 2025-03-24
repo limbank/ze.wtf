@@ -19,9 +19,14 @@
 	<div class="changelog">
 		<div class="container">
 			<div class="changelog__inner">
-		        <b>[{{date|safe}}] {{p_title|safe}}</b>
+		        <div class="changelog__post">
+			        <div class="changelog__top">
+			        	<h1>{{p_title|safe}}</h1>
+			        	<span class="changelog__date">{{date|safe}}</span>
+				    </div>
 
-		        {{postdata|safe}}
+		        	{{postdata|safe}}
+			    </div>
 		    </div>
 		</div>
 	</div>

@@ -11,23 +11,26 @@
 		<div class="container">
 			<div class="changelog__inner">
 		        {% if (latest is defined) and latest %}
-			        <b>[{{latest.date|safe}}] {{latest.title|safe}}</b>
+			        <div class="changelog__post">
+				        <div class="changelog__top">
+				        	<a href="/changelog/{{latest.slug}}" class="changelog__link"><h1>{{latest.title|safe}}</h1></a>
+					        <span class="changelog__date">{{latest.date|safe}}</span>
+					    </div>
 
-			        {{latest.content|safe}}
+				        {{latest.content|safe}}
+				    </div>
 		        {% else %}
 		            No posts found.
 		        {% endif %}
 
 		        {% if (posts is defined) and posts %}
 		        	<div class="changelog__earlier">
-		        		<b>Earlier logs:</b>
+		        		<h2>Earlier logs:</h2>
 		        	</div>
 		            {% for post in posts %}
 		                <div class="changelog__entry">
-		                    <a href="/changelog/{{post.slug}}">
-		                        <span>[{{post.date|safe}}]</span>
-		                        <span>{{post.title|safe}}</span>
-		                    </a>
+	                        <span class="changelog__date">{{post.date|safe}}</span>
+		                    <a href="/changelog/{{post.slug}}">{{post.title|safe}}</a>
 		                </div>
 		            {% endfor %}
 		        {% endif %}

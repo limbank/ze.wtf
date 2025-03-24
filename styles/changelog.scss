@@ -4,7 +4,11 @@
 	}
 
 	&__earlier {
-		padding: 20px 0;
+		padding: 10px 0;
+
+		h2 {
+			margin: 0;
+		}
 	}
 
 	&__back {
@@ -12,6 +16,55 @@
 
 		a {
 			text-decoration: none;
+		}
+	}
+
+	&__top {
+		display: flex;
+		align-items: center;
+		margin-bottom: 10px;
+		justify-content: space-between;
+
+		h1 {
+			margin: 0;
+		}
+
+		a {
+			margin-right: auto;
+		}
+	}
+
+	&__date {
+		display: inline-block;
+		background: #29292E;
+ 		padding: 4px 8px;
+	}
+
+	&__link {
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	&__post {
+		margin-bottom: 10px;
+	}
+
+	&__entry {
+		margin-bottom: 5px;
+
+		span {
+			margin-right: 5px;
+		}
+
+		a {
+			text-decoration: none;
+
+			&:hover {
+				text-decoration: underline;
+			}
 		}
 	}
 }

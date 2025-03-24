@@ -97,6 +97,7 @@ def sort_posts(posts, lock=True):
         #To-Do: Change this to absolute path
         with open("./changelog/" + post + ".md", "r") as f:
             file_content = f.read()
+
         file_metadata = parse(file_content)
         new_date = file_metadata[0]['date']
         new_title = file_metadata[0]['title']
