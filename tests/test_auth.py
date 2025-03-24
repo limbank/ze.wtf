@@ -7,12 +7,13 @@ from psycopg2 import sql
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 from models import Link, Invite, File, User, Cookie, Role, Permission, RolePerm, Space, Key
+from zewtf import app
 
 MODELS = [Link, Invite, File, User, Cookie, Role, Permission, RolePerm, Space, Key]
 
 test_db = PostgresqlDatabase(None)
 
-class PeeWeeModelTestCase(unittest.TestCase):
+class AuthTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Creates und initializes the test database before running tests."""
@@ -28,6 +29,9 @@ class PeeWeeModelTestCase(unittest.TestCase):
             password=os.getenv('DB_PASS'),
         )
 
+        # Override DB_NAME environment variable
+        os.environ["DB_NAME"] = "test_db_name"  # Forces models.py to use `{os.getenv('DB_NAME')}_test`
+
     @classmethod
     def tearDownClass(cls):
         """Drops the test database after tests are complete."""
@@ -42,6 +46,10 @@ class PeeWeeModelTestCase(unittest.TestCase):
         test_db.connect()
         test_db.create_tables(MODELS)
 
+        self.ctx = app.app_context()
+        self.ctx.push()
+        self.client = app.test_client()
+
     def tearDown(self):
         # Not strictly necessary since postgres test db only live
         # for the duration of the connection, and in the next step we close
@@ -51,32 +59,12 @@ class PeeWeeModelTestCase(unittest.TestCase):
         # Close connection to db.
         test_db.close()
 
-    def test_empty_db(self):
-        # Note: yes we can simplify this test and use a for loop, but I don't care lol
+        self.ctx.pop()
 
-        # Arrange
-        link_count = Link.select().count()
-        invite_count = Invite.select().count()
-        file_count = File.select().count()
-        user_count = User.select().count()
-        cookie_count = Cookie.select().count()
-        role_count = Role.select().count()
-        permission_count = Permission.select().count()
-        role_perm_count = RolePerm.select().count()
-        space_count = Space.select().count()
-        key_count = Key.select().count()
-
-        # Assert
-        self.assertEqual(link_count, 0, f"Expected 0 links in the database, but found {link_count}.")
-        self.assertEqual(invite_count, 0, f"Expected 0 invites in the database, but found {invite_count}.")
-        self.assertEqual(file_count, 0, f"Expected 0 files in the database, but found {file_count}.")
-        self.assertEqual(user_count, 0, f"Expected 0 users in the database, but found {user_count}.")
-        self.assertEqual(cookie_count, 0, f"Expected 0 cookies in the database, but found {cookie_count}.")
-        self.assertEqual(role_count, 0, f"Expected 0 roles in the database, but found {role_count}.")
-        self.assertEqual(permission_count, 0, f"Expected 0 permissions in the database, but found {permission_count}.")
-        self.assertEqual(role_perm_count, 0, f"Expected 0 role perms in the database, but found {role_perm_count}.")
-        self.assertEqual(space_count, 0, f"Expected 0 spaces in the database, but found {space_count}.")
-        self.assertEqual(key_count, 0, f"Expected 0 keys in the database, but found {key_count}.")
+    def test_home(self):
+        response = self.client.post("/", data={"content": "hello world"})
+        assert response.status_code == 200
+        assert "POST method called" == response.get_data(as_text=True)
 
     @staticmethod
     def create_test_database():
