@@ -56,7 +56,7 @@ a {
 }
 
 .footer {
-	padding: 8px 12px;
+	padding: 8px 0;
 	font-size: 12px;
 	color: #29292e;
 
@@ -70,25 +70,34 @@ a {
 		align-items: center;
 	}
 
-	&__link {
-		margin: 0 0 0 5px;
+	&__links {
+		list-style: none;
+		padding: 0;
+		margin: 0;
 
-		&:before {
-			content: '[';
+		li, a {
+			display: inline-block;
+			align-items: center;
 		}
 
-		&:after {
-			content: ']';
+		li {
+			margin-left: 5px;
+
+			&:before {
+				content: "[";
+			}
+
+			&:after {
+				content: "]";
+			}
 		}
 
 		a {
 			text-decoration: none;
 			font-size: 12px;
 			color: #29292e;
-		}
 
-		&:hover {
-			a {
+			&:hover {
 				text-decoration: underline;
 			}
 		}

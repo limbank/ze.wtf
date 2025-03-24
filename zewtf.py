@@ -13,6 +13,7 @@ from pages.logout import logout
 from pages.changelog import changelog
 from pages.spaces import spaces
 from pages.nerds import nerds
+from pages.hof import hof
 
 load_dotenv()
 
@@ -43,6 +44,7 @@ app.register_blueprint(logout)
 app.register_blueprint(changelog)
 app.register_blueprint(spaces, subdomain='<subdomain>')
 app.register_blueprint(nerds)
+app.register_blueprint(hof)
 
 sass.compile(dirname=('styles', 'static/styles'))
 
