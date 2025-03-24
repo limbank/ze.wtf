@@ -62,9 +62,22 @@ class AuthTestCase(unittest.TestCase):
         self.ctx.pop()
 
     def test_home(self):
-        response = self.client.post("/", data={"content": "hello world"})
+        # Act
+        response = self.client.get("/")
+
+        # Assert
         assert response.status_code == 200
-        assert "POST method called" == response.get_data(as_text=True)
+        assert "Hey." in response.get_data(as_text=True)
+
+    def test_log_in_wrong_username_and_password(self):
+        # Act
+        data = {"username": "admin", "password": "admin"}
+        response = self.client.post("/auth/login/", data=data)
+
+        # Assert
+        # FIXME: bad test. /auth/login/ always returns 200 with HTML >:(
+        assert response.status_code != 200, f"Should be 401 or 403, got status {response.status_code}"
+        assert "Wrong username or password!" in response.get_data(as_text=True), f"Actual response is `{response.get_data(as_text=True)}`"
 
     @staticmethod
     def create_test_database():

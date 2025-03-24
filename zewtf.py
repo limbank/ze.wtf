@@ -4,6 +4,7 @@ import os
 import time
 from dotenv import load_dotenv
 from flask_cors import CORS
+from pathlib import Path
 
 from pages.home import home
 from pages.auth import auth
@@ -15,6 +16,10 @@ from pages.spaces import spaces
 from pages.nerds import nerds
 
 load_dotenv()
+
+ROOT_DIR = Path(__file__).parent
+STYLES_DIR = ROOT_DIR / 'styles'
+STYLES_DIR_ABSOLUTE = str(STYLES_DIR.absolute())
 
 app = Flask(__name__)
 
@@ -44,7 +49,7 @@ app.register_blueprint(changelog)
 app.register_blueprint(spaces, subdomain='<subdomain>')
 app.register_blueprint(nerds)
 
-sass.compile(dirname=('styles', 'static/styles'))
+sass.compile(dirname=(STYLES_DIR_ABSOLUTE, 'static/styles'))
 
 # from blueprints import register_blueprints  # Auto-register function
 # register_blueprints(app)  # Automatically registers all Blueprints
