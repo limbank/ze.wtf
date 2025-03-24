@@ -333,11 +333,11 @@
         let created_file_slug = new_created_file_name.value;
         //return to here
 
-        if (created_file_slug == "") return;
+        if (created_file_slug == "") return console.log("File name blank");
 
         if (editable_files.some(s => created_file_slug.endsWith(s)) == false) {
             //file name not allowed
-            return;
+            return console.log("Filetype not allowed", created_file_slug);
         }
 
         let file_location = basePath;

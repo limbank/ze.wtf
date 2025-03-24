@@ -21,12 +21,16 @@ from argon2 import PasswordHasher
 ph = PasswordHasher()
 
 # To-Do:
-# - return lists of invalid or failed items during multi-deletion and multi-creation or fail whole query
-# - impose limits on multi-deletion and multi-creation
+# - Return lists of invalid or failed items during multi-deletion and multi-creation or fail whole query
+# - Impose limits on multi-deletion and multi-creation
 # - Make sure all responses return JSON only
 # - Check for duplicated within the same set of list data
 # - Allow users to download subdirectories whole
 # - Limit key creation to be done only from the site/cookie
+# - Uploading file called /tmp/test.txt will write to the root tmp folder on linux
+# - Slashes and dots somehow allowed in space names
+# - Prevent error pages from printing out full errors (leaks path)
+# - Rename is_file to something else (filevalidator for example) and force files to have extensions
 
 # TEMP END
 
@@ -45,34 +49,26 @@ def get_json_data():
         # No body in request
         return None
 
-def in_userspace(current_user, target, in_space = False):
+def in_userspace(current_user, target, in_space=False):
     username = slugify(current_user['username'])
-
-    # Create target base
+    
+    # Define base directory
     temp_base = Path(UPLOAD_FOLDER) / username
-
-    # Is this necessary?
     if in_space:
-        temp_base = Path(UPLOAD_FOLDER) / username / 'space'
+        temp_base = temp_base / 'space'
 
     # Resolve base directory
-    BASE_DIR = Path(temp_base).resolve()
+    BASE_DIR = temp_base.resolve()
 
-    # Ensure local path
-    if type(target) is str and target.startswith("/"):
-        target = target.lstrip("/")
+    # Normalize target path
+    target_destination = (temp_base / target).resolve()
 
-    # Create destination
-    target_destination = temp_base / target
-
-    # Resolve target
-    TARGET_DIR = Path(target_destination).resolve()
-
-    #Check new path against basedir
-    if BASE_DIR not in TARGET_DIR.parents:
+    # Ensure target is within base directory
+    try:
+        target_destination.relative_to(BASE_DIR)
+        return True
+    except ValueError:
         return False
-
-    return True
 
 def is_file(path):
     _, ext = os.path.splitext(path)
@@ -753,7 +749,7 @@ def get_space_files():
 
     space_files = None
 
-    working_dir = Path.cwd() / 'uploads' / g.current_user['username'] / 'space'
+    working_dir = Path(UPLOAD_FOLDER) / g.current_user['username'] / 'space'
     
     get_tree = space_file_tree(working_dir)
 

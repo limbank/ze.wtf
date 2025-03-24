@@ -13,14 +13,48 @@ from utils.general import random_string, check_argon
 # Change to only import users later
 from models import *
 
+# TEMP START
+
+import re
+import unicodedata
+
+# TEMP END
+
 load_dotenv()
 ph = PasswordHasher()
+
 limiter = Limiter(
     get_remote_address,
     app=current_app,
     default_limits=["1000 per day", "50 per hour"],
     storage_uri="memory://",
 )
+
+def is_safe_username(username):
+    # Normalize Unicode (prevent homoglyph attacks)
+    username = unicodedata.normalize("NFKC", username)
+
+    # Remove leading/trailing spaces and invisible characters
+    username = username.strip()
+    username = ''.join(c for c in username if c.isprintable())
+
+    # Check length constraints
+    if not (3 <= len(username) <= 30):
+        return False
+
+    # Enforce allowed characters (letters, numbers, _, -)
+    if not re.fullmatch(r'^[a-zA-Z0-9_-]+$', username):
+        return False
+
+    # Check if username is allowed
+    with open('utils/usernames.json') as f:
+        data = json.load(f)
+
+        # Check for blocked words
+        if any(word in username.lower() for word in data['usernames']):
+            return False
+
+    return True
 
 def check_captcha():
     if 'captcha' in request.form:
@@ -82,16 +116,13 @@ def register_user():
         password = request.form['password']
         password_confirm = request.form['password-confirm']
 
+        if not is_safe_username(username):
+            return dict(msg = "Username not allowed", success = False)
+
         # Check passwords
         if password != password_confirm:
             # Passwords dont match
             return dict(msg = "Passwords do not match", success = False)
-
-        # Check if username is allowed
-        with open('utils/usernames.json') as f:
-            data = json.load(f)
-            if username.lower() in data['usernames']:
-                return dict(msg = "Username not allowed", success = False)
 
         # Check username
         user = User.get_or_none(User.username == username)
