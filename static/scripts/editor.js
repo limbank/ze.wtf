@@ -79,21 +79,21 @@
             if includes slash, split at last slash, 0 = directory, 1 = file
         */
 
-        let new_name;
-        let new_destination = "";
+        //let new_name;
+        //let new_destination = "";
 
-        if (will_edit.match(/\/.*/)) {
-            new_destination = will_edit.substring(0, will_edit.lastIndexOf("/"));
-            new_name = will_edit.substring(will_edit.lastIndexOf("/") + 1, will_edit.length);
-        }
-        else {
-            new_name = will_edit;
-        }
+        //if (will_edit.match(/\/.*/)) {
+        //    new_destination = will_edit.substring(0, will_edit.lastIndexOf("/"));
+        //    new_name = will_edit.substring(will_edit.lastIndexOf("/") + 1, will_edit.length);
+        //}
+        //else {
+        //    new_name = will_edit;
+        //}
+
+        //console.log("NEW NAME", new_name)
 
         const formData = new FormData();
-        formData.append("file", fileBlob, new_name);
-
-        formData.append("destination", new_destination);
+        formData.append("file", fileBlob, will_edit);
         
         try {
             progress.style.display = "block";

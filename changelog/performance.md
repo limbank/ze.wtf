@@ -8,3 +8,4 @@ Latest changes:
 - Reduced the number of re-auth calls
 - Added dynamic linking for invites
 - Fixed the issue with edited files not saving
+- Fixed file editor ignoring parent directory when saving (Thanks spaghetti)

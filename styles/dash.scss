@@ -79,6 +79,8 @@
 		width: 16px;
 		height: 16px;
 		pointer-events: none;
+		/* safari */
+		flex-shrink: 0;
 	}
 
 	.smaller {
