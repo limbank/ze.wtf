@@ -54,7 +54,11 @@ def make_captcha():
     captcha_string = random_string(os.getenv('CAPTCHA_LENGTH'))
     session['captcha'] = phash = ph.hash((captcha_string).lower() + current_app.secret_key)
 
-    image = ImageCaptcha(fonts=['static/fonts/Manrope-Regular.woff'])
+    image = ImageCaptcha(
+        width=250,
+        height=60,
+        fonts=['static/fonts/Inconsolata-Regular.ttf']
+    )
     return image.generate(captcha_string)
 
 def check_captcha():
