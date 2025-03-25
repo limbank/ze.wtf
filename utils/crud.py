@@ -4,8 +4,8 @@ from pathlib import Path
 import shutil
 from slugify import slugify
 from datetime import timedelta
-
-from utils.general import random_string, allowed_files, check_argon
+from utils.auth import check_argon
+from utils.general import random_string, allowed_files
 from utils.permissions import has_permission
 
 from models import *

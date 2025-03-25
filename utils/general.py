@@ -1,7 +1,5 @@
 from flask import request
 from datetime import datetime as dt
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
 import random
 import string
 import os
@@ -39,14 +37,6 @@ ALLOWED_EXTENSIONS = {
     "ico"
 }
 # To-Do: make separate list for space-specific file extensions
-
-ph = PasswordHasher()
-
-def check_argon(chash, value):
-    try:
-        return ph.verify(chash, value)
-    except VerifyMismatchError:
-        return False
 
 def random_string(length = 5):
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=int(length)))
