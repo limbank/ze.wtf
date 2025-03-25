@@ -55,7 +55,7 @@ def make_captcha():
     session['captcha'] = phash = ph.hash((captcha_string).lower() + current_app.secret_key)
 
     image = ImageCaptcha(
-        width=250,
+        width=248,
         height=60,
         fonts=['static/fonts/Inconsolata-Regular.ttf']
     )
