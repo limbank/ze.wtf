@@ -4,10 +4,9 @@ from slugify import slugify
 
 from models import *
 
-
 user_spaces = Path.cwd() / "uploads"
 
-spaces = Blueprint('spaces', __name__, template_folder=user_spaces)
+blueprint = Blueprint('spaces', __name__, template_folder=user_spaces)
 
 UPLOAD_FOLDER = Path.cwd() / 'uploads'
 
@@ -23,9 +22,9 @@ def get_space(space_name):
     except Space.DoesNotExist:
         return None 
 
-@spaces.route("/", defaults={'path': ''})
-@spaces.route("/<string:path>")
-@spaces.route('/<path:path>')
+@blueprint.route("/", defaults={'path': ''})
+@blueprint.route("/<string:path>")
+@blueprint.route('/<path:path>')
 def catch_all(path, subdomain, domain):
     print(f"hai! subdomain {subdomain}, domain {domain}")
     # This request runs for all files, static files included

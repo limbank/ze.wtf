@@ -3,9 +3,9 @@ from dotenv import load_dotenv
 from utils.auth import authenticate
 from werkzeug.exceptions import HTTPException
 
-error = Blueprint('error', __name__, template_folder='templates')
+blueprint = Blueprint('error', __name__, template_folder='templates')
 
-@error.app_errorhandler(Exception)
+@blueprint.app_errorhandler(Exception)
 @authenticate
 def handle_error(e):
     username = None

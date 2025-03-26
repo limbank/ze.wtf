@@ -14,7 +14,7 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-nerds = Blueprint('nerds', __name__, template_folder='templates')
+blueprint = Blueprint('nerds', __name__, template_folder='templates')
 
 intervals = (
     ('weeks', 604800),  # 60 * 60 * 24 * 7
@@ -49,7 +49,7 @@ def get_directory_size(path='.'):
 
     return f"{total_size:.2f} TB"  # Fallback in case it's massive
 
-@nerds.route("/nerds")
+@blueprint.route("/nerds")
 @limiter.limit("2/minute")
 def index():
     valid_cookie = check_cookie()

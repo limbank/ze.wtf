@@ -10,9 +10,9 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-logout = Blueprint('logout', __name__, template_folder='templates')
+blueprint = Blueprint('logout', __name__, template_folder='templates')
 
-@logout.route("/logout")
+@blueprint.route("/logout")
 @limiter.limit("2/second")
 def handle_logout():
     # Delete cookie from DB

@@ -14,10 +14,10 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-changelog = Blueprint('changelog', __name__, template_folder='templates')
+blueprint = Blueprint('changelog', __name__, template_folder='templates')
     
-@changelog.route('/changelog', defaults={'post': None}, strict_slashes=False)
-@changelog.route("/changelog/<post>", strict_slashes=False)
+@blueprint.route('/changelog', defaults={'post': None}, strict_slashes=False)
+@blueprint.route("/changelog/<post>", strict_slashes=False)
 @limiter.limit("2/second")
 @authenticate
 def index(post):

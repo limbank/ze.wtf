@@ -16,15 +16,15 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-dash = Blueprint('dash', __name__, template_folder='templates', url_prefix='/dash')
+blueprint = Blueprint('dash', __name__, template_folder='templates', url_prefix='/dash')
 
-dash.register_blueprint(spaces)
-dash.register_blueprint(invites)
-dash.register_blueprint(files)
-dash.register_blueprint(links)
-dash.register_blueprint(keys)
+blueprint.register_blueprint(spaces)
+blueprint.register_blueprint(invites)
+blueprint.register_blueprint(files)
+blueprint.register_blueprint(links)
+blueprint.register_blueprint(keys)
 
-@dash.route("/")
+@blueprint.route("/")
 @limiter.limit("2/second")
 @authenticate
 def handle_dash():

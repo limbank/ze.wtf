@@ -12,9 +12,9 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-hof = Blueprint('hof', __name__, template_folder='templates')
+blueprint = Blueprint('hof', __name__, template_folder='templates')
 
-@hof.route("/hof")
+@blueprint.route("/hof")
 @limiter.limit("2/minute")
 @authenticate
 def index():

@@ -20,16 +20,16 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-auth = Blueprint('auth', __name__, template_folder='templates')
+blueprint = Blueprint('auth', __name__, template_folder='templates')
 
-@auth.route('/captcha')
+@blueprint.route('/captcha')
 @limiter.limit("2/second")
 def dash_captcha():
     data = make_captcha()
 
     return send_file(data, mimetype='image/png')
 
-@auth.route("/auth/")
+@blueprint.route("/auth/")
 @limiter.limit("2/second")
 @authenticate
 def handle_auth():
@@ -39,7 +39,7 @@ def handle_auth():
         return redirect(url_for('dash.handle_dash'))
 
 
-@auth.route("/auth/login/", methods=['GET', 'POST'])
+@blueprint.route("/auth/login/", methods=['GET', 'POST'])
 @limiter.limit("2/second")
 @authenticate
 def handle_login():
@@ -61,7 +61,7 @@ def handle_login():
 
     return render_template("login.html", msg='')
 
-@auth.route("/auth/register", methods=['GET', 'POST'])
+@blueprint.route("/auth/register", methods=['GET', 'POST'])
 @limiter.limit("2/second")
 @authenticate
 def handle_register():
