@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "tos" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="tos">
+		<div class="container">
+			<div class="tos__inner">
+				<h1>Terms of Service</h1>
+				<p>
+					By using this website, you agree to the following:
+				</p>
+				<ul>
+					<li>
+						<b>Content:</b> You are responsible for the content you upload or share. Do not upload anything illegal, harmful, or infringing on others' rights.
+					</li>
+					<li>
+						<b>Account Responsibility:</b> Keep your account secure. You are responsible for everything that happens under your account.
+					</li>
+					<li>
+						<b>Termination:</b> We may suspend or terminate your account for any reason, including violating these rules.
+					</li>
+					<li>
+						<b>Liability:</b> We are not liable for any damages resulting from using the site.
+					</li>
+					<li>
+						<b>Changes:</b> These rules may change at any time. Continued use of the site means you accept any updates.
+					</li>
+				</ul>
+				<p>
+					For any questions, contact the <a href="https://raccoonbutt.com" target="_blank">admin</a>.
+				</p>
+			</div>
+		</div>
+	</div>
+{% endblock %}
