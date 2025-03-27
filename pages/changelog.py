@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, current_app, abort, g
+from flask import Blueprint, render_template, current_app, abort, Response, g
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import mistune
