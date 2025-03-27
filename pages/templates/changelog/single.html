@@ -22,7 +22,10 @@
 		        <div class="changelog__post">
 			        <div class="changelog__top">
 			        	<h1>{{p_title|safe}}</h1>
-			        	<span class="changelog__date">{{date|safe}}</span>
+				        <div class="changelog__meta">
+				        	<span>{{ver|safe}}</span>
+				        	<span>{{date|safe}}</span>
+				        </div>
 				    </div>
 
 		        	{{postdata|safe}}

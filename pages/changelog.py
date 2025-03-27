@@ -14,7 +14,7 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-blueprint = Blueprint('changelog', __name__, template_folder='templates')
+blueprint = Blueprint('changelog', __name__, template_folder='templates/changelog')
     
 @blueprint.route('/changelog', defaults={'post': None}, strict_slashes=False)
 @blueprint.route("/changelog/<post>", strict_slashes=False)
@@ -34,7 +34,7 @@ def index(post):
 
         latest = sortedposts.pop()
 
-        return render_template('changelog.html', posts=sortedposts[::-1], latest=latest, username=username)
+        return render_template('index.html', posts=sortedposts[::-1], latest=latest, username=username)
     elif post == "feed.xml":
         sortedposts = sort_posts(filenames, False)
 
@@ -51,7 +51,8 @@ def index(post):
 
         title = file_metadata[0]['title']
         date = file_metadata[0]['date']
+        ver = file_metadata[0].get('version', None)
 
-        return render_template('changelog_single.html', postdata=post_content, p_title=title, date=date, username=username)
+        return render_template('single.html', postdata=post_content, p_title=title, date=date, ver=ver, username=username)
     else:
         abort(404)

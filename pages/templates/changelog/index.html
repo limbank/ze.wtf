@@ -14,7 +14,10 @@
 			        <div class="changelog__post">
 				        <div class="changelog__top">
 				        	<a href="/changelog/{{latest.slug}}" class="changelog__link"><h1>{{latest.title|safe}}</h1></a>
-					        <span class="changelog__date">{{latest.date|safe}}</span>
+					        <div class="changelog__meta">
+					        	<span>{{latest.version|safe}}</span>
+					        	<span>{{latest.date|safe}}</span>
+					        </div>
 					    </div>
 
 				        {{latest.content|safe}}
@@ -29,8 +32,11 @@
 		        	</div>
 		            {% for post in posts %}
 		                <div class="changelog__entry">
-	                        <span class="changelog__date">{{post.date|safe}}</span>
 		                    <a href="/changelog/{{post.slug}}">{{post.title|safe}}</a>
+	                        <div class="changelog__meta">
+					        	<span>{{post.version|safe}}</span>
+	                        	<span>{{post.date|safe}}</span>
+	                        </div>
 		                </div>
 		            {% endfor %}
 		        {% endif %}

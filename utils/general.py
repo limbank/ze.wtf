@@ -91,27 +91,19 @@ def sort_posts(posts, lock=True):
         file_metadata = parse(file_content)
         new_date = file_metadata[0]['date']
         new_title = file_metadata[0]['title']
-        new_category = file_metadata[0].get("category", None)
+        ver = file_metadata[0].get('version', None)
 
         post_content = mistune.html(file_metadata[1])
         preview = post_content.partition("</p>")[0] + "</p>"
 
-        if lock ==  True and (new_category == None or new_category == "general"):
-            sorted_posts.append({
-                "content": post_content,
-                "preview": preview,
-                "slug": post,
-                "date": new_date,
-                "title": new_title
-            })
-        else:
-            sorted_posts.append({
-                "content": post_content,
-                "preview": preview,
-                "slug": post,
-                "date": new_date,
-                "title": new_title
-            })
+        sorted_posts.append({
+            "content": post_content,
+            "preview": preview,
+            "slug": post,
+            "date": new_date,
+            "title": new_title,
+            "version": ver
+        })
 
     #sort by date
     newlist = sorted(sorted_posts, key=lambda d: dt.strptime(d['date'], "%m/%d/%Y"))

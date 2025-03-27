@@ -1,5 +1,6 @@
 title: More filetypes
 date: 03/19/2025
+version: 0.0.8
 
 I have allowed more filetypes to be uploaded on the homepage. Also revamped the invite creation system somewhat so it should now be more fluid.
 

@@ -1,5 +1,6 @@
 title: More fixes
 date: 03/21/2025
+version: 0.0.10
 
 I have now started work on cleaning up and organizing the website in preparation of introducing the API
 
