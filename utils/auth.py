@@ -8,7 +8,7 @@ from models import User, Key, Cookie
 from argon2 import PasswordHasher
 from dotenv import load_dotenv
 from functools import wraps
-from models import User
+from models import User, Invite
 import unicodedata
 import json
 import re
@@ -69,6 +69,26 @@ def check_captcha():
             return dict(success = True)
     else:
         return dict(msg = "Missing captcha!", success = False)
+
+def check_invite():
+    if 'invite' in request.form:
+        # Check db for invite
+        invite = Invite.get_or_none(Invite.code == request.form['invite'])
+        if invite is None:
+            # Invite does not exist
+            return dict(msg = "You need a valid invite to join!", success = False)
+
+        if invite.used_by is not None:
+            # Invite already used
+            return dict(msg = "Invite has already been used!", success = False)
+
+        if datetime.now() > invite.expires:
+            # Invite already expired
+            return dict(msg = "Invite has expired!", success = False)
+
+        return dict(msg = "Invite valid!", success = True)
+    else:
+        return dict(msg = "Missing invite code", success = False)
 
 def authenticate_user():
     # Check captcha

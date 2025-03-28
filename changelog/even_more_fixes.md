@@ -11,3 +11,5 @@ Latest changes:
 - Upgraded the site to redirect to HTTPS automatically
 - Changed the way some backend pages load (site should be even faster now)
 - Fixed the issue with the changelog RSS feed (can be found at /changelog/feed.xml)
+- Fixed a bug that prevented user signups
+- Fixed a bug that didnt mark invites as used
