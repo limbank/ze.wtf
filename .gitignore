@@ -172,10 +172,13 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-short.db
-/static/styles
 
 # Custom
+short.db
+/static/styles
 backup.env
 database.env
 /uploads
+/changelog/*
+!/changelog/
+!/changelog/example.md

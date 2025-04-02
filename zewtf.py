@@ -31,7 +31,7 @@ def before_request():
 
     # Get the host (domain) from the request
     host = request.host.split(":")[0]  # Strip out port if present
-    host = host.split(",")[0]  # Strip out port if duplicated by NGINX
+    host = host.split(",")[0]  # Strip out extra host if duplicated by NGINX
     main_domain = os.getenv('SERVER_NAME')
 
     # Check if it's a subdomain of example.com or any other domain
