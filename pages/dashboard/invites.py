@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, current_app, redirect, url_for, re
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.permissions import has_permission
-from utils.crud import get_invites, delete_invites, create_invites
+from utils.crud import get_invites, delete_invites, create_invites, latest_blot
 from utils.auth import authenticate
 from models import Invite, User
 from peewee import JOIN
@@ -60,5 +60,8 @@ def index(path):
         can_delete = has_permission(g.current_user, "delete:ownInvites")
         can_create = has_permission(g.current_user, "create:ownInvites")
 
+        # Get latest blotter post
+        blot = latest_blot()
+
         # Render dashboard page
-        return render_template("dash/invites.html", username= g.current_user['username'], domain=request.host, invites = invites, can_delete = can_delete, can_create=can_create)
+        return render_template("dash/invites.html", username= g.current_user['username'], domain=request.host, invites = invites, can_delete = can_delete, can_create=can_create, blot = blot)

@@ -15,6 +15,7 @@ from utils.crud import (
     download_space_files,
     get_space_archive,
     create_temp_zip,
+    latest_blot,
 )
 
 from models import Space
@@ -69,7 +70,10 @@ def index(path):
         # Retreive space-related permissions for user
         can_delete = has_permission(g.current_user, "delete:ownSpaces")
 
-        return render_template("dash/spaces.html", username=g.current_user['username'], domain=request.host, spaces = own_spaces, can_delete = can_delete)
+        # Get latest blotter post
+        blot = latest_blot()
+
+        return render_template("dash/spaces.html", username=g.current_user['username'], domain=request.host, spaces = own_spaces, can_delete = can_delete, blot = blot)
 
 @spaces.route("/spaces/files/", methods=['GET', 'POST'], defaults={'path': ''})
 @spaces.route("/spaces/files/<string:path>", methods=['GET', 'POST'])

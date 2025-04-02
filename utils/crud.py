@@ -3,7 +3,7 @@ from flask import request, send_file, jsonify, g
 from pathlib import Path
 import shutil
 from slugify import slugify
-from datetime import timedelta
+from datetime import datetime, timedelta
 from utils.auth import check_argon
 from utils.general import random_string, allowed_files
 from utils.permissions import has_permission
@@ -1025,5 +1025,17 @@ def get_space_archive(zip_path):
     # Send the file for download
     return send_file(zip_path, as_attachment=True, download_name=f"{username_as_slug}.zip")
 # SPACES END
+
+# BLOTTER START
+
+def latest_blot():
+    return (
+        Blot.select()
+        .where((Blot.date_expires.is_null(True)) | (Blot.date_expires > datetime.now()))
+        .order_by(Blot.date_created.desc())
+        .first()
+    )
+
+# BLOTTER END
 
 # puffin, jon and noah were here on 03/23/2025

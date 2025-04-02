@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, current_app, redirect, url_for, re
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.permissions import has_permission
-from utils.crud import delete_keys, create_keys
+from utils.crud import delete_keys, create_keys, latest_blot
 from utils.auth import authenticate
 from models import Key
 
@@ -48,4 +48,7 @@ def index(path):
         # Retreive link-related permissions for user
         can_delete = has_permission(g.current_user, "delete:ownKeys")
 
-        return render_template("dash/keys.html", username=g.current_user['username'], domain=request.host, keys = own_keys, can_delete = can_delete)
+        # Get latest blotter post
+        blot = latest_blot()
+
+        return render_template("dash/keys.html", username=g.current_user['username'], domain=request.host, keys = own_keys, can_delete = can_delete, blot = blot)

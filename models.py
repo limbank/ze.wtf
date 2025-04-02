@@ -124,6 +124,16 @@ class Key(Model):
       return False  # Never expires
     return datetime.now() > self.expires
 
+class Blot(Model):
+  blots_id = AutoField(primary_key=True)
+  message = CharField()
+  date_created = DateTimeField(default=datetime.now)
+  date_expires = DateTimeField(null=True)
+
+  class Meta:
+    database = db
+    db_table = 'blots'
+
 def create_tables():
   with db:
-    db.create_tables([Link, Invite, File, User, Cookie, Role, Permission, RolePerm, Space, Key], safe=True)
+    db.create_tables([Link, Invite, File, User, Cookie, Role, Permission, RolePerm, Space, Key, Blot], safe=True)

@@ -213,3 +213,28 @@ a {
 		}
 	}
 }
+
+.blotter {
+	padding: 10px 0;
+
+	&__inner {
+		width: 100%;
+		position: relative;
+		border: 1px solid #111113;
+		padding: 0 34px 0 0;
+		background: #29292e;
+		opacity: 1;
+		transition: opacity 0.5s ease-out;
+		min-height: 33px;
+		padding: 8px 12px;
+	}
+
+	&__date {
+		font-weight: 500;
+		margin-right: 5px;
+	}
+
+	&__message {
+
+	}
+}
