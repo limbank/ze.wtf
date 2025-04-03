@@ -134,6 +134,17 @@ class Blot(Model):
     database = db
     db_table = 'blots'
 
+class AccessLog(Model):
+  accesslogs_id = AutoField(primary_key=True)
+  ip_address = CharField()
+  user_agent = CharField()
+  route = CharField()
+  date_created = DateTimeField(default=datetime.now)
+
+  class Meta:
+    database = db
+    db_table = 'accesslog'
+
 def create_tables():
   with db:
-    db.create_tables([Link, Invite, File, User, Cookie, Role, Permission, RolePerm, Space, Key, Blot], safe=True)
+    db.create_tables([Link, Invite, File, User, Cookie, Role, Permission, RolePerm, Space, Key, Blot, AccessLog], safe=True)

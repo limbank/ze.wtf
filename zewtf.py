@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 from pathlib import Path
 import importlib
-
+from utils.general import log_access
 from pages.spaces import catch_all
 
 load_dotenv()
@@ -25,6 +25,7 @@ def app_version():
     return dict(version=os.getenv('VERSION'))
 
 @app.before_request
+@log_access
 def before_request():
     g.request_start_time = time.time()
     g.request_time = lambda: "%.5fs" % (time.time() - g.request_start_time)

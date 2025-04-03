@@ -6,6 +6,8 @@ import os
 from utils.meta import parse
 import mistune
 
+from models import AccessLog
+
 ALLOWED_EXTENSIONS = {
     'webp',
     'tiff',
@@ -36,7 +38,6 @@ ALLOWED_EXTENSIONS = {
     "svg",
     "ico"
 }
-# To-Do: make separate list for space-specific file extensions
 
 def random_string(length = 5):
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=int(length)))
@@ -108,3 +109,19 @@ def sort_posts(posts, lock=True):
     #sort by date
     newlist = sorted(sorted_posts, key=lambda d: dt.strptime(d['date'], "%m/%d/%Y"))
     return newlist
+
+# Decorator to log access
+def log_access(func):
+    def wrapper(*args, **kwargs):
+        ip_address = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0]
+        # Skip logging for local addresses
+        if ip_address in ['127.0.0.1', 'localhost', '::1']:
+            return func(*args, **kwargs)  # Skip logging for local requests
+        
+        user_agent = request.headers.get('User-Agent')
+        route = request.path
+        # Log to the database
+        AccessLog.create(ip_address=ip_address, user_agent=user_agent, route=route)
+        
+        return func(*args, **kwargs)
+    return wrapper
