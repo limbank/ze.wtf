@@ -120,8 +120,12 @@ def log_access(func):
         
         user_agent = request.headers.get('User-Agent')
         route = request.path
+
+        # Get the host (domain) from the request
+        domain = request.host
+
         # Log to the database
-        AccessLog.create(ip_address=ip_address, user_agent=user_agent, route=route)
+        AccessLog.create(ip_address=ip_address, user_agent=user_agent, route=route, domain=domain)
         
         return func(*args, **kwargs)
     return wrapper

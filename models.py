@@ -139,6 +139,7 @@ class AccessLog(Model):
   ip_address = CharField()
   user_agent = CharField()
   route = CharField()
+  domain = CharField()
   date_created = DateTimeField(default=datetime.now)
 
   class Meta:
