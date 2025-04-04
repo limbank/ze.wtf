@@ -13,6 +13,10 @@ load_dotenv()
 
 app = Flask(__name__)
 
+ROOT_DIR = Path(__file__).parent
+STYLES_DIR = ROOT_DIR / 'styles'
+STYLES_DIR_ABSOLUTE = str(STYLES_DIR.absolute())
+
 app.secret_key = os.getenv('SECRET')
 # First number is megabytes
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1000 * 1000
@@ -73,4 +77,4 @@ def register_blueprints(app: Flask, package_name: str, package_path: Path):
 # Dynamically load blueprints from the `pages` package
 register_blueprints(app, "pages", Path(__file__).parent / "pages")
 
-sass.compile(dirname=('styles', 'static/styles'))
+sass.compile(dirname=(STYLES_DIR_ABSOLUTE, 'static/styles'))

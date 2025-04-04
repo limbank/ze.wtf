@@ -125,7 +125,7 @@ def log_access(func):
         domain = request.host
 
         # Log to the database
-        AccessLog.create(ip_address=ip_address, user_agent=user_agent, route=route, domain=domain)
+        #AccessLog.create(ip_address=ip_address, user_agent=user_agent, route=route, domain=domain)
         
         return func(*args, **kwargs)
     return wrapper
