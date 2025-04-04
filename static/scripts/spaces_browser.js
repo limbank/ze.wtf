@@ -20,6 +20,7 @@
     const new_file_name = document.getElementById("new-file-name");
     const new_file_label = document.getElementById("new-file-label");
 
+    const download_space_button = document.getElementById("download-space-button");
     const upload_directory_button = document.getElementById("upload-directory-button");
     const upload_directory = document.getElementById("upload-directory");
     const confirm_upload_directory = document.getElementById("confirm-upload-directory");
@@ -68,17 +69,29 @@
         </svg>
     `;
 
-    let maxDepth = 1;  // Controls depth
-    let basePath = ""; // Stores the current directory level
-    let backup_data;
-
     let editable_files = [
         'html', 'css', 'js', 'json'
     ];
 
+    let maxDepth = 1;  // Controls depth
+    let basePath = ""; // Stores the current directory level
+    let backup_data;
+
     function updatePath(newPath) {
         basePath = newPath;
         path_address.innerHTML = "/" + newPath;
+    }
+
+    function formatBytes(bytes) {
+        const units = ["B", "KB", "MB", "GB", "TB"];
+        let unitIndex = 0;
+
+        while (bytes >= 1024 && unitIndex < units.length - 1) {
+            bytes /= 1024;
+            unitIndex++;
+        }
+
+        return `${parseFloat(bytes.toFixed(2))} ${units[unitIndex]}`;
     }
 
     function makeButtonWrapper() {
@@ -122,8 +135,8 @@
         container.innerHTML = ""; // Clear previous content
 
         // Ensure directories and files are filtered correctly
-        const filteredDirs = data.directories.filter(dir => isDirectChild(dir, path, true));
-        const filteredFiles = data.files.filter(file => isDirectChild(file, path, false));
+        const filteredDirs = data.directories.filter(dir => isDirectChild(dir.name, path, true));
+        const filteredFiles = data.files.filter(file => isDirectChild(file.name, path, false));
 
         // Add "../" at the top if we're inside a subdirectory
         if (path) {
@@ -145,22 +158,25 @@
         filteredDirs.forEach(dir => {
             const parent_tr = document.createElement('tr');
             const dirElement = document.createElement('td');
+            const dirFiller = document.createElement('td');
             const navLink = document.createElement("a");
             navLink.className = "file-browser__directory";
 
-            let filtered_dirname = path ? dir.replace(path + "/", "") : dir;
-
+            let filtered_dirname = path ? dir.name.replace(path + "/", "") : dir.name;
             navLink.textContent = `/${filtered_dirname.replace(/\/$/, "")}`;
 
             if (navLink.textContent == "/") return;
 
             navLink.onclick = (e) => {
                 e.preventDefault();
-                navigateTo(dir, data);
+                navigateTo(dir.name, data);
             };
+
+            dirFiller.style.width = '100px';
 
             dirElement.appendChild(navLink);
             parent_tr.appendChild(dirElement);
+            parent_tr.appendChild(dirFiller);
             let button_parent = makeButtonWrapper();
             addDeleteButton(button_parent, path + "/" + filtered_dirname);
             parent_tr.appendChild(button_parent);
@@ -170,10 +186,18 @@
         // Display files (remove prefix from file names if inside a subdirectory)
         filteredFiles.forEach(file => {
             const parent_tr = document.createElement('tr');
-            const fileElement = document.createElement('td');
-            let filtered_filename = path ? file.replace(path + "/", "") : file;
-            fileElement.textContent = filtered_filename;
-            parent_tr.appendChild(fileElement);
+            const fileNameElement = document.createElement('td');
+            const fileSizeElement = document.createElement('td');
+            let filtered_filename = path ? file.name.replace(path + "/", "") : file.name;
+            
+            // Show file name
+            fileNameElement.textContent = filtered_filename;
+            // Show file size
+            fileSizeElement.textContent = formatBytes(file.size);
+            fileSizeElement.style.width = '100px';
+
+            parent_tr.appendChild(fileNameElement);
+            parent_tr.appendChild(fileSizeElement);
             let button_parent = makeButtonWrapper();
             addOpenButton(button_parent, path + "/" + filtered_filename);
 
@@ -188,19 +212,19 @@
     }
 
     // Function to check if an item is a direct child of the current path
-    function isDirectChild(item, currentPath, isDir) {
+    function isDirectChild(itemName, currentPath, isDir) {
         if (currentPath) {
-            if (!item.startsWith(currentPath)) return false; // Ignore items outside the path
-            item = item.substring(currentPath.length); // Remove basePath from the item
+            if (!itemName.startsWith(currentPath)) return false; // Ignore items outside the path
+            itemName = itemName.substring(currentPath.length); // Remove basePath from the item
         }
 
-        item = item.replace(/^\/+/, ""); // Remove leading slashes
+        itemName = itemName.replace(/^\/+/, ""); // Remove leading slashes
 
         // Ensure it's a direct child (not deeper nested)
-        let depth = item.split('/').length;
+        let depth = itemName.split('/').length;
 
         if (isDir) {
-            return depth === 1 || (depth === 2 && item.endsWith('/')); // Directories must be one level deep
+            return depth === 1 || (depth === 2 && itemName.endsWith('/')); // Directories must be one level deep
         } else {
             return depth === 1; // Files must be one level deep
         }
@@ -333,11 +357,11 @@
         let created_file_slug = new_created_file_name.value;
         //return to here
 
-        if (created_file_slug == "") return;
+        if (created_file_slug == "") return console.log("File name blank");
 
         if (editable_files.some(s => created_file_slug.endsWith(s)) == false) {
             //file name not allowed
-            return;
+            return console.log("Filetype not allowed", created_file_slug);
         }
 
         let file_location = basePath;
@@ -476,6 +500,49 @@
 
         new_directory_name.value = "";
         create_directory_table.style.display = "none";
+    });
+
+    download_space_button.addEventListener("click", async (event) => {
+        const response = await fetch(window.location.origin + "/dash/spaces/files/archive", {
+            method: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
+        let contentType = response.headers.get("Content-Type");
+
+        if (contentType && contentType.includes("application/json")) {
+            // The response is JSON (likely an error)
+            let result = await response.json();
+            if (result.success === false) {
+                console.log(result);
+                return console.log("Error attempting to download...");
+            }
+        } else {
+            // Get the filename from the Content-Disposition header
+            const contentDisposition = response.headers.get("Content-Disposition");
+            let filename = "space.zip";  // Default filename
+            
+            if (contentDisposition) {
+                const match = contentDisposition.match(/filename="(.+?)"/);
+                if (match && match[1]) {
+                    filename = match[1];  // Extracted filename
+                }
+            }
+
+            // Convert response to blob and create download link
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;  // Use extracted filename
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
     });
 
     confirm_upload_directory.addEventListener("click", async (event) => {

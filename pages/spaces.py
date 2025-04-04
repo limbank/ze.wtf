@@ -1,13 +1,12 @@
-from flask import Blueprint, abort, send_from_directory
+from flask import Blueprint, abort, send_from_directory, request
 from pathlib import Path
 from slugify import slugify
 
 from models import *
 
-
 user_spaces = Path.cwd() / "uploads"
 
-spaces = Blueprint('spaces', __name__, template_folder=user_spaces, subdomain='<subdomain>')
+blueprint = Blueprint('spaces', __name__, template_folder=user_spaces)
 
 UPLOAD_FOLDER = Path.cwd() / 'uploads'
 
@@ -23,10 +22,11 @@ def get_space(space_name):
     except Space.DoesNotExist:
         return None 
 
-@spaces.route("/", subdomain='<subdomain>', defaults={'path': ''})
-@spaces.route("/<string:path>", subdomain='<subdomain>')
-@spaces.route('/<path:path>', subdomain='<subdomain>')
-def catch_all(path, subdomain):
+@blueprint.route("/", defaults={'path': ''})
+@blueprint.route("/<string:path>")
+@blueprint.route('/<path:path>')
+def catch_all(path, subdomain, domain):
+    print(f"hai! subdomain {subdomain}, domain {domain}")
     # This request runs for all files, static files included
 
     space_data = get_space(subdomain)
@@ -57,7 +57,6 @@ def catch_all(path, subdomain):
         if not path.endswith(".html"):
             if path == "":
                 # User requested directory root
-                print("12312")
                 return send_from_directory(named_file_path, "index.html")
             else:
                 #To-Do: If /blogs isnt found, look for blogs.html first, then index html in /blog/

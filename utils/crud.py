@@ -3,9 +3,9 @@ from flask import request, send_file, jsonify, g
 from pathlib import Path
 import shutil
 from slugify import slugify
-from datetime import timedelta
-
-from utils.general import random_string, allowed_files, check_argon
+from datetime import datetime, timedelta
+from utils.auth import check_argon
+from utils.general import random_string, allowed_files
 from utils.permissions import has_permission
 
 from models import *
@@ -15,18 +15,26 @@ UPLOAD_FOLDER = Path.cwd() / 'uploads'
 # TEMP START
 
 import os
+import tempfile
+import zipfile
 import base64
 from argon2 import PasswordHasher
 
 ph = PasswordHasher()
 
 # To-Do:
-# - return lists of invalid or failed items during multi-deletion and multi-creation or fail whole query
-# - impose limits on multi-deletion and multi-creation
+# - Return lists of invalid or failed items during multi-deletion and multi-creation or fail whole query
+# - Impose limits on multi-deletion and multi-creation
 # - Make sure all responses return JSON only
 # - Check for duplicated within the same set of list data
 # - Allow users to download subdirectories whole
 # - Limit key creation to be done only from the site/cookie
+# - Uploading file called /tmp/test.txt will write to the root tmp folder on linux
+# - Slashes and dots somehow allowed in space names
+# - Prevent error pages from printing out full errors (leaks path)
+# - Rename is_file to something else (filevalidator for example) and force files to have extensions
+# - Stream space zip instead of saving it to blob on the frontend
+# - Temp archives not deleting
 
 # TEMP END
 
@@ -45,34 +53,26 @@ def get_json_data():
         # No body in request
         return None
 
-def in_userspace(current_user, target, in_space = False):
+def in_userspace(current_user, target, in_space=False):
     username = slugify(current_user['username'])
-
-    # Create target base
+    
+    # Define base directory
     temp_base = Path(UPLOAD_FOLDER) / username
-
-    # Is this necessary?
     if in_space:
-        temp_base = Path(UPLOAD_FOLDER) / username / 'space'
+        temp_base = temp_base / 'space'
 
     # Resolve base directory
-    BASE_DIR = Path(temp_base).resolve()
+    BASE_DIR = temp_base.resolve()
 
-    # Ensure local path
-    if type(target) is str and target.startswith("/"):
-        target = target.lstrip("/")
+    # Normalize target path
+    target_destination = (temp_base / target).resolve()
 
-    # Create destination
-    target_destination = temp_base / target
-
-    # Resolve target
-    TARGET_DIR = Path(target_destination).resolve()
-
-    #Check new path against basedir
-    if BASE_DIR not in TARGET_DIR.parents:
+    # Ensure target is within base directory
+    try:
+        target_destination.relative_to(BASE_DIR)
+        return True
+    except ValueError:
         return False
-
-    return True
 
 def is_file(path):
     _, ext = os.path.splitext(path)
@@ -580,8 +580,8 @@ def upload_files():
 # SPACES START
 
 def space_file_tree(working_dir):
-    base_path = working_dir  # This is the root path for the listing
-    p = Path(working_dir).glob('**/*')
+    base_path = Path(working_dir)  # This is the root path for the listing
+    p = base_path.glob('**/*')
 
     # Prepare lists
     directories = []
@@ -590,13 +590,18 @@ def space_file_tree(working_dir):
     for path in p:
         relative_path = path.relative_to(base_path).as_posix()  # Make it relative & use forward slashes
         if path.is_dir():
-            directories.append(relative_path + '/')  # Add trailing slash for directories
+            directories.append({
+                "name": relative_path + '/'
+            })  # Add trailing slash for directories
         else:
-            files.append(relative_path)
+            files.append({
+                "name": relative_path,
+                "size": path.stat().st_size  # Fetch file size efficiently
+            })
 
     # Sort them (directories first, then files)
-    directories.sort()
-    files.sort()
+    directories.sort(key=lambda f: f["name"])
+    files.sort(key=lambda f: f["name"])
 
     # Combine into a JSON-serializable format
     listing = {
@@ -753,7 +758,7 @@ def get_space_files():
 
     space_files = None
 
-    working_dir = Path.cwd() / 'uploads' / g.current_user['username'] / 'space'
+    working_dir = Path(UPLOAD_FOLDER) / g.current_user['username'] / 'space'
     
     get_tree = space_file_tree(working_dir)
 
@@ -976,26 +981,61 @@ def download_space_files():
         # Send file to user
         return send_file(file_dest, as_attachment=True)
 
+def create_temp_zip():
+    # Convert username to slug
+    username_as_slug = slugify(g.current_user['username'])
+
+    # Get user space path
+    user_dir = Path(UPLOAD_FOLDER) / username_as_slug / 'space'
+
+    # Create a temporary ZIP file from the given user directory
+    if not user_dir.exists() or not user_dir.is_dir():
+        return None  # Return None if the directory doesn't exist
+
+    # Create a temporary file for the ZIP
+    temp_zip = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
+    zip_path = temp_zip.name  # Get the temp file path
+    temp_zip.close()  # Close so zipfile can use it
+
+    # Create ZIP archive
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for file_path in user_dir.rglob('*'):
+            zipf.write(file_path, file_path.relative_to(user_dir))  # Add files with relative paths
+
+    return zip_path
+
+def get_space_archive(zip_path):
+    # Convert username to slug
+    username_as_slug = slugify(g.current_user['username'])
+
+    # Check if the user exists
+    if g.current_user is None:
+        return dict(success = False, message = "Unauthorized."), 403
+
+    # Retrieve the spaces created by user
+    own_spaces = Space.select().where(Space.owner == g.current_user['user_id'])
+
+    if not own_spaces.exists():
+        return jsonify({"success": False, "message": "No spaces found."}), 404
+
+    zip_path = create_temp_zip()
+    if zip_path is None:
+        return jsonify({"success": False, "message": "User directory not found."}), 404
+
+    # Send the file for download
+    return send_file(zip_path, as_attachment=True, download_name=f"{username_as_slug}.zip")
 # SPACES END
 
+# BLOTTER START
+
+def latest_blot():
+    return (
+        Blot.select()
+        .where((Blot.date_expires.is_null(True)) | (Blot.date_expires > datetime.now()))
+        .order_by(Blot.date_created.desc())
+        .first()
+    )
+
+# BLOTTER END
+
 # puffin, jon and noah were here on 03/23/2025
-
-def check_invite():
-    if 'invite' in request.form:
-        # Check db for invite
-        invite = Invite.get_or_none(Invite.code == request.form['invite'])
-        if invite is None:
-            # Invite does not exist
-            return dict(msg = "You need a valid invite to join!", success = False)
-
-        if invite.used_by is not None:
-            # Invite already used
-            return dict(msg = "Invite has already been used!", success = False)
-
-        if datetime.now() > invite.expires:
-            # Invite already expired
-            return dict(msg = "Invite has expired!", success = False)
-
-        return dict(msg = "Invite valid!", success = True)
-    else:
-        return dict(msg = "Missing invite code", success = False)

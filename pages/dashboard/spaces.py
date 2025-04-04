@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, current_app, redirect, url_for, request, g
+from flask import Blueprint, render_template, current_app, redirect, url_for, request, after_this_request, g
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.permissions import has_permission
 from utils.auth import authenticate
+from pathlib import Path
 from utils.crud import (
     get_spaces,
     delete_spaces,
@@ -12,6 +13,9 @@ from utils.crud import (
     upload_space_files,
     create_space_files,
     download_space_files,
+    get_space_archive,
+    create_temp_zip,
+    latest_blot,
 )
 
 from models import Space
@@ -66,7 +70,10 @@ def index(path):
         # Retreive space-related permissions for user
         can_delete = has_permission(g.current_user, "delete:ownSpaces")
 
-        return render_template("dash/spaces.html", username=g.current_user['username'], domain=request.host, spaces = own_spaces, can_delete = can_delete)
+        # Get latest blotter post
+        blot = latest_blot()
+
+        return render_template("dash/spaces.html", username=g.current_user['username'], domain=request.host, spaces = own_spaces, can_delete = can_delete, blot = blot)
 
 @spaces.route("/spaces/files/", methods=['GET', 'POST'], defaults={'path': ''})
 @spaces.route("/spaces/files/<string:path>", methods=['GET', 'POST'])
@@ -100,6 +107,20 @@ def files(path):
         if path is None or path == "":
             space_files = get_space_files()
             return space_files
+        elif path == "archive" and request.content_type == "application/json":
+            zip_path = create_temp_zip()
+            space_archive = get_space_archive(zip_path)
+
+            #Ensure ZIP is deleted after request is processed
+            @after_this_request
+            def cleanup(response):
+                try:
+                    Path(zip_path).unlink(missing_ok=True)  # Delete the temporary ZIP file
+                except Exception as e:
+                    print(f"Failed to delete temp ZIP: {e}")
+                return response
+
+            return space_archive
         else:
             return dict(success = False, message = "Invalid request."), 400
 

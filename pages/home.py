@@ -5,9 +5,9 @@ from models import Link, File
 
 UPLOAD_FOLDER = Path.cwd() / 'uploads'
 
-home = Blueprint('home', __name__, template_folder='templates')
+blueprint = Blueprint('home', __name__, template_folder='templates')
 
-@home.route("/", defaults={'path': ''})
+@blueprint.route("/", defaults={'path': ''})
 @authenticate
 def index(path):
     if g.current_user == None:
@@ -16,14 +16,14 @@ def index(path):
         return redirect(url_for('dash.handle_dash'))
 
 #If the files are too large
-@home.app_errorhandler(413)
+@blueprint.app_errorhandler(413)
 def request_entity_too_large(error):
     #return dict(success = False, message="File too large."), 413
     print("Too large raised")
     return dict(success = False, message="File too large.")
 
-@home.route("/<string:path>")
-@home.route('/<path:path>')
+@blueprint.route("/<string:path>")
+@blueprint.route('/<path:path>')
 def catch_all(path):
     # Check if slug is a link
     short_link = Link.get_or_none(ref=path)

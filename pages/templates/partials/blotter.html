@@ -1,0 +1,8 @@
+{% if blot %}
+	<div class="blotter">
+		<div class="blotter__inner">
+			<span class="blotter__date">[{{ blot.date_created.strftime('%Y-%m-%d %H:%M') }}]</span>
+			<span class="blotter__message">{{ blot.message }}</span>
+		</div>
+	</div>
+{% endif %}

@@ -73,25 +73,6 @@
         let file_contents = editor.getValue();
         let fileBlob = new Blob([file_contents], { type: "text/plain" });
 
-        console.log(will_edit)
-
-        /*
-            if includes slash, split at last slash, 0 = directory, 1 = file
-        */
-
-        //let new_name;
-        //let new_destination = "";
-
-        //if (will_edit.match(/\/.*/)) {
-        //    new_destination = will_edit.substring(0, will_edit.lastIndexOf("/"));
-        //    new_name = will_edit.substring(will_edit.lastIndexOf("/") + 1, will_edit.length);
-        //}
-        //else {
-        //    new_name = will_edit;
-        //}
-
-        //console.log("NEW NAME", new_name)
-
         const formData = new FormData();
         formData.append("file", fileBlob, will_edit);
         

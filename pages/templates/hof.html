@@ -1,0 +1,40 @@
+{% extends 'core/base.html' %}
+
+{% set active_page = "hof" %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/' + active_page + '.css') + '?v=' + version }}">
+{% endblock %}
+
+{% block content %}
+	<div class="hof">
+		<div class="container">
+			<div class="hof__inner">
+				<h1>Special thanks</h1>
+				<p>
+					Here is a chronologically ordered list of all the people that spent their free time contributing to the project and finding bugs.<br>Huge thanks to all of them!
+				</p>
+				<ul>
+					<li>
+						<a href="https://thesomething.uk/" target="_blank">hatmad</a>
+					</li>
+					<li>
+						<a href="https://jb.is-a.dev/" target="_blank">jbcarreon123</a>
+					</li>
+					<li>
+						<a href="https://bjarne.verschorre.be/" target="_blank">Bjarne Verschorre</a>
+					</li>
+					<li>
+						<a href="https://github.com/Michae1Weiss" target="_blank">Mykhailo B</a>
+					</li>
+					<li>
+						<a href="https://daisy.nekoweb.org/" target="_blank">spaghetti</a>
+					</li>
+					<li>
+						<a href="https://github.com/TortleWortle" target="_blank">TortleWortle</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+{% endblock %}

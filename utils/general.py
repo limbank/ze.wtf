@@ -1,12 +1,12 @@
 from flask import request
 from datetime import datetime as dt
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
 import random
 import string
 import os
 from utils.meta import parse
 import mistune
+
+from models import AccessLog
 
 ALLOWED_EXTENSIONS = {
     'webp',
@@ -38,15 +38,6 @@ ALLOWED_EXTENSIONS = {
     "svg",
     "ico"
 }
-# To-Do: make separate list for space-specific file extensions
-
-ph = PasswordHasher()
-
-def check_argon(chash, value):
-    try:
-        return ph.verify(chash, value)
-    except VerifyMismatchError:
-        return False
 
 def random_string(length = 5):
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=int(length)))
@@ -101,28 +92,40 @@ def sort_posts(posts, lock=True):
         file_metadata = parse(file_content)
         new_date = file_metadata[0]['date']
         new_title = file_metadata[0]['title']
-        new_category = file_metadata[0].get("category", None)
+        ver = file_metadata[0].get('version', None)
 
         post_content = mistune.html(file_metadata[1])
         preview = post_content.partition("</p>")[0] + "</p>"
 
-        if lock ==  True and (new_category == None or new_category == "general"):
-            sorted_posts.append({
-                "content": post_content,
-                "preview": preview,
-                "slug": post,
-                "date": new_date,
-                "title": new_title
-            })
-        else:
-            sorted_posts.append({
-                "content": post_content,
-                "preview": preview,
-                "slug": post,
-                "date": new_date,
-                "title": new_title
-            })
+        sorted_posts.append({
+            "content": post_content,
+            "preview": preview,
+            "slug": post,
+            "date": new_date,
+            "title": new_title,
+            "version": ver
+        })
 
     #sort by date
     newlist = sorted(sorted_posts, key=lambda d: dt.strptime(d['date'], "%m/%d/%Y"))
     return newlist
+
+# Decorator to log access
+def log_access(func):
+    def wrapper(*args, **kwargs):
+        ip_address = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0]
+        # Skip logging for local addresses
+        if ip_address in ['127.0.0.1', 'localhost', '::1']:
+            return func(*args, **kwargs)  # Skip logging for local requests
+        
+        user_agent = request.headers.get('User-Agent')
+        route = request.path
+
+        # Get the host (domain) from the request
+        domain = request.host
+
+        # Log to the database
+        #AccessLog.create(ip_address=ip_address, user_agent=user_agent, route=route, domain=domain)
+        
+        return func(*args, **kwargs)
+    return wrapper

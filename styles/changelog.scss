@@ -34,10 +34,15 @@
 		}
 	}
 
-	&__date {
-		display: inline-block;
-		background: #29292E;
- 		padding: 4px 8px;
+	&__meta {
+		display: inline-flex;
+
+		span {
+			display: inline-block;
+			background: #29292E;
+	 		padding: 4px 8px;
+	 		margin-left: 5px;
+		}
 	}
 
 	&__link {
@@ -54,6 +59,8 @@
 
 	&__entry {
 		margin-bottom: 5px;
+		display: flex;
+		justify-content: space-between;
 
 		span {
 			margin-right: 5px;

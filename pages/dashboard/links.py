@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, current_app, redirect, url_for, re
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.permissions import has_permission
-from utils.crud import get_links, create_links, delete_links
+from utils.crud import get_links, create_links, delete_links, latest_blot
 from utils.auth import authenticate
 from models import Link
 
@@ -59,5 +59,8 @@ def index(path):
         # Retreive link-related permissions for user
         can_delete = has_permission(g.current_user, "delete:ownLinks")
 
+        # Get latest blotter post
+        blot = latest_blot()
+
         # Render dashboard page
-        return render_template("dash/links.html", username=g.current_user['username'], domain=request.host, links = own_links, can_delete = can_delete)
+        return render_template("dash/links.html", username=g.current_user['username'], domain=request.host, links = own_links, can_delete = can_delete, blot = blot)

@@ -2,10 +2,24 @@
 	<div class="container">
 		<div class="footer__inner">
 			<span class="item-left">Page generated in {{ g.request_time() }}</span>
-			<span>v{{version}}</span>
-			<span class="footer__link">
-				<a href="{{ url_for('nerds.index') }}">Nerd stuff</a>
-			</span>
+			<span class="version">v{{version}}</span>
+			<ul class="footer__links">
+				<li>
+					<a href="{{ url_for('tos.index') }}">TOS</a>
+				</li>
+				<li>
+					-
+				</li>
+				<li>
+					<a href="{{ url_for('hof.index') }}">Special thanks</a>
+				</li>
+				<li>
+					-
+				</li>
+				<li>
+					<a href="{{ url_for('nerds.index') }}">Nerd stuff</a>
+				</li>
+			</ul>
 		</div>
 	</div>
 </div>

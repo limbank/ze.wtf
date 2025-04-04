@@ -3,7 +3,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from utils.permissions import has_permission
 from utils.auth import authenticate
-from utils.crud import get_files, delete_files, upload_files
+from utils.crud import get_files, delete_files, upload_files, latest_blot
 
 from models import File
 
@@ -58,4 +58,7 @@ def index(path):
         # Retreive image-related permissions for user
         can_delete = has_permission(g.current_user, "delete:ownFiles")
 
-        return render_template("dash/files.html", username=g.current_user['username'], domain=request.host, files = files, can_delete = can_delete)
+        # Get latest blotter post
+        blot = latest_blot()
+
+        return render_template("dash/files.html", username=g.current_user['username'], domain=request.host, files = files, can_delete = can_delete, blot = blot)

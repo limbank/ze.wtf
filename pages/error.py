@@ -1,21 +1,17 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, g
 from dotenv import load_dotenv
-from utils.cookies import check_cookie, user_from_cookie
+from utils.auth import authenticate
 from werkzeug.exceptions import HTTPException
 
-error = Blueprint('error', __name__, template_folder='templates')
+blueprint = Blueprint('error', __name__, template_folder='templates')
 
-# @error.app_errorhandler(Exception)
+# @blueprint.app_errorhandler(Exception)
+# @authenticate
 # def handle_error(e):
-#     # Get token for the header
-#     valid_cookie = check_cookie()
 #     username = None
-#     user_id = None
 
-#     if valid_cookie != False:
-#         current_user = user_from_cookie(valid_cookie)
-#         username = current_user['username']
-#         user_id = current_user['user_id']
+#     if  g.current_user is not None:
+#         username = g.current_user['username']
 
 #     # Doesn't work for errors on spaces due to the domain being different...
 
