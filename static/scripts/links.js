@@ -1,5 +1,4 @@
 (function(){
-    //To-Do: Clean this up
     console.log("Link script loaded");
 
     const delete_buttons = document.querySelectorAll('.delete-item');
@@ -31,7 +30,6 @@
     create_link_cancel.addEventListener('click', reset_create);
 
     create_link_confirm.addEventListener("click", async (event) => {
-        // To-Do: add input validation
         let alias = create_link_alias.value;
         let url = create_link_url.value;
 
@@ -99,7 +97,6 @@
                     notify(result.message);
                 }
                 else if (result.success === false && result.message && result.message != "") {
-                    // To-Do: make them autodisappear
                     notify(result.message);
                 }
                 else {

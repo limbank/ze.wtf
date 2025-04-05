@@ -22,20 +22,6 @@ from argon2 import PasswordHasher
 
 ph = PasswordHasher()
 
-# To-Do:
-# - Return lists of invalid or failed items during multi-deletion and multi-creation or fail whole query
-# - Impose limits on multi-deletion and multi-creation
-# - Make sure all responses return JSON only
-# - Check for duplicated within the same set of list data
-# - Allow users to download subdirectories whole
-# - Limit key creation to be done only from the site/cookie
-# - Uploading file called /tmp/test.txt will write to the root tmp folder on linux
-# - Slashes and dots somehow allowed in space names
-# - Prevent error pages from printing out full errors (leaks path)
-# - Rename is_file to something else (filevalidator for example) and force files to have extensions
-# - Stream space zip instead of saving it to blob on the frontend
-# - Temp archives not deleting
-
 # TEMP END
 
 # GENERAL START

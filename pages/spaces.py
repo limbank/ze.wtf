@@ -42,11 +42,6 @@ def catch_all(path, subdomain, domain):
 
     # Get user's space directory (slugify username)
     named_file_path = Path(user_spaces) / slugify(space_data.owner.username) / "space"
-    # Do we need secure_filename for path?
-
-    # To-Do:
-    # Figure out whether we should assume .html for unnamed links
-    # Return file router when index.html is not present ?
 
     # Render space
     try:
@@ -59,7 +54,6 @@ def catch_all(path, subdomain, domain):
                 # User requested directory root
                 return send_from_directory(named_file_path, "index.html")
             else:
-                #To-Do: If /blogs isnt found, look for blogs.html first, then index html in /blog/
                 target_file = Path.cwd() / 'uploads' / slugify(space_data.owner.username) / 'space' / path
 
                 if target_file.exists():

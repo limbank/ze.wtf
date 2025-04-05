@@ -1,5 +1,4 @@
 (function(){
-    //To-Do: Clean this up
     console.log("Notifications loaded");
 
     //Create notification div

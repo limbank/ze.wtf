@@ -1,5 +1,4 @@
 (function(){
-    //To-Do: Clean this up
     console.log("Register script loaded");
 
     const invite_input = document.getElementById("invite");

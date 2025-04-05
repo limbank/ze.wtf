@@ -1,5 +1,4 @@
 (function(){
-    //To-Do: Clean this up
     console.log("Spaces script loaded");
 
     const delete_buttons = document.querySelectorAll('.delete-item');
@@ -29,7 +28,6 @@
     create_space_cancel.addEventListener('click', reset_create);
 
     create_space_confirm.addEventListener("click", async (event) => {
-        // To-Do: add input validation
         let name = create_space_name.value;
 
         if (name == "") return;
@@ -94,7 +92,6 @@
                         notify(result.message);
                     }
                     else if (result.success === false && result.message && result.message != "") {
-                        // To-Do: make them autodisappear
                         notify(result.message);
                     }
                     else {

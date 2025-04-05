@@ -189,7 +189,6 @@ def check_cookie():
         # Validate cookie
         try:
             ph.verify(cookie.cookie_hash, cookie_details[1] + request.remote_addr)
-            # To-do, invalidate cookie if the hash verification fails
         except:
             # Cookie invalid
             return None

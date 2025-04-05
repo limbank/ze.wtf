@@ -85,7 +85,6 @@ def sort_posts(posts, lock=True):
     sorted_posts = []
 
     for post in posts:
-        #To-Do: Change this to absolute path
         with open("./changelog/" + post + ".md", "r") as f:
             file_content = f.read()
 

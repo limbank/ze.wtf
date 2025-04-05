@@ -42,7 +42,6 @@ def index(post):
 
         return Response(xml, mimetype='text/xml')
     elif post in filenames:
-        #To-Do: Change this to absolute path
         with open("./changelog/" + post + ".md", "r") as f:
             file_content = f.read()
 

@@ -1,5 +1,4 @@
 (function(){
-    //To-Do: Clean this up
     console.log("Key script loaded");
 
     const delete_buttons = document.querySelectorAll('.delete-item');
@@ -28,7 +27,6 @@
     create_key_cancel.addEventListener('click', reset_create);
 
     create_key_confirm.addEventListener("click", async (event) => {
-        // To-Do: add input validation
         let expiry = create_key_expiry.value;
         let name = create_key_name.value;
 

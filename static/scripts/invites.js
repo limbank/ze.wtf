@@ -1,5 +1,4 @@
 (function(){
-    //To-Do: Clean this up
     console.log("Loaded");
     const delete_buttons = document.querySelectorAll('.delete-item');
     const copy_buttons = document.querySelectorAll('.copy-item');
@@ -62,7 +61,6 @@
                     notify(result.message, 3000)
                 }
                 else if (result.success === false && result.message && result.message != "") {
-                    // To-Do: make them autodisappear
                     notify(result.message, 3000)
                 }
                 else {

@@ -1,5 +1,4 @@
 (function(){
-    //To-Do: Clean this up
     console.log("File script loaded");
 
     const delete_buttons = document.querySelectorAll('.delete-item');
@@ -49,7 +48,6 @@
     });
 
     upload_file_confirm.addEventListener("click", async (event) => {
-        // To-Do: add input validation
         let files = upload_file_input.files;
 
         if (files.length) {

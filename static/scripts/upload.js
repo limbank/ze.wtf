@@ -1,5 +1,4 @@
 (function(){
-    //To-Do: Clean this up
     console.log("Loaded");
     const file_input = document.getElementById("file-upload");
     const zone = document.getElementById("dropzone");

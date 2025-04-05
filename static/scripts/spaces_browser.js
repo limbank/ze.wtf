@@ -1,5 +1,4 @@
 (function(){
-    //To-Do: Clean this up
     console.log("Spaces browser script loaded");
 
     const progress = document.getElementById("progress");
@@ -466,7 +465,6 @@
     });
 
     save_directory.addEventListener("click", async (event) => {
-        // To-Do: add input validation
         let new_name = new_directory_name.value;
 
         if (new_name == "") return;
@@ -546,8 +544,6 @@
     });
 
     confirm_upload_directory.addEventListener("click", async (event) => {
-        // To-Do: add input validation
-        //upload_new_directory
         let files = upload_new_directory.files;
 
         if (files.length) {

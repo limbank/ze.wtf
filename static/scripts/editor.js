@@ -1,5 +1,4 @@
 (function(){
-    //To-Do: Clean this up
     console.log("Loaded");
 
     const progress = document.getElementById("progress");

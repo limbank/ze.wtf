@@ -12,8 +12,6 @@ def random_string(length = 5):
 
 def create_cookie(user):
     # Construct login cookie
-    # TO-DO:
-    # Factor in user-agent
     users_ip = request.remote_addr
     users_id = user.users_id
     user_agent = request.headers.get('User-Agent')
@@ -45,7 +43,6 @@ def check_cookie():
         # Validate cookie
         try:
             ph.verify(cookie.cookie_hash, cookie_details[1] + request.remote_addr)
-            # To-do, invalidate cookie if the hash verification fails
         except:
             # Cookie invalid
             return False
